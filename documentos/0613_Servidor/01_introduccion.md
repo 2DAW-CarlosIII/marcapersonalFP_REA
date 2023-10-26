@@ -22,4 +22,4 @@ De manera genérica, los componentes de **MVC** se podrían definir como sigue:
 - El **Controlador**: Responde a eventos (usualmente acciones del usuario) e invoca peticiones al 'modelo' cuando se hace alguna solicitud de información (por ejemplo, editar un documento o un registro en una base de datos). Por tanto se podría decir que el 'controlador' hace de intermediario entre la 'vista' y el 'modelo'.
 - La **Vista**: Presenta el 'modelo' y los datos preparados por el controlador al usuario de forma visual. El usuario podrá interactuar con la vista y realizar otras peticiones que se enviarán al controlador.
 
-Además, en Laravel cumple los estándares: [PSR-4](http://www.php-fig.org/psr/psr-4/) para la carga automática de clases a partir de su ruta de archivos, y [PSR-2](http://www.php-fig.org/psr/psr-2/) como guía de estilo del código fuente.
+Además, en Laravel cumple los estándares: [PSR-4](http://www.php-fig.org/psr/psr-4/) para la carga automática de clases a partir de su ruta de archivos, y [PSR-12](http://www.php-fig.org/psr/psr-12/) como guía de estilo del código fuente.
