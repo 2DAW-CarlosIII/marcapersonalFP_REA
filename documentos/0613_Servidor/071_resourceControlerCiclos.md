@@ -17,7 +17,7 @@ Para poder utilizar posteriormente el método `create()` del modelo, deberemos, 
         'codCiclo',
         'codFamilia',
         'familia_id',
-        'grado', 30,
+        'grado',
         'nombre'
     ];
 
