@@ -91,7 +91,7 @@ use Illuminate\Support\Str;
 
 El envío de correo electrónico no tiene por qué ser complicado. _Laravel_ proporciona una _API_ de correo electrónico limpia y sencilla alimentada por el popular componente _Symfony Mailer_. _Laravel_ y _Symfony Mailer_ proporcionan controladores para enviar correo electrónico a través de **_SMTP_**, _Mailgun_, _Postmark_, _Amazon SES_ y _sendmail_, lo que le permite comenzar rápidamente a enviar correo a través de un servicio local o en la nube de su elección.
 
-Nosotros utilizaremos **Gmail** como servidor de correo a través de **_SMTP_**. Para ello, necesitaremos modificar nuestro archivo `.env.example` añadiendo las siguientes variables de entorno:
+Nosotros utilizaremos **Gmail** como servidor de correo a través de **_SMTP_**. Para ello, necesitaremos modificar las siguientes variables de entorno en nuestro archivo `.env`:
 
 ```bash
 MAIL_MAILER=smtp
@@ -104,7 +104,7 @@ MAIL_FROM_ADDRESS=nre@alu.murciaeduca.es
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
-> Añade también las variables de entorno anteriores en el archivo `.env` y modifica el valor de `MAIL_USERNAME` y `MAIL_FROM_ADDRESS` con tus credenciales de _@alu.murciaeduca.es_. El valor de la variable `MAIL_PASSWORD` será la contraseña de aplicación que obtendrás a continuación.
+> Modifica el valor de `MAIL_USERNAME` y `MAIL_FROM_ADDRESS` con tus credenciales de _@alu.murciaeduca.es_. El valor de la variable `MAIL_PASSWORD` será la contraseña de aplicación que obtendrás a continuación.
 
 ## Configurando nuestra cuenta de Google
 
