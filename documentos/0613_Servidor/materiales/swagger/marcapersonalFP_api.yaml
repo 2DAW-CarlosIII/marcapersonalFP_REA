@@ -2048,6 +2048,12 @@ components:
         nif:
           type: string
           example: B-123123
+        nombre:
+          type: string
+          example: Mi Empresa
+        nif:
+          type: string
+          example: B-123123
         email:
           type: string
           example: empresa@marcapersonalfp.es

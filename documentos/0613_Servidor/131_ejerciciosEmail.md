@@ -16,10 +16,9 @@ Debemos crear un sistema de autenticación basado en tokens para las empresas. C
 
 Cuando una empresa está autenticada, podrá acceder al currículo de un estudiante. Pero, si intenta descargar el currículo en _PDF_, se le debería mostrar un mensaje indicando que se le enviará un correo electrónico al estudiante para solicitar permiso.
 
-En ese momento, se le enviará un correo electrónico al estudiante con un enlace para que pueda autorizar la descarga del currículo. Ese correo electrónico incluirá dos enlaces.
+En ese momento, se le enviará un correo electrónico al estudiante con un enlace para que pueda autorizar la descarga del currículo. Este enlace lanzará un `GET` a la ruta `/api/v1/curriculos/{idEmpresa}/autorizar`.
 
-1.- El primer enlace le llevará hasta el `show` de la empresa que ha solicitado visualizar el currículo.
-2.- El segundo enlace será el de autorización de la visualización del currículo. Este enlace lanzará un `GET` a la ruta `/api/v1/curriculos/{idCurriculo}/autorizar/{idEmpresa}`.
+En ese mismo correo también se le mostrarán los datos (nombre y nif) de la empresa que ha solicitado el currículo.
 
 ## Ejercicio 3
 
@@ -29,16 +28,16 @@ Esto se debe hacer con la consiguiente creación del método `autorizar` del con
 
 Este método sólo lo podrá ejecutar el estudiante propietario del currículo.
 
-Como respuesta a la autorización, se le debería enviar un correo electrónico a la empresa informándole de que el estudiante ha autorizado la visualización del currículo y también incluirá un enlace para que pueda descargar el currículo en _PDF_: `GET /api/v1/curriculos/{idCurriculo}/descargar/{md5_file}`.
+Como respuesta a la autorización, se le debería enviar un correo electrónico a la empresa informándole de que el estudiante ha autorizado la visualización del currículo y también incluirá un enlace para que pueda descargar el currículo en _PDF_: `GET /api/v1/curriculos/{idCurriculo}/{md5_file}`.
 
-> En este momento, no vamos generar el código necesario para saber qué empresas han sido autorizadas para ver qué currículos, por eso, vamos a permitir que elusuario que disponga del valor correspondiente a la ejecución de la función [`md5_file`](https://www.php.net/manual/es/function.md5-file.php) sobre el fichero almacenado en `storage/app/repoZips` pueda descargar el currículo.
+> En este momento, no vamos generar el código necesario para saber qué empresas han sido autorizadas para ver qué currículos, por eso, vamos a permitir que elusuario que disponga del valor correspondiente a la ejecución de la función [`md5_file`](https://www.php.net/manual/es/function.md5-file.php) sobre el fichero almacenado en `storage/app/curriculos` pueda descargar el currículo.
 
 A este correo electrónico se le debería añadir también el enlace del [capítulo anterior](./13_email.md) con el token de acceso a la aplicación.
 
 ## Ejercicio 4
 
-Implementar el método `descargar` del controlador `API\CurriculoController` que permita descargar el currículo en _PDF_.
+Implementar el método `getCurriculoByMd5` del controlador `API\CurriculoController` que permita descargar el currículo en _PDF_.
 
-El método debe comprobar que el valor del parámetro `md5_file` enviado coincide con el obtenido al volver a aplicarla función [`md5_file`](https://www.php.net/manual/es/function.md5-file.php) sobre el fichero almacenado en `storage/app/repoZips`.
+El método debe comprobar que el valor del parámetro `md5_file` enviado coincide con el obtenido al volver a aplicarla función [`md5_file`](https://www.php.net/manual/es/function.md5-file.php) sobre el fichero almacenado en `storage/app/curriculos`.
 
 Este método lo deberá poder ejecutar una empresa autenticada.

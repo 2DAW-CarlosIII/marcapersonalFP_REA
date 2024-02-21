@@ -70,13 +70,14 @@ protected static function booted()
     static::created(function ($empresa) {
         $empresa->token = Str::random(60);
 
-        $empresa->user()->create([
-            'name' => Str::slug($empresa->nombre),
-            'nombre' => $empresa->nombre,
+        $usuario = User::create([
+            'name' => Str::slug($empresa->nif),
+            'nombre' => substr($empresa->nombre, 0, 50),
             'email' => $empresa->email,
             'password' => bcrypt('token'),
         ]);
 
+        $empresa->user()->associate($usuario);
         $empresa->save();
     });
 }
@@ -190,7 +191,7 @@ Posteriormente, incluimos el contenido en el archivo `resources/views/emails/emp
     <li>Teléfono: {{ $empresa->telefono }}</li>
 </ul>
 <p>Para visitarnos, por favor, haga clic en el siguiente enlace:
-    <a href="{{ url('empresas/acceso', $empresa->token) }}">Registro en Marca Personal F.P.</a></p>
+    <a href="{{ url('api/v1/empresas/acceso', $empresa->token) }}">Registro en Marca Personal F.P.</a></p>
 </p>
 ```
 
@@ -204,13 +205,14 @@ Para enviar el correo electrónico, podemos usar el método `send()` del facade 
     static::created(function ($empresa) {
         $empresa->token = Str::random(60);
 
-        $empresa->user()->create([
-            'name' => Str::slug($empresa->nombre),
-            'nombre' => $empresa->nombre,
+        $usuario = User::create([
+            'name' => Str::slug($empresa->nif),
+            'nombre' => substr($empresa->nombre, 0, 50),
             'email' => $empresa->email,
             'password' => bcrypt('token'),
         ]);
 
+        $empresa->user()->associate($usuario);
         $empresa->save();
 +         Mail::to($empresa->email)->send(new NuevaEmpresaRegistrada($empresa));
     });
