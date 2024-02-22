@@ -864,7 +864,7 @@ paths:
       responses:
         '400':
           description: Invalid curriculo value
-  /curriculos/pdf/{id}:
+  /curriculos/{id}/pdf:
     get:
       tags:
         - curriculo
@@ -909,7 +909,7 @@ paths:
           description: Invalid ID supplied
         '404':
           description: curriculo not found
-  /curriculos/pdf/{id}/{md5}:
+  /curriculos/{id}/pdf/{md5}:
     get:
       tags:
         - curriculo
@@ -1624,7 +1624,7 @@ paths:
       responses:
         '400':
           description: Invalid proyecto value
-  /copyrepo/{user}/{reponame}:
+  /proyectos/copyrepo/{user}/{reponame}:
     post:
       tags:
         - proyecto
@@ -1822,7 +1822,7 @@ paths:
       responses:
         '400':
           description: Invalid reconocimiento value
-  /reconocimientos/validar/{id}:
+  /reconocimientos/{id}/validar:
     put:
       tags:
         - reconocimiento
