@@ -51,7 +51,7 @@ servers:
     description: Servidor localhost
   - url: http://marcapersonalFP.test/api/v1
     variables: {}
-    description: Entorno de producción Carlos III
+    description: Entorno de desarrollo local
   - url: https://marcapersonalFP.cifpcarlos3.es/api/v1
     variables: {}
     description: Entorno de producción
@@ -213,8 +213,7 @@ paths:
           description: texto a buscar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _start
           in: query
           description: posición del registro inicial a mostrar
@@ -234,8 +233,7 @@ paths:
           description: columna por la que ordenar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _order
           in: query
           description: dirección de la ordenación
@@ -381,8 +379,7 @@ paths:
           description: texto a buscar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _start
           in: query
           description: posición del registro inicial a mostrar
@@ -402,8 +399,7 @@ paths:
           description: columna por la que ordenar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _order
           in: query
           description: dirección de la ordenación
@@ -549,8 +545,7 @@ paths:
           description: texto a buscar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _start
           in: query
           description: posición del registro inicial a mostrar
@@ -570,8 +565,7 @@ paths:
           description: columna por la que ordenar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _order
           in: query
           description: dirección de la ordenación
@@ -717,8 +711,7 @@ paths:
           description: texto a buscar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _start
           in: query
           description: posición del registro inicial a mostrar
@@ -738,8 +731,7 @@ paths:
           description: columna por la que ordenar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _order
           in: query
           description: dirección de la ordenación
@@ -872,6 +864,80 @@ paths:
       responses:
         '400':
           description: Invalid curriculo value
+  /curriculos/pdf/{id}:
+    get:
+      tags:
+        - curriculo
+      summary: Descarga del currículo PDF de un estudiante
+      description: Descarga del currículo PDF de un estudiante.
+        Si lo solicita una empresa, se envía un email al estudiante para que autorice
+      operationId: downloadPDFCurriculoById
+      parameters:
+        - name: id
+          in: path
+          description: ID del curriculo a descargar
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: curriculo not found
+  /curriculos/{id}/autorizar:
+    get:
+      tags:
+        - curriculo
+      summary: Autoriza la descarga del currículo PDF de un estudiante
+      description: Un estudiante autoriza que una empresa descargue su currículo.
+      operationId: autorizeDownloadPDFCurriculo
+      parameters:
+        - name: id
+          in: path
+          description: ID de la empresa autorizada
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: curriculo not found
+  /curriculos/pdf/{id}/{md5}:
+    get:
+      tags:
+        - curriculo
+      summary: Descarga del currículo PDF de un estudiante
+      description: Una Empresa, a la que se le ha facilitado el md5 de un currículo,
+        se le permite la descarga de ese PDF
+      operationId: downloadPDFCurriculoByMd5
+      parameters:
+        - name: id
+          in: path
+          description: ID del curriculo a descargar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: md5
+          in: path
+          description: md5 del fichero PDF a descargar
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: curriculo not found
   /empresas:
     get:
       tags:
@@ -885,8 +951,7 @@ paths:
           description: texto a buscar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _start
           in: query
           description: posición del registro inicial a mostrar
@@ -906,8 +971,7 @@ paths:
           description: columna por la que ordenar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _order
           in: query
           description: dirección de la ordenación
@@ -1040,6 +1104,28 @@ paths:
       responses:
         '400':
           description: Invalid empresa value
+  /empresas/acceso/{token}:
+    get:
+      tags:
+        - empresa
+      summary: Autenticación de una empresa con token
+      description: El token se le facilita por correo electrónico cuando un docente
+        registra la empresa en el sistema
+      operationId: accesoEmpresaByToken
+      parameters:
+        - name: token
+          in: path
+          description: ID de la empresa a devolver
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Home
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: empresa not found
   /familias_profesionales:
     get:
       tags:
@@ -1053,8 +1139,7 @@ paths:
           description: texto a buscar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _start
           in: query
           description: posición del registro inicial a mostrar
@@ -1074,8 +1159,7 @@ paths:
           description: columna por la que ordenar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _order
           in: query
           description: dirección de la ordenación
@@ -1221,8 +1305,7 @@ paths:
           description: texto a buscar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _start
           in: query
           description: posición del registro inicial a mostrar
@@ -1242,8 +1325,7 @@ paths:
           description: columna por la que ordenar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _order
           in: query
           description: dirección de la ordenación
@@ -1389,8 +1471,7 @@ paths:
           description: texto a buscar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _start
           in: query
           description: posición del registro inicial a mostrar
@@ -1410,8 +1491,7 @@ paths:
           description: columna por la que ordenar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _order
           in: query
           description: dirección de la ordenación
@@ -1544,6 +1624,38 @@ paths:
       responses:
         '400':
           description: Invalid proyecto value
+  /copyrepo/{user}/{reponame}:
+    post:
+      tags:
+        - proyecto
+      summary: Copia un repositorio de GitHub al repositorio global de MarcaPersonalFP
+      description: Copia un repositorio de GitHub al repositorio global de MarcaPersonalFP
+      operationId: copyRepo
+      parameters:
+        - name: user
+          in: path
+          description: nombre de usuario de GitHub en el que se encuentra el repositorio
+          required: true
+          schema:
+            type: string
+        - name: reponame
+          in: path
+          description: nombre del repositorio a copiar
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proyecto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Proyecto'
+        '405':
+          description: Invalid input
   /reconocimientos:
     get:
       tags:
@@ -1557,8 +1669,7 @@ paths:
           description: texto a buscar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _start
           in: query
           description: posición del registro inicial a mostrar
@@ -1578,8 +1689,7 @@ paths:
           description: columna por la que ordenar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _order
           in: query
           description: dirección de la ordenación
@@ -1712,6 +1822,33 @@ paths:
       responses:
         '400':
           description: Invalid reconocimiento value
+  /reconocimientos/validar/{id}:
+    put:
+      tags:
+        - reconocimiento
+      summary: Un docente valida el reconocimiento de un estudiante.
+      description: ''
+      operationId: validaReconocimiento
+      parameters:
+        - name: id
+          in: path
+          description: ID del reconocimiento a actualizar
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reconocimiento'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Reconocimiento'
+        '405':
+          description: Invalid input
   /users:
     get:
       tags:
@@ -1725,8 +1862,7 @@ paths:
           description: texto a buscar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _start
           in: query
           description: posición del registro inicial a mostrar
@@ -1746,8 +1882,7 @@ paths:
           description: columna por la que ordenar
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: _order
           in: query
           description: dirección de la ordenación
@@ -2048,18 +2183,17 @@ components:
         nif:
           type: string
           example: B-123123
-        nombre:
-          type: string
-          example: Mi Empresa
-        nif:
-          type: string
-          example: B-123123
         email:
           type: string
           example: empresa@marcapersonalfp.es
         token:
           type: string
           example: 43l2jkh2l4jk3hrjkllqk
+        user_id:
+          $ref: '#/components/schemas/User'
+        nombre:
+          type: string
+          example: Mi Empresa
       xml:
         name: empresa
     Idioma:
