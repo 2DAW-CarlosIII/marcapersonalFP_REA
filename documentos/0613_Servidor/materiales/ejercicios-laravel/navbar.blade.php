@@ -7,7 +7,7 @@
       <li @if (Route::currentRouteName() == 'proyectos')
           class="current"
       @endif
-          style="white-space: nowrap;"><a href="/tfcs">Proyectos</a></li>
+          style="white-space: nowrap;"><a href="/proyectos">Proyectos</a></li>
       <li @if (Route::currentRouteName() == 'curriculos')
           class="current"
       @endif

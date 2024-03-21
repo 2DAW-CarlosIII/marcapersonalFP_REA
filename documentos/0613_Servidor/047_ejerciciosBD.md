@@ -51,7 +51,7 @@ Ahora vamos a proceder a rellenar la tabla de la base de datos con los datos ini
     $this->command->info('Tabla catálogo inicializada con datos!');
     }
 ```
-2. Movemos el array de proyectos que se facilitaba en los materiales y que habíamos copiado dentro del controlador `TfcsController` a la clase de _semillas_ (`DatabaseSeeder.php`), guardándolo como variable privada de la clase.
+2. Movemos el array de proyectos que se facilitaba en los materiales y que habíamos copiado dentro del controlador `ProyectosController` a la clase de _semillas_ (`DatabaseSeeder.php`), guardándolo como variable privada de la clase.
 3. Dentro del nuevo método `seedProyectos()` realizamos las siguientes acciones:
     1. En primer lugar borramos el contenido de la tabla `proyectos` con `Proyecto::truncate();`.
     1. Y, a continuación, añadimos el siguiente código:
@@ -74,7 +74,7 @@ Ahora vamos a proceder a rellenar la tabla de la base de datos con los datos ini
 
 ## Ejercicio 4 - Uso de la base de datos
 
-En este último ejercicio, vamos a actualizar los métodos del controlador `TfcsController` para que obtengan los datos desde la base de datos. Seguiremos los siguientes pasos:
+En este último ejercicio, vamos a actualizar los métodos del controlador `ProyectosController` para que obtengan los datos desde la base de datos. Seguiremos los siguientes pasos:
 
 1. Modificar el método `getIndex()` para que obtenga toda la lista de proyectos desde la base de datos usando el modelo Proyecto y que se pase a la vista ese listado.
 1. Modificar el método `getShow()` para que obtenga el proyecto pasado por parámetro usando el método `findOrFail()` y se pase a la vista dicho proyecto.
@@ -86,7 +86,7 @@ Ya no necesitaremos más el _array_ de proyectos (`$arrayProyectos`) que habíam
 
 Ahora tendremos que actualizar las vistas para que, en lugar de acceder a los datos del _array_, los obtenga del objeto con el proyecto. Para esto, cambiaremos en todos los sitios donde hayamos puesto `$proyecto['campo']` por `$proyecto->campo`.
 
-Además, en la vista `tfcs/index.blade.php`, en vez de utilizar el índice del _array_ (`$key`) como identificador para crear el enlace a `tfcs/show/{id}`, tendremos que utilizar el campo `id` del proyecto (`$proyecto->id`). Lo mismo en la vista `tfcs/show.blade.php`, para generar el enlace de editar proyecto tendremos que añadir el identificador del proyecto a la ruta `tfcs/edit`.
+Además, en la vista `proyectos/index.blade.php`, en vez de utilizar el índice del _array_ (`$key`) como identificador para crear el enlace a `proyectos/show/{id}`, tendremos que utilizar el campo `id` del proyecto (`$proyecto->id`). Lo mismo en la vista `proyectos/show.blade.php`, para generar el enlace de editar proyecto tendremos que añadir el identificador del proyecto a la ruta `proyectos/edit`.
 
 ## Comprobar el ejercicio
 

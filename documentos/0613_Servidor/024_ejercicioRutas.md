@@ -13,10 +13,10 @@ Método | Ruta | Texto a mostrar
 GET | `/` | Pantalla principal
 GET | `login` | Login usuario
 GET | `logout` | Logout usuario
-GET | `tfcs` | Listado proyectos
-GET | `tfcs/show/{id}` | Vista detalle proyecto {id}
-GET | `tfcs/create` | Añadir proyecto
-GET | `tfcs/edit/{id}` | Modificar proyecto {id}
+GET | `proyectos` | Listado proyectos
+GET | `proyectos/show/{id}` | Vista detalle proyecto {id}
+GET | `proyectos/create` | Añadir proyecto
+GET | `proyectos/edit/{id}` | Modificar proyecto {id}
 GET | `perfil/{id}` | Visualizar el currículo de {id}
 
 Debemos asegurarnos de que todos los parámetros `{id}` sean números naturales.

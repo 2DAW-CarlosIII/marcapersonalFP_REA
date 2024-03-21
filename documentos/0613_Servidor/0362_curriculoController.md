@@ -140,11 +140,11 @@ También incluiremos dos botones:
 - uno que nos llevará a editar el `curriculo`,
 - otro para volver al listado de `curriculos`.
 
-Para realizar lo anterior, adapta la vista `tfcs.show`.
+Para realizar lo anterior, adapta la vista `proyectos.show`.
 
 ### Método CurriculoController@getCreate
 
-Este método devuelve la vista `curriculos.create` para añadir una nuevo `curriculo`. Para crear este formulario en la vista correspondiente nos podemos basar en el contenido de la vista `tfcs.create`. En el caso de `curriculo`, tendrá que tener los siguientes campos:
+Este método devuelve la vista `curriculos.create` para añadir una nuevo `curriculo`. Para crear este formulario en la vista correspondiente nos podemos basar en el contenido de la vista `proyectos.create`. En el caso de `curriculo`, tendrá que tener los siguientes campos:
 
 Label | Name | Tipo de campo
 ------|------|--------------

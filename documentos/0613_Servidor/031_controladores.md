@@ -6,7 +6,7 @@ Como ya vimos en la [sección de introducción](./01_introduccion.md), los _cont
 
 ## Controlador básico
 
-Los controladores se almacenan en _ficheros PHP_ en la carpeta `app/Http/Controllers` y normalmente se les añade el sufijo _Controller_, por ejemplo `UserController.php` o `TfcsController.php`. A continuación se incluye un ejemplo básico de un controlador almacenado en el fichero `app/Http/Controllers/UserController.php`:
+Los controladores se almacenan en _ficheros PHP_ en la carpeta `app/Http/Controllers` y normalmente se les añade el sufijo _Controller_, por ejemplo `UserController.php` o `ProyectosController.php`. A continuación se incluye un ejemplo básico de un controlador almacenado en el fichero `app/Http/Controllers/UserController.php`:
 
 ```php
 <?php
@@ -47,10 +47,10 @@ En lugar de pasar una función como segundo parámetro, tenemos que escribir una
 Como hemos visto los controladores se almacenan dentro de la carpeta app/Http/Controllers como ficheros PHP. Para crear uno nuevo bien lo podemos hacer a mano y rellenar nosotros todo el código, o podemos utilizar el siguiente comando de Artisan que nos adelantará todo el trabajo:
 
 ```bash
-php artisan make:controller TfcsController
+php artisan make:controller ProyectosController
 ```
 
-Este comando creará el controlador `TfcsController` dentro de la carpeta `app/Http/Controllers` y lo completará con el código básico que hemos visto antes.
+Este comando creará el controlador `ProyectosController` dentro de la carpeta `app/Http/Controllers` y lo completará con el código básico que hemos visto antes.
 
 ## Controladores y espacios de nombres
 

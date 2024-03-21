@@ -160,11 +160,11 @@ También incluiremos dos botones:
 - uno que nos llevará a editar el `user`,
 - otro para volver al listado de `users`.
 
-Para realizar lo anterior, adapta la vista `tfcs.show`.
+Para realizar lo anterior, adapta la vista `proyectos.show`.
 
 ### Método UserController@getCreate
 
-Este método devuelve la vista `users.create` para añadir una nuevo `user`. Para crear este formulario en la vista correspondiente nos podemos basar en el contenido de la vista `tfcs.create`. En el caso de `user`, tendrá que tener los siguientes campos:
+Este método devuelve la vista `users.create` para añadir una nuevo `user`. Para crear este formulario en la vista correspondiente nos podemos basar en el contenido de la vista `proyectos.create`. En el caso de `user`, tendrá que tener los siguientes campos:
 
 Label | Name | Tipo de campo
 ------|------|--------------

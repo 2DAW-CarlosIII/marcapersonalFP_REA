@@ -17,7 +17,7 @@ class ControllersExerciseTest extends TestCase
             $response = $this->get('/');
 
             $response
-                ->assertRedirect('/tfcs');
+                ->assertRedirect('/proyectos');
 
         /**
          * login test.
@@ -41,7 +41,7 @@ class ControllersExerciseTest extends TestCase
         /**
          * proyectos index test.
          */
-            $response = $this->get('/tfcs');
+            $response = $this->get('/proyectos');
             $nombres = [
                 'Tecnologías de la Información',
                 'Diseño Gráfico',
@@ -57,36 +57,36 @@ class ControllersExerciseTest extends TestCase
 
             $response
             ->assertStatus(200)
-            ->assertViewIs('tfcs.index')
+            ->assertViewIs('proyectos.index')
             ->assertSeeTextInOrder($nombres, $escaped = true);
 
         /**
          * proyectos show test.
          */
-            $response = $this->get("/tfcs/show/1");
+            $response = $this->get("/proyectos/show/1");
 
             $response
             ->assertStatus(200)
-            ->assertViewIs('tfcs.show')
+            ->assertViewIs('proyectos.show')
             ->assertSeeText('Diseño Gráfico', $escaped = true);
 
-            $response = $this->get("/tfcs/show/2");
+            $response = $this->get("/proyectos/show/2");
 
             $response
             ->assertSeeText('Electrónica', $escaped = true);
 
-            $response = $this->get("/tfcs/show/A");
+            $response = $this->get("/proyectos/show/A");
             $response->assertNotFound();
 
         /**
          * proyectos create test.
          */
             $value = 'Añadir proyecto';
-            $response = $this->get('/tfcs/create');
+            $response = $this->get('/proyectos/create');
 
             $response
             ->assertStatus(200)
-            ->assertViewIs('tfcs.create')
+            ->assertViewIs('proyectos.create')
             ->assertSeeText($value, $escaped = true);
 
         /**
@@ -94,14 +94,14 @@ class ControllersExerciseTest extends TestCase
          */
             $id = rand(1, 10);
             $value = "Modificar proyecto";
-            $response = $this->get("/tfcs/edit/$id");
+            $response = $this->get("/proyectos/edit/$id");
 
             $response
             ->assertStatus(200)
-            ->assertViewIs('tfcs.edit')
+            ->assertViewIs('proyectos.edit')
             ->assertSeeText($value, $escaped = true);
 
-            $response = $this->get("/tfcs/edit/A");
+            $response = $this->get("/proyectos/edit/A");
             $response->assertNotFound();
 
         /**

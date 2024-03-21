@@ -37,9 +37,9 @@ git push -u origin master
 
 ## Colaborando en el repositorio
 
-Todos los miembros del equipo deberán acceder al repositorio base de _GitHub_ y pulsar sobre el botón `Fork`, que encontrarás a la derecha de la pantalla, para hacer un `fork` del repositorio base en tu cuenta de _GitHub_.
+Todos los miembros del equipo deberán acceder al repositorio base de _GitHub_ y pulsar sobre el botón ![Botón Fork](./images/botonFork.png), que encontrarás a la derecha de la pantalla, para hacer un `fork` del repositorio base en tu cuenta de _GitHub_.
 
-A continuación, se descargarán el código fuente al equipo personal. Para ello, copia el enlace que aparece al pulsar sobre el botón **<> Code**
+A continuación, se descargarán el código fuente al equipo personal. Para ello, copia el enlace que aparece al pulsar sobre el botón ![Botón Code](./images/botonCode.png)
 
 Desde el directorio _Laravel_, deberás ejecutar el siguiente comando:
 
@@ -113,6 +113,12 @@ Accediendo a _phpMyAdmin_ crearemos un usuario `'marcapersonalfp'@'%'`, con cont
 
 ```
 CREATE USER 'marcapersonalfp'@'%' IDENTIFIED VIA mysql_native_password USING PASSWORD('marcapersonalfp');GRANT USAGE ON *.* TO 'marcapersonalfp'@'%' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;CREATE DATABASE IF NOT EXISTS `marcapersonalfp`;GRANT ALL PRIVILEGES ON `marcapersonalfp`.* TO 'marcapersonalfp'@'%';GRANT ALL PRIVILEGES ON `marcapersonalfp\_%`.* TO 'marcapersonalfp'@'%';
+```
+
+Para asegurarnos de que las tablas base necesarias para visualizar la página están creadas, ejecutaremos el siguiente comando _Artisan_:
+
+```bash
+php artisan migrate
 ```
 
 ## Desarrollo de la aplicación
