@@ -161,9 +161,15 @@ La primera vez que se ejecute este comando tardará bastante puesto que tiene qu
 1. Acceder a [phpMyAdmin](http://localhost:8081/)
 
     - Servidor _mariadb_ y usuario _root_/_root_.
+        - ![Acceso a phpMyAdmin](./images/logInPhpMyAdmin.png)
     - Acceder a la pestaña _Cuentas de usuario_ y, una vez en esa pestaña, seleccionar la opción _Agregar cuenta de usuario_.
+        - ![Seleccionar la opción de menú Cuentas de Usuario](./images/seleccionarCuentasUsuario.png)
     - Las credenciales del nuevo usuario serán _marcapersonalfp_ tanto para el nombre de usuario como para la contraseña.
+        - ![Seleccionar Agregar cuenta de usuario](./images/agregarCuentaUsuario.png)
     - Antes de hacer click en el botón _Continuar_ seleccionar la casilla _Crear base de datos con el mismo nombre y otorgar todos los privilegios_.
+        - ![Crear usuario y base de datos marcapersonalfp y otorgar todos los privilegios](./images/credencialesUsuarioBD.png)
+    - El resultado exitoso se muestra en la siguiente imagen
+        - ![Usuario creado correctamente](./images/usuarioCreado.png)
 
     Alternativamente, podemos acceder a la pestaña de SQL de phpMyAdmin o al contenedor de MariaDB y ejecutar las siguientes sentencias:
 
@@ -187,6 +193,14 @@ La primera vez que se ejecute este comando tardará bastante puesto que tiene qu
     DB_PASSWORD=marcapersonalfp
     ```
 
+3. Debido a que las sesiones, en la versión 11 de _Laravel_, se guardan en la base de datos, es necesario ejecutar las migraciones para que se cree la tabla `sessions` en la base de datos. Para ello, ejecutaremos el siguiente comando:
+
+    ```bash
+    php artisan migrate
+    ```
+
+> Más adelante, en el apartado [Migraciones](./042_migraciones.md), veremos cómo gestionamos las tablas de la Base de Datos a través de las migraciones.
+
 ### Definir un servidor virtual en nginx
 
 Para cada aplicación, generaremos un servidor virtual. En este caso, nuestro servidor responderá a la url http://marcapersonalfp.test. Para ello:
@@ -204,7 +218,7 @@ Para cada aplicación, generaremos un servidor virtual. En este caso, nuestro se
     127.0.0.1  marcapersonalfp.test
     ```
 
-4. Reiniciaremos el contenedor de NGINX desde el directorio `laradock`
+4. Reiniciaremos el contenedor de NGINX, **desde el directorio `laradock`**
 
     ```bash
     docker compose restart nginx
