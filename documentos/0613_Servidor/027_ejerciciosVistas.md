@@ -70,10 +70,10 @@ Vista | Carpeta | Ruta asociada
 ------|---------|--------------
 home.blade.php | resources/views/ | /
 login.blade.php | resources/views/auth/ | login
-index.blade.php | resources/views/catalog/ | /catalog
-show.blade.php | resources/views/catalog/ | /catalog/show/{id}
-create.blade.php | resources/views/catalog/ | /catalog/create
-edit.blade.php | resources/views/catalog/ | /catalog/edit/{id}
+index.blade.php | resources/views/tfcs/ | /tfcs
+show.blade.php | resources/views/tfcs/ | /tfcs/show/{id}
+create.blade.php | resources/views/tfcs/ | /tfcs/create
+edit.blade.php | resources/views/tfcs/ | /tfcs/edit/{id}
 
 Creamos una vista separada para cada una de las rutas excepto para la ruta `logout`, la cual no tendrá ninguna vista. _Podemos utilizar artisan para crear cada una de las vistas._
 

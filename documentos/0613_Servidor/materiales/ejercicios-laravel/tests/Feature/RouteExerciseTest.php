@@ -38,7 +38,7 @@ class RouteExerciseTest extends TestCase
      * proyectos index test.
      */
         $value = 'Listado proyectos';
-        $response = $this->get('/catalog');
+        $response = $this->get('/tfcs');
 
         $response->assertStatus(200)->assertSeeText($value, $escaped = true);
 
@@ -47,18 +47,18 @@ class RouteExerciseTest extends TestCase
      */
         $id = rand(1, 10);
         $value = "Vista detalle proyecto $id";
-        $response = $this->get("/catalog/show/$id");
+        $response = $this->get("/tfcs/show/$id");
 
         $response->assertStatus(200)->assertSeeText($value, $escaped = true);
 
-        $response = $this->get("/catalog/show/" . chr($id));
+        $response = $this->get("/tfcs/show/" . chr($id));
         $response->assertNotFound();
 
     /**
      * proyectos create test.
      */
         $value = 'Añadir proyecto';
-        $response = $this->get('/catalog/create');
+        $response = $this->get('/tfcs/create');
 
         $response->assertStatus(200)->assertSeeText($value, $escaped = true);
 
@@ -67,11 +67,11 @@ class RouteExerciseTest extends TestCase
      */
         $id = rand(1, 10);
         $value = "Modificar proyecto $id";
-        $response = $this->get("/catalog/edit/$id");
+        $response = $this->get("/tfcs/edit/$id");
 
         $response->assertStatus(200)->assertSeeText($value, $escaped = true);
 
-        $response = $this->get("/catalog/edit/" . chr($id));
+        $response = $this->get("/tfcs/edit/" . chr($id));
         $response->assertNotFound();
 
     /**

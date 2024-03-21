@@ -17,7 +17,7 @@ class ControllersExerciseTest extends TestCase
             $response = $this->get('/');
 
             $response
-                ->assertRedirect('/catalog');
+                ->assertRedirect('/tfcs');
 
         /**
          * login test.
@@ -41,7 +41,7 @@ class ControllersExerciseTest extends TestCase
         /**
          * proyectos index test.
          */
-            $response = $this->get('/catalog');
+            $response = $this->get('/tfcs');
             $nombres = [
                 'Tecnologías de la Información',
                 'Diseño Gráfico',
@@ -57,36 +57,36 @@ class ControllersExerciseTest extends TestCase
 
             $response
             ->assertStatus(200)
-            ->assertViewIs('catalog.index')
+            ->assertViewIs('tfcs.index')
             ->assertSeeTextInOrder($nombres, $escaped = true);
 
         /**
          * proyectos show test.
          */
-            $response = $this->get("/catalog/show/1");
+            $response = $this->get("/tfcs/show/1");
 
             $response
             ->assertStatus(200)
-            ->assertViewIs('catalog.show')
+            ->assertViewIs('tfcs.show')
             ->assertSeeText('Diseño Gráfico', $escaped = true);
 
-            $response = $this->get("/catalog/show/2");
+            $response = $this->get("/tfcs/show/2");
 
             $response
             ->assertSeeText('Electrónica', $escaped = true);
 
-            $response = $this->get("/catalog/show/A");
+            $response = $this->get("/tfcs/show/A");
             $response->assertNotFound();
 
         /**
          * proyectos create test.
          */
             $value = 'Añadir proyecto';
-            $response = $this->get('/catalog/create');
+            $response = $this->get('/tfcs/create');
 
             $response
             ->assertStatus(200)
-            ->assertViewIs('catalog.create')
+            ->assertViewIs('tfcs.create')
             ->assertSeeText($value, $escaped = true);
 
         /**
@@ -94,14 +94,14 @@ class ControllersExerciseTest extends TestCase
          */
             $id = rand(1, 10);
             $value = "Modificar proyecto";
-            $response = $this->get("/catalog/edit/$id");
+            $response = $this->get("/tfcs/edit/$id");
 
             $response
             ->assertStatus(200)
-            ->assertViewIs('catalog.edit')
+            ->assertViewIs('tfcs.edit')
             ->assertSeeText($value, $escaped = true);
 
-            $response = $this->get("/catalog/edit/A");
+            $response = $this->get("/tfcs/edit/A");
             $response->assertNotFound();
 
         /**

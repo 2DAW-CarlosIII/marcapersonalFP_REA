@@ -172,17 +172,17 @@ protected $middlewareAliases = [
 Una vez registrado nuestro middleware ya lo podemos utilizar en el fichero de rutas `app/Http/routes.php`` mediante la clave o nombre asignado, por ejemplo:
 
 ```php
-Route::prefix('catalog')->middleware('id_mayor_de_10')->group(function () {
+Route::prefix('tfcs')->middleware('id_mayor_de_10')->group(function () {
     Route::get('/', ...
 });
 ```
 
-En el ejemplo anterior hemos asignado el middleware con clave `id_mayor_de_10` al grupo de rutas cuyo prefijo es `catalog`. Si la petición supera el filtro entonces se ejecutara la función asociada.
+En el ejemplo anterior hemos asignado el middleware con clave `id_mayor_de_10` al grupo de rutas cuyo prefijo es `tfcs`. Si la petición supera el filtro entonces se ejecutara la función asociada.
 
 Si queremos asociar varios middleware con una ruta simplemente tenemos que añadir un _array_ con las claves. Los filtros se ejecutarán en el orden indicado en dicho _array_:
 
 ```php
-Route::prefix('catalog')->middleware(['auth', 'id_mayor_de_10'])->group(function () {
+Route::prefix('tfcs')->middleware(['auth', 'id_mayor_de_10'])->group(function () {
     Route::get('/', ...
 });
 ```

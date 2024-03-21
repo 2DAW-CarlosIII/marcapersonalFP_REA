@@ -1,6 +1,6 @@
 # 2.3. Rutas
 
-Las rutas de nuestra aplicación aplicación se tienen que definir en el fichero `routes/web.php`. Este es el punto centralizado para la definición de rutas y cualquier ruta no definida en este fichero no será válida, generado una excepción (lo que devolverá un error **404**).
+Las rutas de nuestra aplicación se tienen que definir en el fichero `routes/web.php`. Este es el punto centralizado para la definición de rutas y cualquier ruta no definida en este fichero no será válida, generado una excepción (lo que devolverá un error **404**).
 
 Las rutas, en su forma más sencilla, pueden devolver directamente un valor desde el propio fichero de rutas, pero también podrán generar la llamada a una vista o a un controlador. Empezaremos viendo el primer tipo de rutas y en secciones posteriores se tratará como enlazarlas con una vista o con un controlador.
 
@@ -143,10 +143,10 @@ El agrupamiento de rutas permite compartir atributos entre las rutas del grupo.
 Los atributos que se pueden compartir entre las rutas de un grupo pueden ser:
 
 - [Middlewares](https://laravel.com/docs/routing#route-group-middleware)
-- [Controladores](https://laravel.com/docs/10.x/routing#route-group-controllers)
-- [Subdominios](https://laravel.com/docs/10.x/routing#route-group-subdomain-routing)
-- [Prefijos](https://laravel.com/docs/10.x/routing#route-group-prefixes)
-- [Prefijos de nombre](https://laravel.com/docs/10.x/routing#route-group-name-prefixes)
+- [Controladores](https://laravel.com/docs/routing#route-group-controllers)
+- [Subdominios](https://laravel.com/docs/routing#route-group-subdomain-routing)
+- [Prefijos](https://laravel.com/docs/routing#route-group-prefixes)
+- [Prefijos de nombre](https://laravel.com/docs/routing#route-group-name-prefixes)
 
 A estas alturas es difícil comprender algunos de esos atributos, aunque sí podemos mostrar un ejemplo de prefijos de rutas.
 

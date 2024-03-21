@@ -125,7 +125,7 @@ Una vez configurado todo el sistema, añadidas las rutas y las vistas para reali
 Si los datos introducidos son correctos se creará la sesión del usuario y se le redirigirá a la ruta `/dashboard`. Si queremos cambiar esta ruta tenemos que definir la constante `HOME` en el fichero `app/Providers/RouteServiceProvider.php`, por ejemplo:
 
 ```php
-    public const HOME = '/catalog';
+    public const HOME = '/tfcs';
 ```
 
 ## Registro de un usuario
@@ -238,7 +238,7 @@ El sistema de autenticación de _Laravel_ también incorpora una serie de filtro
 
 ```php
 // Para proteger una clausula:
-Route::get('admin/catalog', function() {
+Route::get('admin/tfcs', function() {
     // Solo se permite el acceso a usuarios autenticados
 })->middleware('auth');
 
@@ -252,8 +252,8 @@ Si deseamos proteger el acceso a toda una zona de nuestro sitio web (por ejemplo
 
 ```php
 Route::group(['middleware' => 'auth'], function() {
-    Route::get('catalog', [CatalogController::class, 'getIndex']);
-    Route::get('catalog/create', [CatalogController::class, 'getCreate']);
+    Route::get('tfcs', [TfcsController::class, 'getIndex']);
+    Route::get('tfcs/create', [TfcsController::class, 'getCreate']);
     // ...
 });
 ```

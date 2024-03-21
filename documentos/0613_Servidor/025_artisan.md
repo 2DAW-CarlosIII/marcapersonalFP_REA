@@ -14,7 +14,7 @@ O simplemente:
 php artisan
 ```
 
-Si queremos obtener una ayuda más detallada sobre alguna de las opciones de Arti_san simplemente tenemos que escribir la palabra `help` delante del comando en cuestión, por ejemplo:
+Si queremos obtener una ayuda más detallada sobre alguna de las opciones de _Artisan_ simplemente tenemos que escribir la palabra `help` delante del comando en cuestión, por ejemplo:
 
 ```bash
 php artisan help migrate

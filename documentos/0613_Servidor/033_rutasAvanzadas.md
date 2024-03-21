@@ -26,7 +26,7 @@ También podemos utilizar la opción de agrupar rutas para indicar un prefijo qu
 
 ```php
 Route::group(['prefix' => 'dashboard'], function () {
-    Route::get('catalog', function () { /* ... */ });
+    Route::get('tfcs', function () { /* ... */ });
     Route::get('users', function () { /* ... */ });
 });
 ```

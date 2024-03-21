@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\TfcsController;
 use App\Http\Controllers\ActividadController;
 use App\Http\Controllers\ReconocimientoController;
 use App\Http\Controllers\CurriculoController;
@@ -41,24 +41,24 @@ Route::get('/', function () {
 })->name('home');
 */
 
-Route::prefix('catalog')->group(function () {
-    Route::get('/', [CatalogController::class, 'getIndex'])->name('proyectos');
+Route::prefix('tfcs')->group(function () {
+    Route::get('/', [TfcsController::class, 'getIndex'])->name('proyectos');
 
-    Route::get('/show/{id}', [CatalogController::class, 'getShow'])->where('id', '[0-9]+');
+    Route::get('/show/{id}', [TfcsController::class, 'getShow'])->where('id', '[0-9]+');
 
-    Route::put('/editcalificacion/{id}', [CatalogController::class, 'editCalificacion'])->where('id', '[0-9]+')
+    Route::put('/editcalificacion/{id}', [TfcsController::class, 'editCalificacion'])->where('id', '[0-9]+')
     ->middleware('auth');
 
-    Route::get('/create', [CatalogController::class, 'getCreate'])
+    Route::get('/create', [TfcsController::class, 'getCreate'])
     ->middleware('auth');
 
-    Route::get('/edit/{id}', [CatalogController::class, 'getEdit'])->where('id', '[0-9]+')
+    Route::get('/edit/{id}', [TfcsController::class, 'getEdit'])->where('id', '[0-9]+')
     ->middleware('auth');
 
-    Route::put('/edit/{id}', [CatalogController::class, 'putEdit'])->where('id', '[0-9]+')
+    Route::put('/edit/{id}', [TfcsController::class, 'putEdit'])->where('id', '[0-9]+')
     ->middleware('auth');
 
-    Route::post('/', [CatalogController::class, 'store']);
+    Route::post('/', [TfcsController::class, 'store']);
 });
 
 Route::prefix('reconocimientos')->group(function () {

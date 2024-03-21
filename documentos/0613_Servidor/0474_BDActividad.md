@@ -91,4 +91,4 @@ Ya no necesitaremos más el _array_ de actividades (`$arrayActividades`) que hab
 
 Ahora tendremos que actualizar las vistas para que, en lugar de acceder a los datos del _array_, los obtenga del objeto con el actividad. Para esto, cambiaremos en todos los sitios donde hayamos puesto `$actividad['campo']` por `$actividad->campo`.
 
-Además, en la vista `catalog/index.blade.php`, en vez de utilizar el índice del _array_ (`$key`) como identificador para crear el enlace a `catalog/show/{id}`, tendremos que utilizar el campo `id` del actividad (`$actividad->id`). Lo mismo en la vista `catalog/show.blade.php`, para generar el enlace de editar actividad tendremos que añadir el identificador del actividad a la ruta `catalog/edit`.
+Además, en la vista `tfcs/index.blade.php`, en vez de utilizar el índice del _array_ (`$key`) como identificador para crear el enlace a `tfcs/show/{id}`, tendremos que utilizar el campo `id` del actividad (`$actividad->id`). Lo mismo en la vista `tfcs/show.blade.php`, para generar el enlace de editar actividad tendremos que añadir el identificador del actividad a la ruta `tfcs/edit`.

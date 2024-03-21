@@ -54,7 +54,7 @@ class ProyectosDBTest extends TestCase
         /**
          * proyectos index test.
          */
-        $response = $this->get('/catalog');
+        $response = $this->get('/tfcs');
         $nombres = [
             'Proyecto1 de prueba',
             'Proyecto2 de prueba',
@@ -64,19 +64,19 @@ class ProyectosDBTest extends TestCase
         /**
          * proyectos show test.
          */
-        $response = $this->get("/catalog/show/" . $proyecto1->id);
+        $response = $this->get("/tfcs/show/" . $proyecto1->id);
 
         $response
         ->assertStatus(200)
-        ->assertViewIs('catalog.show')
+        ->assertViewIs('tfcs.show')
         ->assertSeeText('Proyecto aprobado', $escaped = true);
 
-        $response = $this->get("/catalog/show/" . $proyecto2->id);
+        $response = $this->get("/tfcs/show/" . $proyecto2->id);
 
         $response
         ->assertSeeText('Proyecto suspenso', $escaped = true);
 
-        $response = $this->get("/catalog/show/A");
+        $response = $this->get("/tfcs/show/A");
         $response->assertNotFound();
 
 
@@ -84,24 +84,24 @@ class ProyectosDBTest extends TestCase
          * proyectos create test.
          */
         $value = 'Añadir proyecto';
-        $response = $this->get('/catalog/create');
+        $response = $this->get('/tfcs/create');
 
         $response
         ->assertStatus(200)
-        ->assertViewIs('catalog.create')
+        ->assertViewIs('tfcs.create')
         ->assertSeeText($value, $escaped = true);
 
         /**
          * proyectos edit test.
          */
 
-        $response = $this->get("/catalog/edit/" . $proyecto1->id);
+        $response = $this->get("/tfcs/edit/" . $proyecto1->id);
 
         $response
         ->assertStatus(200)
-        ->assertViewIs('catalog.edit');
+        ->assertViewIs('tfcs.edit');
 
-        $response = $this->get("/catalog/edit/A");
+        $response = $this->get("/tfcs/edit/A");
         $response->assertNotFound();
 
 

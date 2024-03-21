@@ -161,11 +161,11 @@ También incluiremos dos botones:
 - uno que nos llevará a editar el `reconocimiento`,
 - otro para volver al listado de `reconocimientos`.
 
-Para realizar lo anterior, adapta la vista `catalog.show`.
+Para realizar lo anterior, adapta la vista `tfcs.show`.
 
 ### Método ReconocimientoController@getCreate
 
-Este método devuelve la vista `reconocimientos.create` para añadir una nuevo `reconocimiento`. Para crear este formulario en la vista correspondiente nos podemos basar en el contenido de la vista `catalog.create`. En el caso de `reconocimiento`, tendrá que tener los siguientes campos:
+Este método devuelve la vista `reconocimientos.create` para añadir una nuevo `reconocimiento`. Para crear este formulario en la vista correspondiente nos podemos basar en el contenido de la vista `tfcs.create`. En el caso de `reconocimiento`, tendrá que tener los siguientes campos:
 
 Label | Name | Tipo de campo
 ------|------|--------------

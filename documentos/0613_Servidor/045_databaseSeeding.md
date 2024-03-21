@@ -204,7 +204,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Estudiante>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory
  */
 class EstudianteFactory extends Factory
 {

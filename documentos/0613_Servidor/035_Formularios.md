@@ -69,21 +69,29 @@ A continuación vamos a ver los diferentes elementos que podemos añadir a un fo
 
 Para crear un campo de texto usamos la etiqueta de HTML input, para la cual tenemos que indicar el tipo text y su nombre e identificador de la forma:
 
-`<input type="text" name="nombre" id="nombre">`
+```html
+<input type="text" name="nombre" id="nombre">
+```
 
 En este ejemplo hemos creado un campo de texto vacío cuyo nombre e identificador es **nombre**. El atributo `name` indica el nombre de variable donde se guardará el texto introducido por el usuario y que después utilizaremos desde el controlador para acceder al valor.
 
 Si queremos podemos especificar un valor por defecto usando el atributo value:
 
-`<input type="text" name="nombre" id="nombre" value="Texto inicial">`
+```html
+<input type="text" name="nombre" id="nombre" value="Texto inicial">
+```
 
 Desde una vista con _Blade_ podemos asignar el contenido de una variable (en el ejemplo `$nombre`) para que aparezca el campo de texto con dicho valor. Esta opción es muy útil para crear formularios en los que tenemos que editar un contenido ya existente, como por ejemplo editar los datos de usuario. A continuación se muestra un ejemplo:
 
-`<input type="text" name="nombre" id="nombre" value="{{ $nombre }}">`
+```html
+<input type="text" name="nombre" id="nombre" value="{{ $nombre }}">
+```
 
 Para mostrar los valores introducidos en una petición anterior podemos usar el método `old()`, el cual recuperará las variables almacenadas en la petición anterior. Por ejemplo, imaginad que creáis un formulario para el registro de usuarios y al enviar el formulario comprobáis que el usuario introducido está repetido. En ese caso se tendría que volver a mostrar el formulario con los datos introducidos y marcar dicho campo como erróneo. Para esto, después de comprobar que hay un error en el controlador, habría que realizar una redirección a la página anterior añadiendo la entrada como ya vimos con `withInput()`, por ejemplo: `return back()->withInput();`. El método `withInput()` añade todas las variables de entrada a la sesión, y esto nos permite recuperarlas después de la forma:
 
-`<input type="text" name="nombre" id="nombre" value="{{ old('nombre') }}">`
+```html
+<input type="text" name="nombre" id="nombre" value="{{ old('nombre') }}">
+```
 
 Más adelante, cuando veamos como recoger los datos de entrada revisaremos el proceso completo para procesar un formulario.
 
@@ -91,25 +99,37 @@ Más adelante, cuando veamos como recoger los datos de entrada revisaremos el pr
 
 Utilizando la etiqueta `input` podemos crear más tipos de campos como contraseñas o campos ocultos:
 
-`<input type="password" name="password" id="password">`
+```html
+<input type="password" name="password" id="password">
+```
 
-`<input type="hidden" name="oculto" value="valor">`
+```html
+<input type="hidden" name="oculto" value="valor">
+```
 
 Los campos para contraseñas lo único que hacen es ocultar las letras escritas. Los campos ocultos se suelen utilizar para almacenar opciones o valores que se desean enviar junto con los datos del formulario pero que no se tienen que mostrar al usuario. En las secciones anteriores ya hemos visto que Laravel lo utiliza internamente para almacenar un hash o código para la protección contra ataques tipo _CSRF_ y que también lo utiliza para indicar si el tipo de envío del formulario es distinto de `POST` o `GET`. Además nosotros lo podemos utilizar para almacenar cualquier valor que después queramos recoger justo con los datos del formulario.
 
 También podemos crear otro tipo de inputs como `email`, `number`, `tel`, etc. (podéis consultar la lista de tipos permitidos [aquí](http://www.w3schools.com/html/html_form_input_types.asp)). Para definir estos campos se hace exactamente igual que para un campo de texto pero cambiando el tipo por el deseado, por ejemplo:
 
-`<input type="email" name="correo" id="correo">`
+```html
+<input type="email" name="correo" id="correo">
+```
 
-`<input type="number" name="numero" id="numero">`
+```html
+<input type="number" name="numero" id="numero">
+```
 
-`<input type="tel" name="telefono" id="telefono">`
+```html
+<input type="tel" name="telefono" id="telefono">
+```
 
 ### Textarea
 
 Para crear un área de texto simplemente tenemos que usar la etiqueta _HTML_ textarea de la forma:
 
-`<textarea name="texto" id="texto"></textarea>`
+```html
+<textarea name="texto" id="texto"></textarea>
+```
 
 Esta etiqueta además permite indicar el número de filas (`rows`) y columnas (`cols`) del área de texto. 
 
@@ -117,7 +137,9 @@ Para insertar un texto o valor inicial lo tenemos que poner entre la etiqueta de
 
 A continuación se puede ver un ejemplo completo:
 
-`<textarea name="texto" id="texto" rows="4" cols="50">Texto por defecto</textarea>`
+```html
+<textarea name="texto" id="texto" rows="4" cols="50">Texto por defecto</textarea>
+```
 
 ### Etiquetas
 
@@ -125,7 +147,9 @@ Las etiquetas nos permiten poner un texto asociado a un campo de un formulario p
 
 Para crear una etiqueta tenemos que usar el tag `label` de HTML:
 
-`<label for="nombre">Nombre</label>`
+```html
+<label for="nombre">Nombre</label>
+```
 
 Donde el atributo for se utiliza para especificar el identificador del campo relacionado con la etiqueta. De esta forma, al pulsar sobre la etiqueta se marcará automáticamente el campo relacionado. A continuación se muestra un ejemplo completo:
 
