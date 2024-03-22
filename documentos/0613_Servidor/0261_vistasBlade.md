@@ -82,11 +82,23 @@ Ademas podemos pasarle un `array` de datos a la vista a cargar usando el segundo
 
 Esta opción es muy útil para crear vistas que sean reutilizables o para separar el contenido de una vista en varios ficheros.
 
+### Components y slots
+
+`@include` no es la única manera de incorporar el contenido de una vista en otra.
+
+La utilización de _[components](https://laravel.com/docs/blade#components)_ también permiten la incorporación de vistas, dotándolas, incluso, de cierta capacidad de lógica.    
+
 ## Layouts
 
 _Blade_ también nos permite la definición de _layouts_ para crear una estructura _HTML_ base con secciones que serán rellenadas por otras plantillas o vistas hijas. Por ejemplo, podemos crear un _layout_ con el contenido principal o común de nuestra web (`head`, `body`, etc.) y definir una serie de secciones que serán rellenados por otras plantillas para completar el código. Este _layout_ puede ser utilizado para todas las pantallas de nuestro sitio web, lo que nos permite que en el resto de plantillas no tengamos que repetir todo este código.
 
-A continuación se incluye un ejemplo de una plantilla tipo _layout_ almacenada en el fichero `resources/views/layouts/master.blade.php`:
+Para nuestra página web, vamos a crear un _layout_ almacenado en el fichero `resources/views/layouts/master.blade.php`:
+
+```bash
+php artisan make:view layouts.master
+```
+
+El contenido de ese archivo, de momento, será el siguiente:
 
 ```
 <html>

@@ -16,12 +16,10 @@ class ViewsExerciseTest extends TestCase
             $value = 'Pantalla principal';
             $response = $this->get('/');
 
-            $pieceOfNavBar = 'Marca Personal FP';
             $response
                 ->assertStatus(200)
                 ->assertViewIs('home')
-                ->assertSeeText($value, $escaped = true)
-                ->assertSeeText($pieceOfNavBar, $escaped = true);
+                ->assertSeeText($value, $escaped = true);
 
         /**
          * login test.

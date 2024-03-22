@@ -1,4 +1,4 @@
-# Reutilizar plantillas
+# Crear un Layout
 
 En internet, podemos encontrar sitios que ofrecen plantillas gratuitas para utilizar en nuestros proyectos. Por ejemplo, en [HTML5 UP!](https://html5up.net/) podemos encontrar una gran cantidad de plantillas gratuitas para utilizar en nuestros proyectos. En este apartado, vamos a utilizar una de estas plantillas para crear el _layout_ principal de nuestra web.
 
@@ -113,8 +113,13 @@ Esto se hacía incorporando `@yield('content')` a la plantilla. En este caso, in
                             </section>
 ```
 
-## incluir el `navbar`
+## Incluir el `navbar`
 
 En el _partial_ `header.blade.php` vamos a eliminar los códigos que hay bajo los comentarios `<!-- Logo -->` y `<!-- Nav -->`, sustituyéndolos por `@include('partials.navbar')`.
 
 Para que se vea correctamente, debemos asegurarnos de incluir el archivo del [navbar](./materiales/ejercicios-laravel/navbar.blade.php) en la carpeta `resources/views/partials/`.
+
+## Resultado
+
+Aunque el contenido de la página web es más extenso, se muestra las secciones `header` y, parcialmente, la sección `main` resultante de la práctica desarrollada.
+![Reultado de desarrollar un layout a partir de la plantilla Dopetrope de HTML5Up.net](./images/layoutDopetrope.png)
