@@ -1849,6 +1849,128 @@ paths:
                 $ref: '#/components/schemas/Reconocimiento'
         '405':
           description: Invalid input
+  /docentes:
+    get:
+      tags:
+        - user
+      summary: Devuelve todos los docentes
+      description: Devuelve todos los docentes
+      operationId: getDocentes
+      parameters:
+        - name: q
+          in: query
+          description: texto a buscar
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: _start
+          in: query
+          description: posición del registro inicial a mostrar
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: _end
+          in: query
+          description: posición del registro final a mostrar
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: _sort
+          in: query
+          description: columna por la que ordenar
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: _order
+          in: query
+          description: dirección de la ordenación
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: user not found
+  /estudiantes:
+    get:
+      tags:
+        - user
+      summary: Devuelve todos los estudiantes
+      description: Devuelve todos los estudiantes
+      operationId: getEstudiantes
+      parameters:
+        - name: q
+          in: query
+          description: texto a buscar
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: _start
+          in: query
+          description: posición del registro inicial a mostrar
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: _end
+          in: query
+          description: posición del registro final a mostrar
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: _sort
+          in: query
+          description: columna por la que ordenar
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: _order
+          in: query
+          description: dirección de la ordenación
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: user not found
   /users:
     get:
       tags:
