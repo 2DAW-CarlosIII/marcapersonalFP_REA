@@ -1,6 +1,6 @@
 # 3.6. Ejercicios
 
-En los ejercicios de esta parte vamos a continuar con el sitio Web que empezamos para la gestión de **marcapersonalFP**. Primero, añadiremos los controladores y métodos asociados a cada ruta, y posteriormente también completaremos las vistas usando formularios y el sistema de plantillas _Blade_.
+En los ejercicios de esta parte, vamos a continuar con el sitio Web que empezamos para la gestión de **marcapersonalFP**. Primero, añadiremos los controladores y métodos asociados a cada ruta, y posteriormente también completaremos las vistas usando formularios y el sistema de plantillas _Blade_.
 
 ## Ejercicio 1 - Controladores
 
@@ -18,7 +18,9 @@ proyectos/show/{id} | ProyectosController | getShow
 proyectos/create | ProyectosController | getCreate
 proyectos/edit/{id} | ProyectosController | getEdit
 
-Acordaos que los métodos `getShow()` y `getEdit()` tendrán que recibir como parámetro el `$id` del elemento a mostrar o editar y enviar a la vista el proyecto correspondiente, además del id recibido, por lo que la definición del método en el controlador tendrá que ser como la siguiente:
+Acordaos que los métodos `getShow()` y `getEdit()` tendrán que recibir, como parámetro, el `$id` del elemento a mostrar o editar y enviarán, a la vista, tanto el `$id` recibido como el proyecto asociado a ese `$id`.
+
+Se muestra, a continuación, la definición del  método `getShow()` en el controlador:
 
 ```php
 public function getShow($id)
@@ -50,7 +52,14 @@ En este método, de momento, solo vamos a hacer una redirección a la acción qu
 
 ### Método ProyectosController@getIndex
 
-Este método tiene que mostrar un listado de todas los proyectos que tiene marcapersonalFP. El listado de proyectos lo podéis obtener del fichero [array_proyectos.php](./materiales/ejercicios-laravel/array_proyectos.php) facilitado con los [materiales](./materiales). Este array de proyectos lo tenéis que copiar como variable miembro de la clase (más adelante las almacenaremos en la base de datos). En el método del controlador simplemente tendremos que modificar la generación de la vista para pasarle este array de proyectos completo (`$this->arrayProyectos`).
+Este método tiene que mostrar un listado de todos los proyectos que tiene _marcapersonalFP_. El listado de proyectos lo podéis obtener del fichero [array_proyectos.php](./materiales/ejercicios-laravel/array_proyectos.php) facilitado con los [materiales](./materiales). Este array de proyectos lo tenéis que copiar como variable miembro de la clase (más adelante las almacenaremos en la base de datos). En el método del controlador simplemente tendremos que modificar la generación de la vista para pasarle este array de proyectos completo (`$this->arrayProyectos`).
+
+```php
+    public function getIndex()
+    {
+        return view('proyectos.index', array('proyectos' => $this->arrayProyectos));
+    }
+```
 
 Y en la vista correspondiente simplemente tendremos que incluir el siguiente trozo de código en su sección content:
 
@@ -61,7 +70,7 @@ Y en la vista correspondiente simplemente tendremos que incluir el siguiente tro
 
 <div class="row">
 
-    @foreach ($arrayProyectos as $key => $proyecto)
+    @foreach ($proyectos as $key => $proyecto)
 
     <div class="col-4 col-6-medium col-12-small">
         <section class="box">
@@ -82,7 +91,7 @@ Y en la vista correspondiente simplemente tendremos que incluir el siguiente tro
         </section>
     </div>
 
-    @endfor
+    @endforeach
 
 </div>
 @endsection
