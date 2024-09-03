@@ -1,6 +1,6 @@
 # 3.1. Controladores
 
-Hasta el momento hemos visto solamente como devolver una cadena para una ruta y como asociar una vista a una ruta directamente en el fichero de rutas. Pero en general la forma recomendable de trabajar será **asociar dichas rutas a un método de un controlador**. Esto nos permitirá separar mucho mejor el código y crear clases (_controladores_) que agrupen toda la funcionalidad de un determinado recurso. Por ejemplo, _podemos crear un controlador para gestionar toda la lógica asociada al control de usuarios o cualquier otro tipo de recurso_.
+Hasta el momento, hemos visto solamente cómo devolver una cadena para una ruta y cómo asociar una vista a una ruta directamente en el fichero de rutas. Pero, en general, la forma recomendable de trabajar será **asociar dichas rutas a un método de un controlador**. Esto nos permitirá separar mucho mejor el código y crear clases (_controladores_) que agrupen toda la funcionalidad de un determinado recurso. Por ejemplo, _podemos crear un controlador para gestionar toda la lógica asociada al control de usuarios o cualquier otro tipo de recurso_.
 
 Como ya vimos en la [sección de introducción](./01_introduccion.md), los _controladores_ son el punto de entrada de las peticiones de los usuarios y son los que **deben contener toda la lógica asociada al procesamiento de una petición**, encargándose de realizar las consultas necesarias a la base de datos, de preparar los datos y de llamar a la vista correspondiente con dichos datos.
 
@@ -18,7 +18,7 @@ class UserController extends Controller
 {
     /**
      * Mostrar información de un usuario.
-     * @param  int  $id
+     * @param  string  $nombre
      * @return Response
      */
     public function showProfile($nombre)
@@ -28,11 +28,11 @@ class UserController extends Controller
 }
 ```
 
-Todos los controladores tienen que extender la clase base `Controller`. Esta clase viene ya creada por defecto con la instalación de _Laravel_, la podemos encontrar en la carpeta `app/Http/Controllers`. Se utiliza para centralizar toda la lógica que se vaya a utilizar de forma compartida por los controladores de nuestra aplicación. Por defecto solo carga código para validación y autorización, pero podemos añadir en la misma todos los métodos que necesitemos.
+Todos los controladores tienen que extender la clase base `Controller`. Esta clase viene ya creada por defecto con la instalación de _Laravel_, encontrándose en la carpeta `app/Http/Controllers`. Se utiliza para centralizar toda la lógica que se vaya a utilizar de forma compartida por los controladores de nuestra aplicación. Por defecto, solo carga código para _validación_ y _autorización_, pero podemos añadir en la misma todos los métodos que necesitemos.
 
-En el código de ejemplo, el método `showProfile($nombre)` lo único que realiza es obtener los datos de un usuario, generar la vista `user.profile` a partir de los datos obtenidos y devolverla como valor de retorno para que se muestre por pantalla.
+El código del ejemplo anterior, el método `showProfile($nombre)` únicamente se encarga de obtener los datos de un usuario, generar la vista `user/profile.blade.php` a partir de los datos obtenidos y devolverla como valor de retorno para que se muestre por pantalla.
 
-Una vez definido un _controlador_ ya podemos asociarlo a una _ruta_. Para esto tenemos que modificar el fichero de rutas `routes.php` de la forma:
+Una vez definido un _controlador_, ya podremos asociarlo a una _ruta_. Para esto tenemos que modificar el fichero de rutas `routes.php` de la forma:
 
 ```php
 use App\Http\Controllers\UserController;
@@ -40,11 +40,11 @@ use App\Http\Controllers\UserController;
 Route::get('user/{nombre}', [UserController::class, 'showProfile']);
 ```
 
-En lugar de pasar una función como segundo parámetro, tenemos que escribir una cadena que contenga el _nombre del controlador_, seguido de una arroba `@` y del _nombre del método_ que queremos asociar. No es necesario añadir nada más, ni los parámetros que recibe el método en cuestión, todo esto se hace de forma automática.
+En lugar de pasar una función como segundo parámetro, tenemos que escribir un _array_ que contenga la **_clase del controlador_** y el **_nombre del método_** que queremos asociar. No es necesario añadir nada más, ni los parámetros que recibe el método en cuestión, todo esto se hace de forma automática.
 
 ## Crear un nuevo controlador
 
-Como hemos visto los controladores se almacenan dentro de la carpeta app/Http/Controllers como ficheros PHP. Para crear uno nuevo bien lo podemos hacer a mano y rellenar nosotros todo el código, o podemos utilizar el siguiente comando de Artisan que nos adelantará todo el trabajo:
+Como hemos visto, los controladores se almacenan dentro de la carpeta `app/Http/Controllers` como ficheros _PHP_. Para crear uno nuevo, bien lo podemos hacer a mano y rellenar nosotros todo el código, o podemos utilizar el siguiente comando de _Artisan_ que nos facilitará todo el trabajo:
 
 ```bash
 php artisan make:controller ProyectosController

@@ -4,7 +4,7 @@ En este primer apartado vamos a ver los primeros pasos que tenemos que dar con _
 
 ## Configuración de la Base de Datos
 
-Lo primero que tenemos que hacer para trabajar con bases de datos es completar la configuración. Como ejemplo vamos a configurar el acceso a una base de datos tipo _MySQL_. Si editamos el fichero con la configuración `config/database.php` podemos ver en primer lugar la siguiente línea:
+Lo primero que tenemos que hacer para trabajar con bases de datos es completar la configuración. Como ejemplo, vamos a configurar el acceso a una base de datos tipo _MySQL_. Si editamos el fichero con la configuración `config/database.php` podemos ver en primer lugar la siguiente línea:
 
 ```php
 'default' => env('DB_CONNECTION', 'mysql'),
@@ -40,7 +40,7 @@ DB_PASSWORD=contraseña-de-acceso
 
 ## Crear la base de datos
 
-Para crear la base de datos que vamos a utilizar en _MySQL_ podemos utilizar la herramienta _PHPMyAdmin_ que tenemos instalado. Para esto accedemos a la ruta:
+Para crear la base de datos que vamos a utilizar en _MySQL_ podemos utilizar la herramienta _PHPMyAdmin_ que hemos iniciado con _Laradock_. Para esto accedemos a la ruta:
 
 [http://localhost:8081/](http://localhost:8081/)
 
