@@ -156,6 +156,9 @@ docker compose up -d nginx mariadb php-fpm phpmyadmin workspace
 
 La primera vez que se ejecute este comando tardará bastante puesto que tiene que descargar muchas imágenes desde internet.
 
+> **Límites en la descarga** _Si todo un grupo/clase lanza el comando anterior, es posible que Docker limite la descarga, imposibilitando que el comando se complete.
+> Una solución es que se generen las imágenes en un único equipo y que se compartan las imágenes con [`docker save`](https://docs.docker.com/reference/cli/docker/image/save/) y [`docker load`](https://docs.docker.com/reference/cli/docker/image/save/)._
+
 ### Crear la base de datos
 
 1. Acceder a [phpMyAdmin](http://localhost:8081/)
