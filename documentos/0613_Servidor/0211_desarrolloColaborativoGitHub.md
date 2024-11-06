@@ -8,7 +8,7 @@ Para poder trabajar colaborativamente y tener actualizado el código con las apo
 
     ![Captura de pantalla del menú desplegable _GitHub_ que muestra las opciones para crear nuevos elementos. El elemento de menú **"New repository"** está resaltado en naranja oscuro.](https://docs.github.com/assets/cb-31554/mw-1440/images/help/repository/repo-create.webp)
 
-2. Escriba un nombre corto y fácil de recordar para el repositorio. Por ejemplo: "marcapersonalfp".
+2. Escriba un nombre corto y fácil de recordar para el repositorio. Por ejemplo: "marcapersonalfp[curso]".
 
     ![Captura de pantalla del primer paso para crear un repositorio de _GitHub_. El campo **"Repository name"** contiene el texto "hello-world" y aparece en naranja oscuro.](https://docs.github.com/assets/cb-61138/mw-1440/images/help/repository/create-repository-name.webp)
 
@@ -31,7 +31,7 @@ cd marcapersonalfp; git init; git add .; git commit -m "Initial commit"; cd ..
 Colocaremos en repositorio de _GitHub_ el primer `commit` creado en nuestra aplicación:
 
 ```
-git remote add origin https://github.com/[tu usuario]/marcapersonalfp.git
+git remote add origin git@github.com:[tu usuario]/marcapersonalFP[curso].git
 git push -u origin master
 ```
 
@@ -44,22 +44,31 @@ A continuación, se descargarán el código fuente al equipo personal. Para ello
 Desde el directorio _Laravel_, deberás ejecutar el siguiente comando:
 
 ```
-git clone https://github.com/[tu usuario]/marcapersonalfp.git
+git clone git@github.com:[tu usuario]/marcapersonalFP[curso].git
 ```
 
 Mantendremos un enlace al repositorio original:
 
 ```
-git remote add upstream https://github.com/albsierra/marcapersonalfp.git
+git remote add upstream git@github.com:2DAW-CarlosIII/marcapersonalFP[curso].git
 ```
+
+> Para que el nombre de la carpeta que utilizamos no tenga que ser modificada curso tras curso, vamos a renombrar la carpeta generada con el comando `git clone`:
+>
+>```
+>mv marcapersonalFP[curso] marcapersonalfp
+>```
 
 A continuación, debemos descargar las librerías necesarias para cualquier proyecto _Laravel_, es decir, aquellas que se definen en el fichero `composer.json`. Para conseguirlo, necesitamos poder ejecutar un comando _php_, por lo que necesitaremos también estar en una consola de _bash_, levantando previamente los contenedores si no se han levantado previamente.
 
 ```
 cd laradock
 docker compose up -d nginx mariadb phpmyadmin workspace
+```
 
-cd ../marcapersonalfp
+
+```
+cd ../marcapersonalfp[curso]
 composer install
 ```
 
