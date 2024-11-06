@@ -1,3 +1,4 @@
+{% raw %}
 # Enviando correo electrónico
 
 ## Objetivo
@@ -270,3 +271,4 @@ A continuación, crea una nueva empresa que tenga, una dirección de correo elec
 > Si necesitas realizar la prueba más de una vez, necesitarás eliminar de la base de datos, tanto la empresa que has creado como el usuario que se genera automáticamente.
 
 Momentos después de haber creado la empresa, deberás recibir un correo electrónico en la cuenta asociada a dicha empresa.
+{% endraw %}

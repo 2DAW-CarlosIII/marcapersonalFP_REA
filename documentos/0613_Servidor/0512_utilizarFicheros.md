@@ -1,3 +1,4 @@
+{% raw %}
 # Manejo de ficheros
 
 _Laravel_ facilita el manejo de ficheros, tanto si se van a almacenar en el **sistema de ficheros local**, como si se van a almacenar en un servicio como _**Amazon S3**_.
@@ -109,3 +110,4 @@ Para mostrar el fichero en la vista, podemos utilizar el método `url()` de la c
         <img width="300" style="height:300px" alt="Curriculum-vitae-warning-icon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Curriculum-vitae-warning-icon.svg/256px-Curriculum-vitae-warning-icon.svg.png">
 @endif
 ```
+{% endraw %}

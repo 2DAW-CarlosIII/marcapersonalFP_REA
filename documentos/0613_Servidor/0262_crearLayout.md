@@ -1,3 +1,4 @@
+{% raw %}
 # Crear un Layout
 
 En internet, podemos encontrar sitios que ofrecen plantillas gratuitas para utilizar en nuestros proyectos. Por ejemplo, en [HTML5 UP!](https://html5up.net/) podemos encontrar una gran cantidad de plantillas gratuitas para utilizar en nuestros proyectos. En este apartado, vamos a utilizar una de estas plantillas para crear el _layout_ principal de nuestra web.
@@ -123,3 +124,4 @@ Para que se vea correctamente, debemos asegurarnos de incluir el archivo del [na
 
 Aunque el contenido de la página web es más extenso, se muestra las secciones `header` y, parcialmente, la sección `main` resultante de la práctica desarrollada.
 ![Reultado de desarrollar un layout a partir de la plantilla Dopetrope de HTML5Up.net](./images/layoutDopetrope.png)
+{% endraw %}

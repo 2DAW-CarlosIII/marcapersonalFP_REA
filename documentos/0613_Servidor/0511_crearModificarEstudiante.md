@@ -1,3 +1,4 @@
+{% raw %}
 # Crear un registro de Estudiante
 
 ## Definir el destino de los datos del formulario
@@ -76,3 +77,4 @@ En el método `putEdit()` del controlador `EstudianteController` se modifica el 
        return redirect()->action([self::class, 'getShow'], ['id' => $estudiante->id]);
     }
 ```
+{% endraw %}

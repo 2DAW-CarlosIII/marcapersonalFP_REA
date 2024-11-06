@@ -1,3 +1,4 @@
+{% raw %}
 # 2.6. Vistas
 
 Las vistas son la forma de presentar el resultado (una pantalla de nuestro sitio web) de forma visual al usuario, el cual podrá interactuar con él y volver a realizar una petición. Las vistas además nos permiten separar toda la parte de presentación de resultados de la lógica (_controladores_) y de la base de datos (_modelos_). Por lo tanto no tendrán que realizar ningún tipo de consulta ni procesamiento de datos, simplemente recibirán datos y los prepararán para mostrarlos como HTML.
@@ -68,3 +69,4 @@ $view = view('proyectos.mostrar')
             ->with('proyecto', $proyecto)
             ->with('editable', false);
 ```
+{% endraw %}

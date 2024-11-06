@@ -1,3 +1,4 @@
+{% raw %}
 # 3.6. Ejercicios
 
 En los ejercicios de esta parte, vamos a continuar con el sitio Web que empezamos para la gestión de **marcapersonalFP**. Primero, añadiremos los controladores y métodos asociados a cada ruta, y posteriormente también completaremos las vistas usando formularios y el sistema de plantillas _Blade_.
@@ -289,3 +290,4 @@ En el caso de obtener un resultado diferente, habrá que investigar cuál es la 
 - [Currículos](./0362_curriculoController.md)
 - [Reconocimientos](./0363_reconocimientoController.md)
 - [Actividades](./0364_actividadController.md)
+{% endraw %}

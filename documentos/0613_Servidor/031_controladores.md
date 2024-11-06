@@ -1,3 +1,4 @@
+{% raw %}
 # 3.1. Controladores
 
 Hasta el momento, hemos visto solamente cómo devolver una cadena para una ruta y cómo asociar una vista a una ruta directamente en el fichero de rutas. Pero, en general, la forma recomendable de trabajar será **asociar dichas rutas a un método de un controlador**. Esto nos permitirá separar mucho mejor el código y crear clases (_controladores_) que agrupen toda la funcionalidad de un determinado recurso. Por ejemplo, _podemos crear un controlador para gestionar toda la lógica asociada al control de usuarios o cualquier otro tipo de recurso_.
@@ -97,3 +98,4 @@ php artisan route:clear
 ```
 
 La caché se recomienda crearla solo cuando ya vayamos a pasar a producción nuestra web. Cuando estamos trabajando en la web es posible que añadamos nuevas rutas y sino nos acordamos de regenerar la caché la ruta no funcionará.
+{% endraw %}
