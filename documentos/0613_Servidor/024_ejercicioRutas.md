@@ -32,7 +32,7 @@ php artisan test
 ```
 
 El resultado debería ser similar al que se muestra a continuación:
-<small>
+
 <pre>
 [alumno@vm1:~/Documentos/laravel/marcapersonalFP]$ php artisan test
 
@@ -46,8 +46,6 @@ El resultado debería ser similar al que se muestra a continuación:
 <span style="color: lightgreen">✓</span> <span style="color: gray">rutas</span>
 
 <span style="color: gray">Tests:    <span style="color: lightgreen">3 passed</span> (24 assertions)</span>
-</span>
 </pre>
-</small>
 
 En el caso de obtener un resultado diferente, habrá que investigar cuál es la la condición `assert` que no se cumple e intentar reparar el error.
