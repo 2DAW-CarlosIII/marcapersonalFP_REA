@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+    <!-- Main timeline (main branch) -->
+    <line x1="50" y1="300" x2="750" y2="300" stroke="#333" stroke-width="2"/>
+    <text x="700" y="290" font-family="Arial" font-size="14">main</text>
+    
+    <!-- Repositories -->
+    <circle cx="150" cy="100" r="40" fill="white" stroke="#333" stroke-width="2"/>
+    <text x="150" y="105" font-family="Arial" font-size="14" text-anchor="middle">repo</text>
+    <text x="150" y="120" font-family="Arial" font-size="14" text-anchor="middle">propio</text>
+    
+    <circle cx="150" cy="500" r="40" fill="white" stroke="#333" stroke-width="2"/>
+    <text x="150" y="495" font-family="Arial" font-size="14" text-anchor="middle">repo</text>
+    <text x="150" y="510" font-family="Arial" font-size="14" text-anchor="middle">común</text>
+    <text x="150" y="550" font-family="Arial" font-size="12" text-anchor="middle">2daw-Carlosiii</text>
+    
+    <!-- Actions -->
+    <!-- 1. Fork -->
+    <path d="M 150 460 L 150 140" fill="none" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="165" y="160" font-family="Arial" font-size="14">1. fork</text>
+    
+    <!-- 2. Clone -->
+    <path d="M 190 100 L 300 300" fill="none" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="270" y="180" font-family="Arial" font-size="14">2. clone</text>
+    
+    <!-- 3. Branch ej1 -->
+    <path d="M 350 300 L 450 200" fill="none" stroke="#ff6666" stroke-width="2"/>
+    <circle cx="450" cy="200" r="5" fill="#ff6666"/>
+    <text x="460" y="190" font-family="Arial" font-size="14">3. ej1</text>
+    
+    <!-- 4. Push -->
+    <path d="M 450 200 L 180 120" fill="none" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="300" y="140" font-family="Arial" font-size="14">4. push</text>
+    
+    <!-- 5. Pull Request (antes 4.5) -->
+    <path d="M 180 120 L 180 480" fill="none" stroke="#666" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+    <text x="190" y="450" font-family="Arial" font-size="14">5. Pull Request</text>
+    
+    <!-- 6. Pull (antes 5) -->
+    <path d="M 150 460 L 500 300" fill="none" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="300" y="400" font-family="Arial" font-size="14">6. pull</text>
+    
+    <!-- 7. Branch ej2 (antes 6) -->
+    <path d="M 550 300 L 650 200" fill="none" stroke="#ff6666" stroke-width="2"/>
+    <circle cx="650" cy="200" r="5" fill="#ff6666"/>
+    <text x="660" y="190" font-family="Arial" font-size="14">7. ej2</text>
+    
+    <!-- Arrow marker definition -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#333"/>
+        </marker>
+    </defs>
+</svg>

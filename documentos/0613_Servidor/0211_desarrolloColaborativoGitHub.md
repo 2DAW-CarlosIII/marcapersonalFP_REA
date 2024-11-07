@@ -25,14 +25,15 @@ Felicidades. Ha creado correctamente su primer repositorio.
 Una vez que tenemos una aplicación iniciada de alguna de las formas descritas en la sección anterior, accederemos al directorio de la aplicación y, desde allí, iniciaremos un repositorio `git`. Para ello, ejecutaremos:
 
 ```
-cd marcapersonalfp; git init; git add .; git commit -m "Initial commit"; cd ..
+cd marcapersonalfp; git init; git add .; git commit -m "Initial commit"
 ```
 
 Colocaremos en repositorio de _GitHub_ el primer `commit` creado en nuestra aplicación:
 
 ```
 git remote add origin git@github.com:[tu usuario]/marcapersonalFP[curso].git
-git push -u origin master
+git branch -M main
+git push -u origin main
 ```
 
 ## Colaborando en el repositorio
@@ -50,7 +51,7 @@ git clone git@github.com:[tu usuario]/marcapersonalFP[curso].git
 Mantendremos un enlace al repositorio original:
 
 ```
-git remote add upstream git@github.com:2DAW-CarlosIII/marcapersonalFP[curso].git
+git remote add upstream git@github.com:[organización/perfil]/marcapersonalFP[curso].git
 ```
 
 > Para que el nombre de la carpeta que utilizamos no tenga que ser modificada curso tras curso, vamos a renombrar la carpeta generada con el comando `git clone`:
@@ -74,7 +75,13 @@ composer install
 
 Cuando clonamos un repositorio, este nunca deberá incluir el fichero `.env`. Pero, este fichero es importante, ya que en él definiremos el entorno en el que se va a ejecutar nuestra aplicación. Para generar un archivo `.env`, haremos una copia del fichero `.env.example`.
 
-Tras hacer la copia, debemos definir los elementos correspondientes a la cadena de conexión de la base de datos:
+Tras hacer la copia, debemos crear una clave de encriptación, ejecutando el comando:
+
+```
+php artisan key:generate
+```
+
+También debemos definir los elementos correspondientes a la cadena de conexión de la base de datos:
 
 ```
 DB_CONNECTION=mysql
@@ -83,12 +90,6 @@ DB_PORT=3306
 DB_DATABASE=marcapersonalfp
 DB_USERNAME=marcapersonalfp
 DB_PASSWORD=marcapersonalfp
-```
-
-También debemos crear una clave de encriptación, ejecutando el comando:
-
-```
-php artisan key:generate
 ```
 
 ## Preparando el servidor de bases de datos y web
@@ -137,7 +138,7 @@ A partir de este momento, todos los cambios en el código fuente, se deberán de
 Antes de iniciar cada funcionalidad de la aplicación deberás crear una rama _funcionalidadI_ y cambiarte a ella, con el comando:
 
 ```
-git checkout -b funcionalidadI
+git switch -c funcionalidadI
 ```
 
 A la finalización de cada funcionalidad, deberás:
@@ -156,13 +157,13 @@ A la finalización de cada funcionalidad, deberás:
 - Se actualizarán los repositorios locales y remotos de todos los miembros del equipo.
 
     ```
-    git checkout master
-    git pull upstream master
-    git push origin master
+    git checkout main
+    git pull upstream main
+    git push origin main
     ```
 
 El proceso se esquematiza en las siguientes imágenes:
-![Esquema colaboración con funcionalidades](./images/esquemaSolucionEjerciciosGit.png)
+![Esquema colaboración con funcionalidades](./images/esquemaSolucionEjerciciosGit.svg)
 
 ![Interacciones de los desarrolladores con los repositorios](https://www.dalescott.net/wp-content/uploads/2012/09/centralized-github-4-1024x625.png)
 [© by Dale Scott](https://www.dalescott.net)
