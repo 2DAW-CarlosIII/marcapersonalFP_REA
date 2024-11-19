@@ -1,4 +1,3 @@
-{% raw %}
 # 3.6. Ejercicios
 
 En los ejercicios de esta parte, vamos a continuar con el sitio Web que empezamos para la gestión de **marcapersonalFP**. Primero, añadiremos los controladores y métodos asociados a cada ruta, y posteriormente también completaremos las vistas usando formularios y el sistema de plantillas _Blade_.
@@ -64,6 +63,7 @@ Este método tiene que mostrar un listado de todos los proyectos que tiene _marc
 
 Y en la vista correspondiente simplemente tendremos que incluir el siguiente trozo de código en su sección content:
 
+{% raw %}
 ```php
 @extends('layouts.master')
 
@@ -98,6 +98,7 @@ Y en la vista correspondiente simplemente tendremos que incluir el siguiente tro
 @endsection
 ```
 
+{% endraw %}
 El logo lo debemos recoger también de la carpeta de [materiales](./materiales) y colocarlo en la carpeta `public/images`.
 
 Como se puede ver en el código, en primer lugar se crea una fila (usando el sistema de rejilla de Bootstrap) y a continuación se realiza un bucle `foreach` utilizando la notación de _Blade_ para iterar por todos los proyectos. Para cada proyecto obtenemos su posición en el array y sus datos asociados, y generamos una columna para mostrarlos. Es importante que nos fijemos en como se itera por los elementos de un array de datos y en la forma de acceder a los valores. Además, se ha incluido un enlace para que, al pulsar sobre un proyecto, nos lleve a la dirección `/proyectos/show/{$key}`, siendo `key` la posición de ese proyecto en el array.
@@ -108,6 +109,7 @@ Este método se utiliza para mostrar la vista detalle de un proyecto. Hemos de t
 
 En esta vista vamos a crear dos columnas, la primera columna para mostrar la imagen del proyecto y la segunda para incluir todos los detalles. A continuación se incluye la estructura _HTML_ que tendría que tener esta pantalla:
 
+{% raw %}
 ```php
 <div class="row m-4">
 
@@ -124,6 +126,7 @@ En esta vista vamos a crear dos columnas, la primera columna para mostrar la ima
 </div>
 ```
 
+{% endraw %}
 En la columna de la izquierda insertamos la imagen del proyecto, mientras que en la columna de la derecha se tendrán que mostrar todos los datos del proyecto: `docente_id`, `nombre`, `url_github` y `metadatos`.
 
 Para mostrar el estado del proyecto consultaremos el valor `calificacion` del array, el cual podrá tener dos casos:
@@ -137,6 +140,7 @@ Además tenemos que incluir dos botones más, un botón que nos llevará a edita
 
 Esta pantalla finalmente tendría el siguiente código:
 
+{% raw %}
 ```php
 @section('content')
 
@@ -192,6 +196,7 @@ Esta pantalla finalmente tendría el siguiente código:
 @endsection
 ```
 
+{% endraw %}
 ### Método ProyectosController@getCreate
 
 Este método devuelve la vista `proyectos.create` para añadir una nuevo proyecto. Para crear este formulario en la vista correspondiente nos podemos basar en el contenido de la plantilla [proyectos_create.php](./materiales/ejercicios-laravel/proyectos_create.php). Esta plantilla tiene una serie de `TODO`s que hay que completar. En total tendrá que tener los siguientes campos:
@@ -205,6 +210,7 @@ Metadatos | metadatos | textarea
 
 Además, tendrá un botón al final con el texto "Añadir proyecto".
 
+{% raw %}
 ```php
 @section('content')
 
@@ -259,6 +265,7 @@ Además, tendrá un botón al final con el texto "Añadir proyecto".
 @endsection
 ```
 
+{% endraw %}
 > De momento el formulario no funcionará. Más adelante lo terminaremos.
 
 ### Método ProyectosController@getEdit
@@ -290,4 +297,3 @@ En el caso de obtener un resultado diferente, habrá que investigar cuál es la 
 - [Currículos](./0362_curriculoController.md)
 - [Reconocimientos](./0363_reconocimientoController.md)
 - [Actividades](./0364_actividadController.md)
-{% endraw %}
