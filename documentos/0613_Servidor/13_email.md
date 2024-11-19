@@ -1,4 +1,3 @@
-{% raw %}
 # Enviando correo electrónico
 
 ## Objetivo
@@ -183,6 +182,7 @@ php artisan make:view emails.empresas.nuevaEmpresa
 
 Posteriormente, incluimos el contenido en el archivo `resources/views/emails/empresas/nuevaEmpresa`:
 
+{% raw %}
 ```html
 <p>Uno de nuestros docentes considera que le podría interesar conocer la página web <strong>Marca Personal F.P.</strong>
     que le ayudará a encontrar los profesionales cuyas competencias mejor se adaptan a las necesidades de su empresa.</p>
@@ -195,6 +195,7 @@ Posteriormente, incluimos el contenido en el archivo `resources/views/emails/emp
     <a href="{{ url('api/v1/empresas/acceso', $empresa->token) }}">Registro en Marca Personal F.P.</a></p>
 </p>
 ```
+{% endraw %}
 
 4. Enviando el Email
 Para enviar el correo electrónico, podemos usar el método `send()` del facade `Mail` de _Laravel_. Por ejemplo, podríamos hacer esto en el método evento `created`, que se genera tras el registro de una nueva empresa:
@@ -271,4 +272,3 @@ A continuación, crea una nueva empresa que tenga, una dirección de correo elec
 > Si necesitas realizar la prueba más de una vez, necesitarás eliminar de la base de datos, tanto la empresa que has creado como el usuario que se genera automáticamente.
 
 Momentos después de haber creado la empresa, deberás recibir un correo electrónico en la cuenta asociada a dicha empresa.
-{% endraw %}

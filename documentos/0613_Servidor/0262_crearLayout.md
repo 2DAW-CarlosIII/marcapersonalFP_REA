@@ -1,4 +1,3 @@
-{% raw %}
 # Crear un Layout
 
 En internet, podemos encontrar sitios que ofrecen plantillas gratuitas para utilizar en nuestros proyectos. Por ejemplo, en [HTML5 UP!](https://html5up.net/) podemos encontrar una gran cantidad de plantillas gratuitas para utilizar en nuestros proyectos. En este apartado, vamos a utilizar una de estas plantillas para crear el _layout_ principal de nuestra web.
@@ -31,12 +30,15 @@ Hacer esto no es suficiente, ya que el _layout_ de dopetrope utiliza una serie d
 
 - En la línea 12, cambiamos la ruta de la hoja de estilos de la siguiente forma:
 
+{% raw %}
 ```
 <link rel="stylesheet" href="{{ asset('/dopetrope/assets/css/main.css') }}" />
 ```
+{% endraw %}
 
 - En las líneas 384 y siguientes, cambiamos las rutas de los _javascript_ para que los busque en la carpeta `dopetrope` de `public`:
 
+{% raw %}
 ```
 <script src="{{ asset('/dopetrope/assets/js/jquery.min.js') }}"></script>
 <script src="{{ asset('/dopetrope/assets/js/jquery.dropotron.min.js') }}"></script>
@@ -45,9 +47,11 @@ Hacer esto no es suficiente, ya que el _layout_ de dopetrope utiliza una serie d
 <script src="{{ asset('/dopetrope/assets/js/util.js') }}"></script>
 <script src="{{ asset('/dopetrope/assets/js/main.js') }}"></script>
 ```
+{% endraw %}
 
 - En la línea 21, cambiaremos también la ruta de la imagen del logo de la siguiente forma (tendremos que redefinir `APP_URL` en el fichero `.env`):
 
+{% raw %}
 ```
 <h1>
     <a href="{{ url(env('APP_URL', 'http://marcapersonalFP.test')) }}">
@@ -55,9 +59,12 @@ Hacer esto no es suficiente, ya que el _layout_ de dopetrope utiliza una serie d
     </a>
 </h1>
 ```
+{% endraw %}
 
+{% raw %}
 - Las referencias a cada una de las imágenes también habrá que cambiarlas para que apunten a la carpeta `dopetrope\images` de `public`. Para remplazar, desde Visual Studio Code, todas las ocurrencias que incluyan el texto `images/pic`, seguidas de un número y el texto `.jpg` por "{{ asset('/dopetrope/images/pic" seguidos del número anterior y `.jpg') }}`, necesitamos utilizar una búsqueda con expresión regular, en el que el texto de la búsqueda sea el siguiente `src="images/pic([0-9]*).jpg"` y el texto para remplazar sería `src="{{ asset('/dopetrope/images/pic$1.jpg') }}"`
 
+{% endraw %}
 ## Distribuir el contenido del layout en partes
 
 En el _layout_ de dopetrope, el contenido de la web se divide en tres secciones (`section`):
@@ -124,4 +131,3 @@ Para que se vea correctamente, debemos asegurarnos de incluir el archivo del [na
 
 Aunque el contenido de la página web es más extenso, se muestra las secciones `header` y, parcialmente, la sección `main` resultante de la práctica desarrollada.
 ![Reultado de desarrollar un layout a partir de la plantilla Dopetrope de HTML5Up.net](./images/layoutDopetrope.png)
-{% endraw %}

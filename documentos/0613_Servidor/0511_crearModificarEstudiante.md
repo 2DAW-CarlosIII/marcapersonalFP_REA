@@ -1,13 +1,14 @@
-{% raw %}
 # Crear un registro de Estudiante
 
 ## Definir el destino de los datos del formulario
 
 Para crear un registro de estudiante, habíamos creado un formulario que nos permitía introducir los datos del estudiante. Deberíamos modificar la propiedad `action`de ese formulario para que apunte al método `store` del controlador `EstudianteController`:
 
+{% raw %}
 ```php
 <form action="{{ action([\App\Http\Controllers\EstudianteController::class, 'store']) }}" method="POST">
 ```
+{% endraw %}
 
 ## Crear la ruta y el método del controlador
 
@@ -54,9 +55,11 @@ En el caso de la modificación de un registro de estudiantes, tenemos casi todo 
 
 Para modificar un registro de estudiante, habíamos creado un formulario que nos permitía modificar los datos del estudiante. Deberíamos modificar la propiedad `action`de ese formulario para que apunte al método `putEdit()` del controlador `EstudianteController`:
 
+{% raw %}
 ```php
 <form action="{{ action([\App\Http\Controllers\EstudianteController::class, 'putEdit'], ['id' => $estudiante->id]) }}" method="POST">
 ```
+{% endraw %}
 
 ## Crear la ruta y el método del controlador
 
@@ -77,4 +80,3 @@ En el método `putEdit()` del controlador `EstudianteController` se modifica el 
        return redirect()->action([self::class, 'getShow'], ['id' => $estudiante->id]);
     }
 ```
-{% endraw %}

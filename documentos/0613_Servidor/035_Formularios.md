@@ -1,4 +1,3 @@
-{% raw %}
 # 3.5. Formularios
 
 En esta sección vamos a repasar brevemente como crear un formulario usando etiquetas de _HTML_, los distintos elementos o inputs que podemos utilizar, además también veremos como conectar el envío de un formulario con un controlador, como protegernos de ataques _CSRF_ y algunas cuestiones más.
@@ -15,11 +14,13 @@ Para abrir y cerrar un formulario que apunte a la _URL_ actual y utilice el mét
 
 Si queremos cambiar la _URL_ de envío de datos podemos utilizar el atributo `action` de la forma:
 
+{% raw %}
 ```php
 <form action="{{ url('foo/bar') }}" method="POST">
     ...
 </form>
 ```
+{% endraw %}
 
 La función `url()` generará la dirección a la ruta indicada. Ademas también podemos usar la función `action()` para indicar directamente el método de un controlador a utilizar, por ejemplo:
 
@@ -42,12 +43,14 @@ _HTML_ solo permite el uso de formularios de tipo `GET` o `POST`. Si queremos en
 
 Laravel se encargará de recoger el valor de dicho campo y de procesarlo como una petición tipo `PUT` (o la que indiquemos). Además, para facilitar más la definición de este tipo de formularios ha añadido la función `method_field`` que directamente creará este campo oculto:
 
+{% raw %}
 ```php
 <form action="/foo/bar" method="POST">
     {{ method_field('PUT') }}
     ...
 </form>
 ```
+{% endraw %}
 
 ## Protección contra CSRF
 
@@ -84,15 +87,19 @@ Si queremos podemos especificar un valor por defecto usando el atributo value:
 
 Desde una vista con _Blade_ podemos asignar el contenido de una variable (en el ejemplo `$nombre`) para que aparezca el campo de texto con dicho valor. Esta opción es muy útil para crear formularios en los que tenemos que editar un contenido ya existente, como por ejemplo editar los datos de usuario. A continuación se muestra un ejemplo:
 
+{% raw %}
 ```html
 <input type="text" name="nombre" id="nombre" value="{{ $nombre }}">
 ```
+{% endraw %}
 
 Para mostrar los valores introducidos en una petición anterior podemos usar el método `old()`, el cual recuperará las variables almacenadas en la petición anterior. Por ejemplo, imaginad que creáis un formulario para el registro de usuarios y al enviar el formulario comprobáis que el usuario introducido está repetido. En ese caso se tendría que volver a mostrar el formulario con los datos introducidos y marcar dicho campo como erróneo. Para esto, después de comprobar que hay un error en el controlador, habría que realizar una redirección a la página anterior añadiendo la entrada como ya vimos con `withInput()`, por ejemplo: `return back()->withInput();`. El método `withInput()` añade todas las variables de entrada a la sesión, y esto nos permite recuperarlas después de la forma:
 
+{% raw %}
 ```html
 <input type="text" name="nombre" id="nombre" value="{{ old('nombre') }}">
 ```
+{% endraw %}
 
 Más adelante, cuando veamos como recoger los datos de entrada revisaremos el proceso completo para procesar un formulario.
 

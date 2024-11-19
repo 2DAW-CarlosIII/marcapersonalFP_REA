@@ -1,4 +1,3 @@
-{% raw %}
 # Manejo de ficheros
 
 _Laravel_ facilita el manejo de ficheros, tanto si se van a almacenar en el **sistema de ficheros local**, como si se van a almacenar en un servicio como _**Amazon S3**_.
@@ -47,6 +46,7 @@ php artisan migrate
 
 Vamos a modificar el formulario de edición de un `Estudiante` para que permita la subida de un fichero. Para ello, además de crear un campo de tipo `file`, debemos indicar que el formulario va a enviar un fichero, por lo que debemos añadir el atributo `enctype="multipart/form-data"` al formulario.
 
+{% raw %}
 ```php
 <form action="{{ action([App\Http\Controllers\EstudianteController::class, 'putEdit'], ['id' => $estudiante->id]) }}" method="POST" enctype="multipart/form-data">
 ...
@@ -58,6 +58,7 @@ Vamos a modificar el formulario de edición de un `Estudiante` para que permita 
     <div class="form-group text-center">
 ...
 ```
+{% endraw %}
 
 ## Elección del destino de los ficheros.
 
@@ -96,13 +97,13 @@ Por eso, generaremos el siguiente código en `AvatarController`:
         $estudiante->update($request->all());
         return redirect()->action([self::class, 'getShow'], ['id' => $estudiante->id]);
     }
-
 ```
 
 ## Mostrando el fichero en la vista
 
 Para mostrar el fichero en la vista, podemos utilizar el método `url()` de la clase `Storage`:
 
+{% raw %}
 ```php
 @if ($estudiante->avatar)
     <img src="{{ Storage::url($estudiante->avatar) }}" alt="Avatar" class="img-thumbnail">

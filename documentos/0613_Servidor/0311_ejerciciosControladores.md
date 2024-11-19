@@ -97,8 +97,8 @@ Y en la vista correspondiente simplemente tendremos que incluir el siguiente tro
 </div>
 @endsection
 ```
-
 {% endraw %}
+
 El logo lo debemos recoger también de la carpeta de [materiales](./materiales) y colocarlo en la carpeta `public/images`.
 
 Como se puede ver en el código, en primer lugar se crea una fila (usando el sistema de rejilla de Bootstrap) y a continuación se realiza un bucle `foreach` utilizando la notación de _Blade_ para iterar por todos los proyectos. Para cada proyecto obtenemos su posición en el array y sus datos asociados, y generamos una columna para mostrarlos. Es importante que nos fijemos en como se itera por los elementos de un array de datos y en la forma de acceder a los valores. Además, se ha incluido un enlace para que, al pulsar sobre un proyecto, nos lleve a la dirección `/proyectos/show/{$key}`, siendo `key` la posición de ese proyecto en el array.
@@ -125,8 +125,8 @@ En esta vista vamos a crear dos columnas, la primera columna para mostrar la ima
     </div>
 </div>
 ```
-
 {% endraw %}
+
 En la columna de la izquierda insertamos la imagen del proyecto, mientras que en la columna de la derecha se tendrán que mostrar todos los datos del proyecto: `docente_id`, `nombre`, `url_github` y `metadatos`.
 
 Para mostrar el estado del proyecto consultaremos el valor `calificacion` del array, el cual podrá tener dos casos:
@@ -195,8 +195,8 @@ Esta pantalla finalmente tendría el siguiente código:
 
 @endsection
 ```
-
 {% endraw %}
+
 ### Método ProyectosController@getCreate
 
 Este método devuelve la vista `proyectos.create` para añadir una nuevo proyecto. Para crear este formulario en la vista correspondiente nos podemos basar en el contenido de la plantilla [proyectos_create.php](./materiales/ejercicios-laravel/proyectos_create.php). Esta plantilla tiene una serie de `TODO`s que hay que completar. En total tendrá que tener los siguientes campos:
@@ -264,8 +264,8 @@ Además, tendrá un botón al final con el texto "Añadir proyecto".
 
 @endsection
 ```
-
 {% endraw %}
+
 > De momento el formulario no funcionará. Más adelante lo terminaremos.
 
 ### Método ProyectosController@getEdit

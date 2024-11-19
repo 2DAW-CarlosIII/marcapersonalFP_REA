@@ -1,4 +1,3 @@
-{% raw %}
 # 3.6.1 Ejercicio Controlador CurriculoController
 
 ## Ejercicio 1 - Controlador
@@ -89,6 +88,7 @@ Este array de `curriculos` lo tenéis que copiar como variable miembro de la cla
 
 Y en la vista correspondiente tendremos que adaptar el siguiente trozo de código en su sección content:
 
+{% raw %}
 ```php
 @extends('layouts.master')
 
@@ -126,6 +126,7 @@ Y en la vista correspondiente tendremos que adaptar el siguiente trozo de códig
 </div>
 @endsection
 ```
+{% endraw %}
 
 ### Método CurriculoController@getShow
 
@@ -188,4 +189,3 @@ php artisan test
 Como en el caso del ejercicio de rutas, la ejecución de los test debería devolver <span style="background-color: lightgreen">PASS</span> en color verde para cada uno de los tests.
 
 En el caso de obtener un resultado diferente, habrá que investigar cuál es la la condición `assert` que no se cumple e intentar reparar el error.
-{% endraw %}
