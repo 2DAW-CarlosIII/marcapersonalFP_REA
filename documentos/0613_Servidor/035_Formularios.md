@@ -287,4 +287,3 @@ class UserController extends Controller
     }
 }
 ```
-{% endraw %}
