@@ -293,6 +293,12 @@ En el caso de obtener un resultado diferente, habrá que investigar cuál es la 
 
 # Otros ejercicios de controladores
 
+Podemos realizar colaborativamente ejercicios para obtener otros controladores útiles para nuestra aplicación web.
+
+Para que esa colaboración no genere conflictos por la modificación conjunta del fichero `routes/web.php` conviene trasladar las rutas de los `proyectos` a un fichero de rutas específico. Para ello, podemos crear un fichero `routes/proyectos.php` y añadir las rutas de proyectos en ese fichero. Posteriormente, incluiremos ese fichero en el fichero `routes/web.php` con la instrucción `require __DIR__.'/proyectos.php';`.
+
+A continuación, se proponen una serie de controladores que se pueden añadir a la aplicación:
+
 - [Usuarios](0361_controladorUsers.md)
 - [Currículos](./0362_curriculoController.md)
 - [Reconocimientos](./0363_reconocimientoController.md)

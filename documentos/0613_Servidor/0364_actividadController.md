@@ -17,7 +17,7 @@ actividades/edit/{id} | ActividadController | getEdit | actividades.edit
 
 Acordaos que los métodos `getShow()` y `getEdit()` tendrán que recibir como parámetro el `$id` del elemento a mostrar o editar y enviar a la vista el `actividad` correspondiente, además del id recibido.
 
-Por último, añadid al fichero `routes/web.php` las rutas de la tabla anterior que apuntarán a los métodos del controlador `ActividadController`.
+Por último, añadid el fichero `routes/actividades.php` con las rutas de la tabla anterior que apuntarán a los métodos del controlador `ActividadController` e incluirlo en el fichero `routes/web.php`.
 
 ## Ejercicio 2 - Completar las vistas
 
