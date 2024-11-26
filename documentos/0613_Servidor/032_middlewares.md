@@ -116,11 +116,22 @@ use App\Http\Middleware\MyMiddleware;
 })
 ```
 
+Modifiquemos el código :
+
+```php
+    public function handle(Request $request, Closure $next): Response
+    {
+        $parametros = explode("/", $request->path());
+        if (intval($parametros[count($parametros) - 1]) > 9) {
+            // if ($request->route()->query('id') && $request->route()->parameter('id') > 9) {
+            return redirect('/');
+        }
+        return $next($request);
+    }
+```
 ### Middleware asociado a grupos
 
 _Laravel_ incluye los grupos de middlewares predefinidos `web` y `api` para facilitar la aplicación de los middlewares a las rutas definidas en el archivo `routes/web.php` y `routes/api.php` respectivamente. Estos grupos se definen en el fichero `bootstrap/app.php` y se pueden modificar o ampliar. Los middleware incluidos en cada uno de los grupso son los siguientes:
-
-<div class="overflow-auto">
 
 | The `web` Middleware Group |
 | --- |
@@ -131,15 +142,10 @@ _Laravel_ incluye los grupos de middlewares predefinidos `web` y `api` para faci
 | `Illuminate\Foundation\Http\Middleware\ValidateCsrfToken` |
 | `Illuminate\Routing\Middleware\SubstituteBindings` |
 
-</div>
-
-<div class="overflow-auto">
 
 | The `api` Middleware Group |
 | --- |
 | `Illuminate\Routing\Middleware\SubstituteBindings` |
-
-</div>
 
 Si quisiéramos añadir a estos grupos, podríamos usar el método `appendToGroup` en el archivo `bootstrap/app.php` asociándolo al grupo `web` o `api`:
 
@@ -152,6 +158,18 @@ Si quisiéramos añadir a estos grupos, podríamos usar el método `appendToGrou
 ```
 
 En este ejemplo hemos registrado la clase `MyMiddleware` como un middleware adicional al grupo `web`.
+
+Al asociarlo a rutas, podemos buscar el valor del parámetro `id` con el objeto que devuelve el método `$request->route()`:
+
+```php
+    public function handle(Request $request, Closure $next): Response
+    {
+        if ($request->route()->hasParameter('id') && $request->route()->parameter('id') > 9) {
+            return redirect('/');
+        }
+        return $next($request);
+    }
+```
 
 ### Middleware asociado a rutas
 
@@ -189,6 +207,8 @@ Route::get('/proyectos/show/{id}', function ($id) {
 })->middleware(id_mayor_de_10);
 ```
 
+> _Si hemos distribuido las rutas de los distintos controladores en ficheros diferenciados de rutas, deberemos buscar la ruta del ejemplo en el fichero de rutas correspondiente._
+
 En el ejemplo anterior hemos asignado el middleware con clave `id_mayor_de_10` al grupo de rutas cuyo prefijo es `proyectos`. Si la petición supera el filtro entonces se ejecutara la función asociada.
 
 Si queremos asociar varios middleware con una ruta simplemente tenemos que añadir un _array_ con los respectivos alias. Los filtros se ejecutarán en el orden indicado en dicho _array_:
@@ -207,8 +227,6 @@ Route::get('profile', 'UserController@showProfile')->middleware('auth');
 
 La siguiente es una lista de los alias de los middleware que vienen por defecto en Laravel:
 
-<div class="overflow-auto">
-
 | Alias | Middleware |
 | --- | --- |
 | `auth` | `Illuminate\Auth\Middleware\Authenticate` |
@@ -224,7 +242,6 @@ La siguiente es una lista de los alias de los middleware que vienen por defecto 
 | `throttle` | `Illuminate\Routing\Middleware\ThrottleRequests` or `Illuminate\Routing\Middleware\ThrottleRequestsWithRedis` |
 | `verified` | `Illuminate\Auth\Middleware\EnsureEmailIsVerified` |
 
-</div>
 
 ### Middleware dentro de controladores
 
@@ -252,14 +269,14 @@ class UserController extends Controller
 Al crear una aplicación Web es importante asegurarse de que todas las rutas definidas son correctas y que las partes privadas realmente están protegidas. Para esto Laravel incluye el siguiente método de Artisan:
 
 ```bash
-php artisan route:list
+php artisan route:list -v
 ```
 
 Este método muestra una tabla con todas las rutas, métodos y acciones. Ademas para cada ruta indica los filtros asociados, tanto si están definidos desde el fichero de rutas como desde dentro de un controlador. Por lo tanto es muy útil para comprobar que todas las rutas y filtros que hemos definido se hayan creado correctamente.
 
 ## Paso de parámetros
 
-Un Middleware también puede recibir parámetros. Por ejemplo, podemos crear un filtro para comprobar si el usuario logueado tiene un determinado _rol_ indicado por parámetro. Para esto lo primero que tenemos que hacer es añadir un tercer parámetro a la función handle del Middleware:
+Un Middleware también puede recibir parámetros. Por ejemplo, podemos modificar nuestro filtro para definir el valor máximo que puede tener el `id`. Para esto, lo primero que tenemos que hacer es añadir un tercer parámetro a la función handle del Middleware:
 
 ```php
 <?php
@@ -267,37 +284,61 @@ Un Middleware también puede recibir parámetros. Por ejemplo, podemos crear un 
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class RoleMiddleware
+class MyMiddleware
 {
     /**
-     * Run the request filter.
+     * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string  $role
-     * @return mixed
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle($request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, $maximo): Response
     {
-        if (! $request->user()->hasRole($role)) {
-            // No tiene el rol esperado!
+        if ($request->route()->hasParameter('id') && $request->route()->parameter('id') > $maximo) {
+            return redirect('/');
         }
-
         return $next($request);
     }
-
 }
+
 ```
 
-En el código anterior de ejemplo se ha añadido el tercer parámetro `$role` a la función. Si nuestro filtro necesita recibir más parámetros simplemente tendríamos que añadirlos de la misma forma a esta función.
+En el código anterior de ejemplo se ha añadido el tercer parámetro `$maximo` a la función. Si nuestro filtro necesita recibir más parámetros simplemente tendríamos que añadirlos de la misma forma a esta función.
 
 Para pasar un parámetro a un middleware en la definición de una ruta lo tendremos que añadir a continuación del nombre del filtro separado por dos puntos, por ejemplo:
 
 ```php
-Route::put('post/{id}', function ($id) {
-    //
-})->middleware('auth'.':editor,publisher';
+Route::get('proyectos/show/{id}', [ProyectosController::class, 'getShow'])
+->middleware('id_mayor_de_10'.':5')
+->where('id', '[0-9]+');
 ```
 
-Si tenemos que pasar más de un parámetro al filtro los separaremos por comas, por ejemplo: `role:editor,admin`.
+Si tenemos que pasar más de un parámetro al filtro los separaremos por comas.
+
+Por ejemplo, imaginemos que modificamos el método `handle()` de nuestro middleware para que acepte un valor **mínimo** y **máximo** del parámetro `id`:
+
+```php
+    public function handle(Request $request, Closure $next, $minimo, $maximo): Response
+    {
+        if ($request->route()->hasParameter('id')
+            && (
+                $request->route()->parameter('id') < $minimo
+                ||
+                $request->route()->parameter('id') > $maximo
+            )
+        ) {
+            return redirect('/');
+        }
+        return $next($request);
+    }
+```
+
+En ese caso, enviaremos el valor de los dos parámetros separados por `,`:
+
+```php
+Route::get('proyectos/show/{id}', [ProyectosController::class, 'getShow'])
+->middleware('id_mayor_de_10'.':2,6')
+->where('id', '[0-9]+');
+```
