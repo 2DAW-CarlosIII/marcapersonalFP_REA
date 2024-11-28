@@ -70,7 +70,7 @@ Después de crear una migración y de definir los campos de la tabla (en la sigu
 php artisan migrate
 ```
 
-    Si nos aparece el error _"class not found"_ lo podremos solucionar llamando a `composer dump-autoload` y volviendo a lanzar las migraciones.
+> Si nos aparece el error _"class not found"_ lo podremos solucionar llamando a `composer dump-autoload` y volviendo a lanzar las migraciones.
 
 Este comando aplicará la migración sobre la base de datos. Si hubiera más de una migración pendiente se ejecutarán todas. Para cada migración se llamará a su método `up()` para que cree o modifique la base de datos. Posteriormente, en caso de que queramos deshacer los últimos cambios podremos ejecutar:
 
