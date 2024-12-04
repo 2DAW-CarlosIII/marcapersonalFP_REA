@@ -93,4 +93,4 @@ En caso de que se produzca cualquier excepción en las operaciones que se realiz
 
 Para más información sobre la construcción de _Querys_ (`join`, `insert`, `update`, `delete`, _agregados_, etc.) podéis consultar la documentación de _Laravel_ en su sitio web:
 
-http://laravel.com/docs/queries
+[http://laravel.com/docs/queries](http://laravel.com/docs/queries)

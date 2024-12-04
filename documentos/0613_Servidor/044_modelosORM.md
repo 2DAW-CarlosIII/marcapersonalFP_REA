@@ -52,7 +52,9 @@ class Estudiante extends Model
 {
     use HasFactory;
 
-    protected $table = 'mis_estudiantes'; // como, en nuestro caso, la tabla es estudiantes, conviene no definir esta propiedad
+    protected $table = 'mis_estudiantes';
+    // como, en nuestro caso, la tabla es estudiantes, conviene no definir esta propiedad
+    // ni las propiedades que se mostrarán a continuación
 }
 ```
 
@@ -83,6 +85,7 @@ class Estudiante extends Model
     protected $table = 'mis_estudiantes';
     protected $primaryKey = 'my_id'
     public $timestamps = false;
+    // Recuerda que en nuestro modelo Estudiantes no hay que redefinir estas propiedades
 }
 ```
 

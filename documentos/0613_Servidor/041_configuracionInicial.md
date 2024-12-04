@@ -40,7 +40,7 @@ Como se puede ver, básicamente los campos que tenemos que configurar para usar 
 
 ```php
 DB_CONNECTION=mariadb
-DB_HOST=DB_HOST=mariadb
+DB_HOST=mariadb
 DB_DATABASE=nombre-base-de-datos
 DB_USERNAME=nombre-de-usuario
 DB_PASSWORD=contraseña-de-acceso
