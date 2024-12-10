@@ -4,7 +4,7 @@ En estos ejercicios vamos a continuar con la gestión de marcapersonalFP.es, que
 
 ## Ejercicio 1 - Configuración de la base de datos y migraciones.
 
-En primer lugar, vamos a comprobar la correcta configuración de la base de datos. Para esto, tenemos que abrir el fichero `.env` para comprobar que vamos a usar una base de datos tipo _MySQL_ llamada `marcapersonalfp` junto con el nombre de usuario y contraseña de acceso.
+En primer lugar, vamos a comprobar la correcta configuración de la base de datos. Para esto, tenemos que abrir el fichero `.env` para comprobar que vamos a usar una base de datos tipo _MariaDB_ llamada `marcapersonalfp` junto con el nombre de usuario y contraseña de acceso.
 
 A continuación, abrimos _PHPMyAdmin_ y comprobamos que el usuario llamado `marcapersonalfp` y la base de datos con el mismo nombre están creados. Por último, abriremos un terminal en la carpeta de nuestro proyecto y ejecutamos el comando que traslada las _migraciones_ realizadas hasta este momento.
 
@@ -16,7 +16,7 @@ php artisan migrate
 
 Ahora vamos a crear la tabla que utilizaremos para almacenar las actividades. Ejecuta el [comando de _Artisan_ para crear la migración](./042_migraciones.md#crear-una-nueva-migración) llamada `create_actividades_table` para la tabla `actividades`.
 
-> Renombra el archivo como _`[año_actual]`_`_11_29_000004_create_actividades_table.php`
+> Renombra el archivo como _`[año]_[mes]_[día]`_`_000004_create_actividades_table.php`
 
 Una vez creado, edita este fichero para añadir todos los campos necesarios, estos son:
 
