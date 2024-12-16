@@ -12,7 +12,7 @@ Vamos a crear un fichero de migración que añada un atributo _avatar_, el cual 
 php artisan make:migration add_avatar_to_estudiantes_table --table=estudiantes
 ```
 
-> Renombra el fichero como _`[año_actual]`_`_12_11_000001_add_avatar_to_user_table.php`.
+> Renombra el fichero como _`[año]_[mes]_[día]`_`_000001_add_avatar_to_user_table.php`.
 
 El contenido del método  `up()` de la migración añadirá el atributo `avatar` a la tabla  `estudiantes`.
 
