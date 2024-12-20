@@ -22,7 +22,7 @@ password | String |
 remember_token | Campo remember_token | 
 timestamps | Timestamps de Eloquent |  
 
-Crearemos una nueva migración para añadir los campos `nombre` y `apellidos`, que son comunes tanto para los `estudiantes` como para los `docentes`:
+Crearemos una nueva migración para añadir los campos `nombre` y `apellidos`:
 
 Campo | Tipo | Modificador
 --|--|--
@@ -35,7 +35,7 @@ Para esto usamos el comando de _Artisan_ que crea las migraciones y editamos el 
 php artisan make:migration add_nombre_apellidos_to_users_table --table=users
 ```
 
-> Renombra el fichero como _`[año_actual]`_`_12_12_000001_add_nombre_apellidos_to_users_table.php`.
+> Renombra el fichero como _`[año]_[mes]_[día]`_`_000001_add_nombre_apellidos_to_users_table.php`.
 
 ```php
 public function up()
@@ -64,12 +64,13 @@ Por último, usamos el comando de Artisan que añade las nuevas migraciones y co
 ```bash
 php artisan migrate
 ```
+> Podríamos haber sustituido el atributo `name` por `nombre`y haber añadido únicamente el atributo `apellidos` pero, por simplicidad, se ha considerado más conveniente añadir los dos como nuevos atributos de la tabla `users`.
 
 ## Registro de `users`
 
 Como hemos añadido los campos `nombre` y `apellidos` a la tabla de `users`, tendremos que actualizar el controlador `RegisteredUserController`: `validate` y `create`. En la llamada a `validate()` simplemente tendremos que añadir `nombre` y `apellidos` al _array_ de validaciones como campos requeridos, mientras que en la invocación del método `create()` tendremos que añadir esos campos para almacenarlos. También habrá que modificar el _array_ que devuelve el método `rules()` de `app/Http/Requests/ProfileUpdateRequest.php`.
 
-También tendremos que modificar el formulario de registro para añadir los campos `nombre` y `apellidos`:
+También tendremos que modificar el formulario de registro (`resources/views/auth/register.blade.php`) para añadir los campos `nombre` y `apellidos`:
 
 ```php
         <!-- Nombre -->
@@ -90,7 +91,7 @@ También tendremos que modificar el formulario de registro para añadir los camp
 
 Añade también esos campos a la propiedad `$fillable` del modelo `User`.
 
-> Trata de modificar también el formulario de edición de un usuario.
+> Trata de modificar también el formulario de edición de un usuario (`resources/views/profile/partials/update-profile-information-form.blade.php`).
 
 ## Seeder de usuarios
 
