@@ -89,14 +89,13 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-        $estudiante = new \App\Models\Estudiante;
-        $estudiante->nombre = 'Juan';
-        $estudiante->apellidos = 'Martínez';
-        $estudiante->direccion = 'Dirección de Juan';
-        $estudiante->votos = 130;
-        $estudiante->confirmado = true;
-        $estudiante->ciclo = 'DAW';
-        $estudiante->save();
+
+        $ciclo = new \App\Models\Ciclo;
+        $ciclo->nombre = 'Técnico Superior en Desarrollo de Aplicaciones Laravel';
+        $ciclo->codCiclo = 'DAPL3';
+        $ciclo->codFamilia = 'IFC';
+        $ciclo->grado = 'G.S.';
+        $ciclo->save();
     }
 }
 ```
@@ -105,10 +104,10 @@ class DatabaseSeeder extends Seeder
 
 Como hemos visto en el apartado anterior, podemos crear más ficheros o clases _semilla_ para modularizar mejor el código de las inicializaciones. De esta forma podemos crear un fichero de semillas para cada una de las tablas o modelos de datos que tengamos.
 
-En la carpeta `database/seeders` podemos añadir más ficheros _PHP_ con clases que extiendan de `Seeder` para definir nuestros propios ficheros de _semillas_. El nombre de los ficheros suele seguir el mismo patrón `<nombre-tabla>TableSeeder`, por ejemplo `EstudiantesTableSeeder`. _Artisan_ incluye un comando que nos facilitará crear los ficheros de semillas y que además incluirán las estructura base de la clase. Por ejemplo, para crear el fichero de inicialización de la tabla de `estudiantes` haríamos:
+En la carpeta `database/seeders` podemos añadir más ficheros _PHP_ con clases que extiendan de `Seeder` para definir nuestros propios ficheros de _semillas_. El nombre de los ficheros suele seguir el mismo patrón `<nombre-tabla>TableSeeder`, por ejemplo `CiclosTableSeeder`. _Artisan_ incluye un comando que nos facilitará crear los ficheros de semillas y que además incluirán las estructura base de la clase. Por ejemplo, para crear el fichero de inicialización de la tabla de `ciclos` haríamos:
 
 ```bash
-php artisan make:seeder EstudiantesTableSeeder
+php artisan make:seeder CiclosTableSeeder
 ```
 
 Para que esta nueva clase se ejecute tenemos que llamarla desde el método `run()` de la clase principal `DatabaseSeeder` de la forma:
@@ -134,7 +133,7 @@ class DatabaseSeeder extends Seeder
         Model::unguard();
         Schema::disableForeignKeyConstraints();
 
-        $this->call(EstudiantesTableSeeder::class);
+        $this->call(CiclosTableSeeder::class);
 
         Model::reguard();
 
@@ -143,7 +142,7 @@ class DatabaseSeeder extends Seeder
 }
 ```
 
-De este modo, podemos trasladar la creación de un `Estudiante` a la clase `EstudiantesTableSeeder`:
+De este modo, podemos trasladar la creación de un `Ciclo` a la clase `CiclosTableSeeder`:
 
 ```php
 <?php
@@ -153,24 +152,24 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class EstudiantesTableSeeder extends Seeder
+class CiclosTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $estudiante = new \App\Models\Estudiante;
-        $estudiante->nombre = 'Juan';
-        $estudiante->apellidos = 'Martínez';
-        $estudiante->direccion = 'Dirección de Juan';
-        $estudiante->votos = 130;
-        $estudiante->confirmado = true;
-        $estudiante->ciclo = 'DAW';
-        $estudiante->save();
+        $ciclo = new \App\Models\Ciclo;
+        $ciclo->nombre = 'Técnico Superior en Desarrollo de Aplicaciones Laravel';
+        $ciclo->codCiclo = 'DAPL3';
+        $ciclo->codFamilia = 'IFC';
+        $ciclo->grado = 'G.S.';
+        $ciclo->save();
     }
 }
 ```
+
+> No obstante, para poder trabajar con datos reales de los ciclos formativos, el contenido del archivo [CiclosTableSeeder](./materiales/ejercicios-laravel/CiclosTableSeeder.php) está disponible en los materiales.
 
 El método `call()` de `DatabaseSeeder` lo que hace es llamar al método `run()` de la clase indicada. Además, en el ejemplo hemos añadido las llamadas a `unguard()` y a `reguard()`, que lo que hacen es desactivar y volver a activar (respectivamente) la inserción de datos masiva o por lotes.
 
@@ -191,8 +190,10 @@ En _Laravel_, las _factories_ son herramientas poderosas para generar datos de p
 Para la creación de las _factories_ también utilizaremos _Artisan_, que almacenará el fichero en el directorio `database/factories`:
 
 ```bash
-php artisan make:factory EstudianteFactory --model=Estudiante
+php artisan make:factory CicloFactory --model=Ciclo
 ```
+
+> Únicamente como prueba de uso de los _factories_ se muestra un posible fichero para generar ciclos.
 
 Las _factories_, a menudo, hacen uso de la librería _Faker_ de _PHP_ para generar datos ficticios.
 
@@ -206,7 +207,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory
  */
-class EstudianteFactory extends Factory
+class CicloFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -216,13 +217,10 @@ class EstudianteFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre' => fake()->firstName(),
-            'apellidos' => fake()->lastName(),
-            'direccion' => fake()->address(),
-            'votos' => fake()->numberBetween(50, 150),
-            'confirmado' => fake()->boolean(),
-            'ciclo' => fake()->randomElement(['ASIR', 'DAW', 'DAM']),
-            'user_id' => null,
+            'nombre' => 'Técnico Superior en ' . fake()->sentence(),
+            'codCiclo' => 'Cic' . fake()->randomNumber(2, false),
+            'codFamilia' => 'Fa' . fake()->randomNumber(2, false),
+            'grado' => fake()->randomElement(['BÁSICA', 'G.M.', 'G.S.', 'C.E. G.M.', 'C.E. G.S.']),
         ];
     }
 }
@@ -230,11 +228,14 @@ class EstudianteFactory extends Factory
 
 ### Uso de la Factory
 
-Habitualmente, las _factories_ las utilizaremos desde los test, aunque en esta ocasión las vamos a utilizar como ficheros para el _seeding_. Para ello, modificaremos el archivo `database/EstudiantesTableSeeder.php` para invocar la creación de 10 estudiantes.
+Habitualmente, las _factories_ las utilizaremos desde los test, aunque en esta ocasión las vamos a utilizar como ficheros para el _seeding_. Para ello, modificaremos momentáneamente el archivo `database/CiclosTableSeeder.php` para invocar la creación de 10 ciclos.
 
 ```php
     public function run(): void
     {
-        \App\Models\Estudiante::factory(10)->create();
+        \App\Models\Ciclo::factory(10)->create();
     }
 ```
+
+> Para que el modelo `Ciclo`pueda utilizar _factories_ se debe añadir la siguiente línea a la clase de dicho modelo:
+`use HasFactory;`

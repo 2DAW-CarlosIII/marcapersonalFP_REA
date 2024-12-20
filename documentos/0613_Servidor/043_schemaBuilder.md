@@ -8,7 +8,7 @@ Crear y borrar una tabla
 Para añadir una nueva tabla a la base de datos se utiliza el siguiente constructor:
 
 ```php
-Schema::create('estudiantes', function (Blueprint $table) {
+Schema::create('ciclos', function (Blueprint $table) {
     $table->id();
     ...
 });
@@ -19,9 +19,9 @@ Donde el primer argumento es el nombre de la tabla y el segundo es una función 
 En el método `down()` de la migración tendremos que eliminar la tabla que hemos creado, para esto usaremos alguno de los siguientes métodos:
 
 ```php
-Schema::drop('estudiantes');
+Schema::drop('ciclos');
 // o
-Schema::dropIfExists('estudiantes');
+Schema::dropIfExists('ciclos');
 ```
 
 Al crear una migración con el comando de _Artisan_ `make:migration` ya nos viene este código añadido por defecto, la creación y eliminación de la tabla que se ha indicado y además se añaden un par de columnas por defecto (`id` y `timestamps`).
@@ -30,34 +30,32 @@ Al crear una migración con el comando de _Artisan_ `make:migration` ya nos vien
 
 El constructor `Schema::create` recibe como segundo parámetro una función que nos permite especificar las columnas que va a tener dicha tabla. En esta función podemos ir añadiendo todos los campos que queramos, indicando para cada uno de ellos su tipo y nombre, y además, si queremos, también podremos indicar una serie de modificadores como _valor por defecto_, _índices_, etc. Por ejemplo:
 
-- En la migración `<TIMESTAMP>_create_estudiantes_table` añadiremos los atributos iniciales de la tabla:
+- En la migración `<TIMESTAMP>_create_ciclos_table` añadiremos los atributos iniciales de la tabla:
 
 ```php
-        Schema::create('estudiantes', function($table)
+        Schema::create('ciclos', function($table)
         {
             $table->id();
-            $table->string('nombre', 32);
-            $table->string('apellidos', 32);
-            $table->string('direccion');
-            $table->integer('votos');
-            $table->boolean('confirmado')->default(false);
+            $table->string('codCiclo', 6);
+            $table->string('nombre');
+            $table->string('grado', 30);
             $table->timestamps();
         });
 ```
 
-- Por su parte, en la migración `<TIMESTAMP>_add_ciclo_to_estudiante_table` añadiremos, a la tabla definida anteriormente, el atributo `ciclo` en el método `up()`:
+- Por su parte, en la migración `<TIMESTAMP>_add_familia_to_ciclo_table` añadiremos, a la tabla definida anteriormente, el atributo `familia` en el método `up()`:
 
 ```php
-        Schema::table('estudiantes', function (Blueprint $table) {
-            $table->string('ciclo', 4);
+        Schema::table('ciclos', function (Blueprint $table) {
+            $table->string('codFamilia', 4)->after('codCiclo');
         });
 ```
 
-- Por si tuviéramos que deshacer alguna migración, deberíamos poner en el método `down()` del mismo fichero `<TIMESTAMP>_add_ciclo_to_estudiante_table`, el siguiente código:
+- Por si tuviéramos que deshacer alguna migración, deberíamos poner en el método `down()` del mismo fichero `<TIMESTAMP>_add_familia_to_ciclos_table`, el siguiente código:
 
 ```php
-        Schema::table('estudiantes', function (Blueprint $table) {
-            $table->dropColumn('ciclo');
+        Schema::table('ciclos', function (Blueprint $table) {
+            $table->dropColumn('codFamilia');
         });
 ```
 
@@ -110,36 +108,36 @@ $table->string('email')->unique();
 Para probar a generar una clave ajena, vamos a crear el correspondiente fichero de migración:
 
 ```bash
-php artisan make:migration add_user_id_to_estudiantes_table --table=estudiantes
+php artisan make:migration add_ciclo_id_to_proyectos_table --table=proyectos
 ```
 
-> Renombra el archivo como _`[año_actual]`_`_11_28_000002_add_user_id_to_estudiantes_table.php`
+> Renombra el archivo como _`[año]_[mes]_[día]`_`_000003_add_ciclo_id_to_proyectos_table.php`
 
 `Schema` permite definir _claves ajenas_ entre tablas. en el fichero de migración que acabamos de crear, añadimos las siguientes órdenes de creación de atributos e índice:
 
 ```php
-$table->unsignedBigInteger('user_id')->nullable();
+$table->unsignedBigInteger('ciclo_id')->nullable()->after('metadatos');
 
-$table->foreign('user_id')->references('id')->on('users');
+$table->foreign('ciclo_id')->references('id')->on('ciclos');
 ```
 
-En este ejemplo, en primer lugar añadimos la columna `user_id` de tipo `UNSIGNED INTEGER` (siempre tendremos que crear primero la columna sobre la que se va a aplicar la clave ajena). A continuación, creamos la _clave ajena_ entre la columna `user_id` y la columna `id` de la tabla `users`.
+En este ejemplo, en primer lugar añadimos la columna `ciclo_id` de tipo `UNSIGNED BIG INTEGER` (siempre tendremos que crear primero la columna sobre la que se va a aplicar la clave ajena). A continuación, creamos la _clave ajena_ entre la columna `ciclo_id` y la columna `id` de la tabla `ciclos`.
 
     La columna con la clave ajena tiene que ser del mismo tipo que la columna a la que apunta. Si, por ejemplo, creamos una columna a un índice _auto-incremental_ tendremos que especificar que la columna sea `unsigned` para que no se produzcan errores.
 
 También podemos especificar las acciones que se tienen que realizar para `on delete` y `on update`:
 
 ```php
-        $table->foreign('user_id')
-            ->references('id')->on('users')
+        $table->foreign('ciclo_id')
+            ->references('id')->on('ciclos')
             ->onDelete('cascade');
 ```
 
 Para eliminar una _clave ajena_, en el método `down()` de la migración tenemos que utilizar el siguiente código:
 
 ```php
-            $table->dropForeign('estudiantes_user_id_foreign');
-            $table->dropColumn('user_id');
+            $table->dropForeign('proyectos_ciclo_id_foreign');
+            $table->dropColumn('ciclo_id');
 ```
 
 Para indicar la _clave ajena_ a eliminar tenemos que seguir el siguiente patrón para especificar el nombre `<tabla>_<columna>_foreign`. Donde "tabla" es el nombre de la tabla actual y "columna" el nombre de la columna sobre la que se creo la _clave ajena_.
