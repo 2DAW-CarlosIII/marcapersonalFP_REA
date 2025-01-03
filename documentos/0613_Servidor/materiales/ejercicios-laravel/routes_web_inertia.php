@@ -8,7 +8,7 @@ use App\Http\Controllers\ActividadController;
 use App\Http\Controllers\ReconocimientoController;
 use App\Http\Controllers\CurriculoController;
 use App\Http\Controllers\CicloController;
-use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\FamiliaProfesionalController;
 use App\Http\Controllers\TallerController;
 
 use Illuminate\Foundation\Application;
@@ -141,17 +141,20 @@ Route::prefix('ciclos')->group(function () {
 
 });
 
-Route::prefix('docentes')->group(function () {
+Route::prefix('familias_profesionales')->group(function () {
 
-    Route::get('/', [DocenteController::class, 'getIndex'])->name('docentes');
+    Route::get('/', [FamiliaProfesionalController::class, 'getIndex'])->name('familias_profesionales');
 
-    Route::get('/show/{id}', [DocenteController::class, 'getShow'])->where('id', '[0-9]+');
+    Route::get('/show/{id}', [FamiliaProfesionalController::class, 'getShow'])->where('id', '[0-9]+');
 
-    Route::get('/create', [DocenteController::class, 'getCreate'])->middleware('auth');
+    Route::get('/create', [FamiliaProfesionalController::class, 'getCreate'])->middleware('auth');
 
-    Route::get('/edit/{id}', [DocenteController::class, 'getEdit'])->where('id', '[0-9]+')->middleware('auth');
+    Route::get('/edit/{id}', [FamiliaProfesionalController::class, 'getEdit'])->where('id', '[0-9]+')->middleware('auth');
 
-    Route::put('/edit/{id}', [DocenteController::class, 'putEdit'])->where('id', '[0-9]+');
+    Route::put('/edit/{id}', [FamiliaProfesionalController::class, 'putEdit'])->where('id', '[0-9]+');
+
+    Route::post('/', [FamiliaProfesionalController::class, 'store']);
+
 });
 
 Route::get('/talleres', [TallerController::class, 'getIndex']);
