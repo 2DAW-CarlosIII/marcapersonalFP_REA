@@ -18,7 +18,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Estudiante extends Model
+class Ciclo extends Model
 {
     use HasFactory;
 }
@@ -27,16 +27,16 @@ class Estudiante extends Model
 Sin embargo es mucho más fácil y rápido crear los modelos usando el comando `make:model` de _Artisan_:
 
 ```bash
-php artisan make:model Estudiante
+php artisan make:model Ciclo
 ```
 
-Este comando creará el fichero `Estudiante.php` dentro de la carpeta `app/Models` con el código básico de un modelo que hemos visto en el ejemplo anterior.
+Este comando creará el fichero `Ciclo.php` dentro de la carpeta `app/Models` con el código básico de un modelo que hemos visto en el ejemplo anterior.
 
 ## Convenios en Eloquent
 
 ### Nombre
 
-En general, el nombre de los modelos se pone en singular, con la primera letra en mayúscula, mientras que el nombre de las tablas suele estar en plural. Gracias a esto, al definir un modelo no es necesario indicar el nombre de la tabla asociada, sino que _Eloquent_ automáticamente buscará la tabla transformando el nombre del modelo a minúsculas y buscando su plural (en inglés). En el ejemplo anterior, que hemos creado el modelo `Estudiante` buscará la tabla de la base de datos llamada `estudiantes` y en caso de no encontrarla daría un error.
+En general, el nombre de los modelos se pone en singular, con la primera letra en mayúscula, mientras que el nombre de las tablas suele estar en plural. Gracias a esto, al definir un modelo no es necesario indicar el nombre de la tabla asociada, sino que _Eloquent_ automáticamente buscará la tabla transformando el nombre del modelo a minúsculas y buscando su plural (en inglés). En el ejemplo anterior, que hemos creado el modelo `Ciclo` buscará la tabla de la base de datos llamada `ciclos` y en caso de no encontrarla daría un error.
 
 Si la tabla tuviese otro nombre lo podemos indicar usando la propiedad protegida `$table` del modelo:
 
@@ -48,19 +48,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Estudiante extends Model
+class Ciclo extends Model
 {
     use HasFactory;
 
-    protected $table = 'mis_estudiantes';
-    // como, en nuestro caso, la tabla es estudiantes, conviene no definir esta propiedad
+    protected $table = 'ciclos_formativos';
+    // como, en nuestro caso, la tabla es ciclos, conviene no definir esta propiedad
     // ni las propiedades que se mostrarán a continuación
 }
 ```
 
 ### Clave primaria
 
-_Laravel_ también asume que cada tabla tiene declarada una _clave primaria_ con el nombre `id`. En el caso de que no sea así y queramos cambiarlo tendremos que sobrescribir el valor de la propiedad protegida `$primaryKey` del modelo, por ejemplo: `protected $primaryKey = 'my_id';`.
+_Laravel_ también asume que cada tabla tiene declarada una _clave primaria_ con el nombre `id`. En el caso de que no sea así y queramos cambiarlo tendremos que sobrescribir el valor de la propiedad protegida `$primaryKey` del modelo, por ejemplo: `protected $primaryKey = 'codCiclo';`.
 
     Es importante definir correctamente este valor ya que se utiliza en determinados métodos de _Eloquent_, como por ejemplo para buscar registros o para crear las relaciones entre modelos.
 
@@ -78,14 +78,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Estudiante extends Model
+class Ciclo extends Model
 {
     use HasFactory;
 
-    protected $table = 'mis_estudiantes';
-    protected $primaryKey = 'my_id'
+    protected $table = 'ciclos_formativos';
+    protected $primaryKey = 'codCiclo'
     public $timestamps = false;
-    // Recuerda que en nuestro modelo Estudiantes no hay que redefinir estas propiedades
+    // Recuerda que en nuestro modelo Ciclo no hay que redefinir estas propiedades
 }
 ```
 
@@ -93,41 +93,16 @@ class Estudiante extends Model
 
 Una vez creado el modelo, ya podemos empezar a utilizarlo para recuperar datos de la base de datos, para insertar nuevos datos o para actualizarlos. **El sitio correcto donde realizar estas acciones es en el controlador**, el cual se los tendrá que pasar a la vista ya preparados para su visualización.
 
-Es importante que para su utilización indiquemos al inicio de la clase el _espacio de nombres_ del modelo o modelos a utilizar. Por ejemplo, si vamos a usar los modelos `User` y `Estudiante` tendríamos que añadir:
+Es importante que para su utilización indiquemos al inicio de la clase el _espacio de nombres_ del modelo o modelos a utilizar. Por ejemplo, si vamos a usar los modelos `User` y `Ciclo` tendríamos que añadir:
 
 ```php
 use App\Models\User;
-use App\Models\Estudiante;
+use App\Models\Ciclo;
 ```
 
-Si queremos tener algunos registros en la tabla `estudiantes`, podemos ejecutar la siguiente rutina en la pestaña SQL de [phpMyAdmin](http://localhost:8081).
+Si queremos tener algunos registros en la tabla `ciclos`, podemos ejecutar el script _SQL_ que encontraremos en el fichero [`datosCiclos.sql`](./materiales/ejercicios-laravel/datosCiclos.sql) en la pestaña SQL de [phpMyAdmin](http://localhost:8081).
 
-```sql
-DELIMITER $$
-CREATE DEFINER=`root`@`%` PROCEDURE `insertar_estudiantes`()
-BEGIN
-    DECLARE i INT DEFAULT 1;
-    
-    WHILE i <= 20 DO
-        INSERT INTO estudiantes (nombre, apellidos, direccion, votos, confirmado, created_at, updated_at, ciclo)
-        VALUES
-            (
-                CONCAT('Nombre', i),
-                CONCAT('Apellido', i),
-                CONCAT('Direccion', i),
-                FLOOR(RAND() * (120 - 80 + 1)) + 80,
-                ROUND(RAND()),
-                CURRENT_TIMESTAMP - INTERVAL 20 + i DAY,
-                CURRENT_TIMESTAMP - INTERVAL 20 + i DAY,
-                CONCAT('C_', i)
-            );
-        SET i = i + 1;
-    END WHILE;
-END$$
-DELIMITER ;
-
-CALL insertar_estudiantes();
-```
+> Para que la clave ajena de `proyectos` hacia `ciclos` no genere un error, debemos deactivar la opción **Habilite la revisión de las claves foráneas** de phpMyAdmin.
 
 Debemos tener en cuenta que la utilización de los modelos se realizará habitualmente desde los controladores. No obstante, con el único objetivo de hacer pruebas de utilización de los modelos, crearemos una ruta, en cuyo _Closure_ pondremos el código que utiliza el modelo.
 
@@ -146,61 +121,62 @@ Route::get('pruebaDB', function () {
 Para obtener todas las filas de la tabla asociada a un modelo usaremos el método `all()`:
 
 ```php
-    $estudiantes = Estudiante::all();
+    $ciclos = Ciclo::all();
 
-    foreach( $estudiantes as $estudiante ) {
-        echo $estudiante->nombre . '<br />';
+    foreach( $ciclos as $ciclo ) {
+        echo $ciclo->nombre . '<br />';
     }
 
 ```
 
-Este método nos devolverá un _array_ de resultados, donde cada item del _array_ será una instancia del modelo `Estudiante`. Gracias a esto al obtener un elemento del _array_ podemos acceder a los campos o columnas de la tabla como si fueran propiedades del objeto ($estudiante->nombre).
+Este método nos devolverá un _array_ de resultados, donde cada item del _array_ será una instancia del modelo `Ciclo`. Gracias a esto al obtener un elemento del _array_ podemos acceder a los campos o columnas de la tabla como si fueran propiedades del objeto ($ciclo->nombre).
 
     Nota: Todos los métodos que se describen en la sección de "Constructor de consultas" y en la documentación de _Laravel_ sobre "Query Builder" también se pueden utilizar en los modelos _Eloquent_. Por lo tanto podremos utilizar `where`, `orWhere`, `first`, `get`, `orderBy`, `groupBy`, `having`, `skip`, `take`, etc. para elaborar las consultas.
 
 _Eloquent_ también incorpora el método find($id) para buscar un elemento a partir del identificador único del modelo, por ejemplo:
 
 ```php
-$estudiante = Estudiante::find(1);
-echo $estudiante->nombre;
+$ciclo = Ciclo::find(1);
+echo $ciclo->nombre;
 ```
 
 Si queremos que se lance una excepción cuando no se encuentre un modelo podemos utilizar los métodos `findOrFail()` o `firstOrFail()`. Esto nos permite capturar las excepciones y mostrar un error `404` cuando sucedan.
 
 ```php
-$estudiante = Estudiante::findOrFail(21);
-echo $estudiante->nombre;
+$ciclo = Ciclo::findOrFail(1001);
+echo $ciclo->nombre;
 ```
 
 ```php
-$estudiante = Estudiante::where('votos', '>', 100)->firstOrFail();
-echo $estudiante->nombre;
+$ciclo = Ciclo::where('id', '>', 93)->firstOrFail();
+echo $ciclo->nombre;
 ```
 
 A continuación se incluyen otros ejemplos de consultas usando _Eloquent_ con algunos de los métodos que ya habíamos visto en la sección "Constructor de consultas":
 
 ```php
-// Obtener 10 estudiantes con más de 100 votos
-$estudiantes = Estudiante::where('votos', '>', 100)->take(10)->get();
+// Obtener 10 ciclos siguientes al de id 93
+$ciclos = Ciclo::where('id', '>', 93)->take(10)->get();
 
-    foreach( $estudiantes as $estudiante ) {
-        echo $estudiante->nombre . '<br />';
+    foreach( $ciclos as $ciclo ) {
+        echo $ciclo->nombre . '<br />';
     }
 ```
 
 ```php
-// Obtener el primer estudiante con más de 100 votos
-$estudiante = Estudiante::where('votos', '>', 100)->first();
-echo $estudiante->nombre;
+// Obtener el primer ciclo posterior al de id 93
+$ciclo = Ciclo::where('votos', '>', 93)->first();
+echo $ciclo->nombre;
 ```
 
 También podemos utilizar los métodos agregados para calcular el **total** de registros obtenidos, o el **máximo**, **mínimo**, **media** o **suma** de una determinada columna. Por ejemplo:
 ```php
-$count = Estudiante::where('votos', '>', 100)->count();
-$votos = Estudiante::max('votos');
-$votos = Estudiante::min('votos');
-$votos = Estudiante::avg('votos');
-$total = Estudiante::sum('votos');
+$count = Ciclo::where('id', '>', 93)->count();
+$max = Ciclo::max('id');
+$min = Ciclo::min('id');
+$media = Ciclo::avg('id');
+$total = Ciclo::sum('id');
+echo "Total: $total<br />Media: $media<br />Mínimo: $min<br />Máximo: $max<br />Count: $count";
 ```
 
 ## Insertar datos
@@ -208,19 +184,17 @@ $total = Estudiante::sum('votos');
 Para añadir una entrada en la tabla de la base de datos asociada con un modelo simplemente tenemos que crear una nueva instancia de dicho modelo, asignar los valores que queramos y por último guardarlos con el método `save()`:
 
 ```php
-$count = Estudiante::where('votos', '>', 100)->count();
+$count = Ciclo::where('id', '>', 93)->count();
 echo 'Antes: ' . $count . '<br />';
 
-$estudiante = new Estudiante;
-$estudiante->nombre = 'Juan';
-$estudiante->apellidos = 'Martínez';
-$estudiante->direccion = 'Dirección de Juan';
-$estudiante->votos = 130;
-$estudiante->confirmado = true;
-$estudiante->ciclo = 'DAW';
-$estudiante->save();
+$ciclo = new Ciclo;
+$ciclo->nombre = 'Técnico Superior en Desarrollo d eAplicaciones Laravel';
+$ciclo->codCiclo = 'DAPL3';
+$ciclo->codFamilia = 'IFC';
+$ciclo->grado = 'G.S.';
+$ciclo->save();
 
-$count = Estudiante::where('votos', '>', 100)->count();
+$count = Ciclo::where('id', '>', 93)->count();
 echo 'Después: ' . $count . '<br />';
 
 ```
@@ -236,9 +210,9 @@ $insertedId = $user->id;
 Para actualizar una instancia de un modelo es muy sencillo, solo tendremos que recuperar en primer lugar la instancia que queremos actualizar, a continuación modificarla y por último guardar los datos:
 
 ```php
-$estudiante = Estudiante::find(1);
-$estudiante->votos = 200;
-$estudiante->save();
+$ciclo = Ciclo::find(1);
+$ciclo->grado = 'G.M.';
+$ciclo->save();
 ```
 
 ## Borrar datos
@@ -246,20 +220,20 @@ $estudiante->save();
 Para borrar una instancia de un modelo en la base de datos simplemente tenemos que usar su método `delete()`:
 
 ```php
-$count = Estudiante::count();
+$count = Ciclo::count();
 echo 'Antes: ' . $count . '<br />';
-$estudiante = Estudiante::find(1);
-$estudiante->delete();
+$ciclo = Ciclo::find(1);
+$ciclo->delete();
 
-$count = Estudiante::count();
+$count = Ciclo::count();
 echo 'Después: ' . $count . '<br />';
 ```
 
 Si, por ejemplo, queremos borrar un conjunto de resultados también podemos usar el método `delete()` de la forma:
 
 ```php
-$affectedRows = Estudiante::where('votos', '>', 100)->delete();
-echo 'Estudiantes eliminados: ' . $affectedRows . '<br />';
+$affectedRows = Ciclo::where('id', '>', 100)->delete();
+echo 'Ciclos eliminados: ' . $affectedRows . '<br />';
 ```
 
 ## Más información

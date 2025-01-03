@@ -9,11 +9,11 @@ Para conseguir acceso a estos métodos _Laravel_ utiliza inyección de dependenc
  
 namespace App\Http\Controllers;
 
-use App\Models\Estudiante;
+use App\Models\FamiliaProfesional;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
  
-class EstudianteController extends Controller
+class FamiliaProfesionalController extends Controller
 {
     ...
     public function store(Request $request): RedirectResponse
@@ -33,12 +33,12 @@ Si el método del controlador tuviera más parámetros simplemente los tendremos
 ```php
     public function putEdit(Request $request, $id): RedirectResponse
     {
-        $estudiante = Estudiante::findOrFail($id);
+        $familiaProfesional = FamiliaProfesional::findOrFail($id);
         //
     }
 ```
 
-> Puedes ver un ejemplo completo de creación y modificación de un `Estudiante` en la sección [Crear y Modificar registro de `Estudiante`](./0511_crearModificarEstudiante.md).
+> Puedes ver un ejemplo completo de creación y modificación de una `FamiliaProfesional` en la sección [Crear y Modificar registro de `FamiliaProfesional`](./0511_crearModificarFamiliaProfesional.md).
 
 A continuación veremos los métodos y datos que podemos obtener a partir de la variable `$request`.
 

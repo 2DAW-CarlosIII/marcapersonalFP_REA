@@ -6,32 +6,32 @@ En esta práctica guiada, vamos a utilizar el _driver_ que incluye para el almac
 
 ## Preparar la base de datos.
 
-Vamos a crear un fichero de migración que añada un atributo _avatar_, el cual va a contener la imagen asociada a un `Estudiante`.
+Vamos a crear un fichero de migración que añada un atributo _imagen_, el cual va a contener la imagen asociada a una `FamiliaProfesional`.
 
 ```bash
-php artisan make:migration add_avatar_to_estudiantes_table --table=estudiantes
+php artisan make:migration add_imagen_to_familias_profesionales_table --table=familias_profesionales
 ```
 
-> Renombra el fichero como _`[año]_[mes]_[día]`_`_000001_add_avatar_to_user_table.php`.
+> Renombra el fichero como _`[año]_[mes]_[día]`_`_000001_add_imagen_to_familias_profesionales_table.php`.
 
-El contenido del método  `up()` de la migración añadirá el atributo `avatar` a la tabla  `estudiantes`.
+El contenido del método  `up()` de la migración añadirá el atributo `imagen` a la tabla  `familias_profesionales`.
 
 ```php
     public function up(): void
     {
-        Schema::table('estudiantes', function (Blueprint $table) {
-            $table->string('avatar')->nullable();
+        Schema::table('familias_profesionales', function (Blueprint $table) {
+            $table->string('imagen')->nullable();
         });
     }
 ```
 
-Por su parte, el contenido del método  `down()` de la migración borrará el atributo `avatar` de la tabla `estudiantes`.
+Por su parte, el contenido del método  `down()` de la migración borrará el atributo `imagen` de la tabla `familias_profesionales`.
 
 ```php
     public function down(): void
     {
         Schema::table('estudiantes', function (Blueprint $table) {
-            $table->dropColumn('avatar');
+            $table->dropColumn('imagen');
         });
     }
 ```
@@ -44,15 +44,15 @@ php artisan migrate
 
 ## Modificar el formulario
 
-Vamos a modificar el formulario de edición de un `Estudiante` para que permita la subida de un fichero. Para ello, además de crear un campo de tipo `file`, debemos indicar que el formulario va a enviar un fichero, por lo que debemos añadir el atributo `enctype="multipart/form-data"` al formulario.
+Vamos a modificar el formulario de edición de una `FamiliaProfesional` para que permita la subida de un fichero. Para ello, además de crear un campo de tipo `file`, debemos indicar que el formulario va a enviar un fichero, por lo que debemos añadir el atributo `enctype="multipart/form-data"` al formulario.
 
 {% raw %}
 ```php
-<form action="{{ action([App\Http\Controllers\EstudianteController::class, 'putEdit'], ['id' => $estudiante->id]) }}" method="POST" enctype="multipart/form-data">
+<form action="{{ action([App\Http\Controllers\EstudianteController::class, 'putEdit'], ['id' => $familiaProfesional->id]) }}" method="POST" enctype="multipart/form-data">
 ...
     <div class="form-group">
-        <label for="avatar">Avatar</label>
-        <input type="file" class="form-control" id="avatar" name="avatar" placeholder="Avatar">
+        <label for="imagen">imagen</label>
+        <input type="file" class="form-control" id="imagen" name="imagen" placeholder="imagen">
     </div>
 
     <div class="form-group text-center">
@@ -82,31 +82,31 @@ cd ..
 
 Para almacenar un fichero que se ha enviado en una petición _HTTP_, podemos utilizar el método `store()` de la instancia del fichero enviado en la petición.
 
-Por eso, generaremos el siguiente código en `AvatarController`:
+Por eso, generaremos el siguiente código en `FamiliaProfesionalController`:
 
 ```php
     public function putEdit(Request $request, $id): RedirectResponse
     {
-        $estudiante = Estudiante::findOrFail($id);
+        $familiaProfesional = FamiliaProfesional::findOrFail($id);
 
-        // TODO: Eliminar el avatar anterior si existiera
-        $path = $request->file('avatar')->store('avatars', ['disk' => 'public']);
-        $estudiante->avatar = $path;
-        $estudiante->save();
+        // TODO: Eliminar el imagen anterior si existiera
+        $path = $request->file('imagen')->store('imagens', ['disk' => 'public']);
+        $familiaProfesional->imagen = $path;
+        $familiaProfesional->save();
 
-        $estudiante->update($request->all());
-        return redirect()->action([self::class, 'getShow'], ['id' => $estudiante->id]);
+        $familiaProfesional->update($request->all());
+        return redirect()->action([self::class, 'getShow'], ['id' => $familiaProfesional->id]);
     }
 ```
 
 ## Mostrando el fichero en la vista
 
-Para mostrar el fichero en la vista, podemos utilizar el método `url()` de la clase `Storage`:
+Para mostrar el fichero en la vista, podemos utilizar el método `url()` de la clase `Storage`, tanto en la vista `index` como en la `show`:
 
 {% raw %}
 ```php
-@if ($estudiante->avatar)
-    <img src="{{ Storage::url($estudiante->avatar) }}" alt="Avatar" class="img-thumbnail">
+@if ($familiaProfesional->imagen)
+    <img width="300" style="height:300px" src="{{ Storage::url($familiaProfesional->imagen) }}" alt="imagen" class="img-thumbnail">
 @else
         <img width="300" style="height:300px" alt="Curriculum-vitae-warning-icon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Curriculum-vitae-warning-icon.svg/256px-Curriculum-vitae-warning-icon.svg.png">
 @endif

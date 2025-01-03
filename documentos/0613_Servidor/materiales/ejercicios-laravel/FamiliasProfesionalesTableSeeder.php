@@ -2,20 +2,21 @@
 
 namespace Database\Seeders;
 
+use App\Models\FamiliaProfesional;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class FamiliasProfesionalesSeeder extends Seeder
+class FamiliasProfesionalesTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        DB::table('familias_profesionales')->truncate();
+        FamiliaProfesional::truncate();
         foreach (self::$familias_profesionales as $familia) {
-            DB::table('familias_profesionales')->insert([
+            FamiliaProfesional::insert([
                 'codigo' => $familia['codigo'],
                 'nombre' => $familia['nombre'],
             ]);

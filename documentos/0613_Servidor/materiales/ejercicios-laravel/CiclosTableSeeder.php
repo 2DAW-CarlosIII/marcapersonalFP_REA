@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class CiclosSeeder extends Seeder
+class CiclosTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,12 +14,13 @@ class CiclosSeeder extends Seeder
     public function run(): void
     {
         DB::table('ciclos')->truncate();
-        $familias = FamiliasProfesionalesSeeder::$familias_profesionales;
+        // $familias = FamiliasProfesionalesSeeder::$familias_profesionales;
+        // $codigosFamilias = array_column($familias, 'codigo');
         foreach (self::$ciclos as $ciclo) {
             DB::table('ciclos')->insert([
                 'codCiclo' => $ciclo['codCiclo'],
                 'codFamilia' => $ciclo['codFamilia'],
-                'familia_id' => array_search($ciclo['codFamilia'], array_column($familias, 'codigo')) + 1,
+                // 'familia_id' => array_search($ciclo['codFamilia'], $codigosFamilias) + 1,
                 'grado' => $ciclo['grado'],
                 'nombre' => $ciclo['nombre'],
             ]);

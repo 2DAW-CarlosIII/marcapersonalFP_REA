@@ -7,7 +7,7 @@ use App\Http\Controllers\ProyectosController;
 use App\Http\Controllers\ActividadController;
 use App\Http\Controllers\ReconocimientoController;
 use App\Http\Controllers\CurriculoController;
-use App\Http\Controllers\EstudianteController;
+use App\Http\Controllers\CicloController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\TallerController;
 
@@ -125,19 +125,19 @@ Route::prefix('curriculos')->group(function () {
 
 });
 
-Route::prefix('estudiantes')->group(function () {
+Route::prefix('ciclos')->group(function () {
 
-    Route::get('/', [EstudianteController::class, 'getIndex'])->name('estudiantes');
+    Route::get('/', [CicloController::class, 'getIndex'])->name('ciclos');
 
-    Route::get('/show/{id}', [EstudianteController::class, 'getShow'])->where('id', '[0-9]+');
+    Route::get('/show/{id}', [CicloController::class, 'getShow'])->where('id', '[0-9]+');
 
-    Route::get('/create', [EstudianteController::class, 'getCreate'])->middleware('auth');
+    Route::get('/create', [CicloController::class, 'getCreate'])->middleware('auth');
 
-    Route::get('/edit/{id}', [EstudianteController::class, 'getEdit'])->where('id', '[0-9]+')->middleware('auth');
+    Route::get('/edit/{id}', [CicloController::class, 'getEdit'])->where('id', '[0-9]+')->middleware('auth');
 
-    Route::put('/edit/{id}', [EstudianteController::class, 'putEdit'])->where('id', '[0-9]+');
+    Route::put('/edit/{id}', [CicloController::class, 'putEdit'])->where('id', '[0-9]+');
 
-    Route::post('/', [EstudianteController::class, 'store']);
+    Route::post('/', [CicloController::class, 'store']);
 
 });
 
