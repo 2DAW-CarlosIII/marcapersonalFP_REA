@@ -102,7 +102,7 @@ En el caso de obtener un resultado diferente, habrá que investigar cuál es la 
 
 # Otros ejercicios de Bases de Datos
 
-- [Docentes](./0471_BDDocente.md)
+- [FamiliasProfesionales](./0471_BDFamiliaProfesional.md)
 - [Currículos](./0472_BDCurriculo.md)
 - [Reconocimientos](./0473_BDReconocimiento.md)
 - [Actividades](./0474_BDActividad.md)

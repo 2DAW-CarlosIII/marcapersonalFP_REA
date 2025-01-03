@@ -169,8 +169,6 @@ class CiclosTableSeeder extends Seeder
 }
 ```
 
-> No obstante, para poder trabajar con datos reales de los ciclos formativos, el contenido del archivo [CiclosTableSeeder](./materiales/ejercicios-laravel/CiclosTableSeeder.php) está disponible en los materiales.
-
 El método `call()` de `DatabaseSeeder` lo que hace es llamar al método `run()` de la clase indicada. Además, en el ejemplo hemos añadido las llamadas a `unguard()` y a `reguard()`, que lo que hacen es desactivar y volver a activar (respectivamente) la inserción de datos masiva o por lotes.
 
 ## Ejecutar la inicialización de datos
@@ -237,5 +235,7 @@ Habitualmente, las _factories_ las utilizaremos desde los test, aunque en esta o
     }
 ```
 
-> Para que el modelo `Ciclo`pueda utilizar _factories_ se debe añadir la siguiente línea a la clase de dicho modelo:
+> Para que el modelo `Ciclo`pueda utilizar _factories_ se debe añadir la siguiente línea en el contenido de la clase de dicho modelo:
 `use HasFactory;`
+
+> No obstante, para poder trabajar con datos reales de los ciclos formativos, el contenido del archivo [CiclosTableSeeder](./materiales/ejercicios-laravel/CiclosTableSeeder.php) está disponible en los materiales.

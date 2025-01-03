@@ -34,7 +34,7 @@ Los contenidos que se presentan a continuación constituyen un desarrollo que, i
     7. [Ejercicios](./047_ejerciciosBD.md)
 5. [Datos de entrada y Control de usuarios](./05_requestYAutenticacion.md)
     1. [Datos de entrada](./051_datosEntrada.md)
-        1. [Crear y modificar registro de `Estudiante`](./0511_crearModificarEstudiante.md)
+        1. [Crear y modificar registro de `FamiliaProfesional`](./0511_crearModificarFamiliaProfesional.md)
         2. [Asociar fichero de currículo](./0512_utilizarFicheros.md)
     2. [Control de usuarios](./052_Autenticacion.md)
     3. [Ejercicios](./053_ejerciciosRequestUsers.md)

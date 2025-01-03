@@ -15,11 +15,12 @@ class CiclosTableSeeder extends Seeder
     {
         DB::table('ciclos')->truncate();
         // $familias = FamiliasProfesionalesSeeder::$familias_profesionales;
+        // $codigosFamilias = array_column($familias, 'codigo');
         foreach (self::$ciclos as $ciclo) {
             DB::table('ciclos')->insert([
                 'codCiclo' => $ciclo['codCiclo'],
                 'codFamilia' => $ciclo['codFamilia'],
-                // 'familia_id' => array_search($ciclo['codFamilia'], array_column($familias, 'codigo')) + 1,
+                // 'familia_id' => array_search($ciclo['codFamilia'], $codigosFamilias) + 1,
                 'grado' => $ciclo['grado'],
                 'nombre' => $ciclo['nombre'],
             ]);
