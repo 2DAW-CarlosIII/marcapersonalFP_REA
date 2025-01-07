@@ -6,10 +6,14 @@ Al finalizar el trimestre anterior, conseguimos una web funcional, que permitía
 
 Para la definición de la API, hemos utilizado la herramienta [Swagger](https://swagger.io/), que nos permite definir la API de forma sencilla, y nos genera la documentación de la misma. El resultado es un [fichero en formato _YAML_](./materiales/swagger/marcapersonalFP_api.yaml).
 
-Para editar este fichero, podemos utilizar _Swagger Editor_, y para probar su funcionalidad, utilizaremos _Swagger UI_. Para levantar ambos contenedores, ejecutaremos el siguiente comando desde el directorio en el que tenemos `laradock`:
+Para editar este fichero, podemos utilizar _Swagger Editor_, y para probar su funcionalidad, utilizaremos _Swagger UI_.
+
+Vamos a levantar el contenedor _Swagger UI_ ejecutando el siguiente comando desde el directorio en el que tenemos `laradock`:
 
 ```bash
-docker compose up -d swagger-editor swagger-ui
+docker compose up -d swagger-ui
 ```
 
-_Swagger Editor_ estará disponible en la dirección [http://localhost:5151](http://localhost:5151), y _Swagger UI_ en [http://localhost:5555](http://localhost:5555).
+_Swagger UI_ estará disponible en la dirección [http://localhost:5555](http://localhost:5555) o [http://marcapersonalfp.test:5555](http://marcapersonalfp.test:5555).
+
+Una vez abierto _Swagger UI_ en el navegador, podemos **explorar** el fichero _YAML_ de la API, que se encuentra en la ruta [https://raw.githubusercontent.com/2DAW-CarlosIII/marcapersonalFP_REA/refs/heads/master/documentos/0613_Servidor/materiales/swagger/marcapersonalFP_api.yaml](https://raw.githubusercontent.com/2DAW-CarlosIII/marcapersonalFP_REA/refs/heads/master/documentos/0613_Servidor/materiales/swagger/marcapersonalFP_api.yaml).

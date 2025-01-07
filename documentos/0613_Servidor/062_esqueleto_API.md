@@ -1,10 +1,8 @@
 # Breeze API
 
-En el capítulo dedicado a la [autenticación](./052_Autenticacion.md) ya instalamos el paquete [`laravel/breeze`](https://laravel.com/docs/10.x/starter-kits#laravel-breeze), que nos facilitó la gestión de usuarios.
+En el capítulo dedicado a la [autenticación](./052_Autenticacion.md) ya instalamos el paquete [`laravel/breeze`](https://laravel.com/docs/starter-kits#laravel-breeze), que nos facilitó la gestión de usuarios.
 
 En este capítulo, vamos a reinstalar `laravel/breeze` pero desechando el código referente a las vistas, ya que nuestro objetivo es crear una _API_ que envíe y reciba datos sin ningún código referente a las vistas.
-
-> Conviene realizar este capítulo en una rama nueva, ya que las modificaciones que realicemos en éste, serán sobreescritas en el cápitulo siguiente.
 
 ## Instalación de Breeze API
 
@@ -26,22 +24,18 @@ Cambios no rastreados para el commit:
 	modificado:     app/Http/Controllers/Auth/PasswordResetLinkController.php
 	modificado:     app/Http/Controllers/Auth/RegisteredUserController.php
 	modificado:     app/Http/Controllers/Auth/VerifyEmailController.php
-	modificado:     app/Http/Kernel.php
 	modificado:     app/Http/Requests/Auth/LoginRequest.php
-	modificado:     app/Providers/AuthServiceProvider.php
-	modificado:     config/app.php
-	modificado:     config/cors.php
-	modificado:     config/sanctum.php
+	modificado:     app/Providers/AppServiceProvider.php
+	modificado:     bootstrap/app.php
+	modificado:     composer.json
+	modificado:     composer.lock
 	borrado:        package.json
 	borrado:        resources/css/app.css
 	borrado:        resources/js/app.js
 	borrado:        resources/js/bootstrap.js
-   	borrado:        resources/views/welcome.blade.php
-	modificado:     routes/api.php
+	borrado:        resources/views/welcome.blade.php
 	modificado:     routes/auth.php
 	modificado:     routes/web.php
-	modificado:     routes/api.php
-	modificado:     routes/auth.php
 	modificado:     tests/Feature/Auth/AuthenticationTest.php
 	modificado:     tests/Feature/Auth/EmailVerificationTest.php
 	borrado:        tests/Feature/Auth/PasswordConfirmationTest.php
@@ -51,8 +45,12 @@ Cambios no rastreados para el commit:
 
 Archivos sin seguimiento:
   (usa "git add <archivo>..." para incluirlo a lo que se será confirmado)
-	app/Http/Middleware/EnsureEmailIsVerified.php
+	app/Http/Middleware/
+	config/cors.php
+	config/sanctum.php
+	database/migrations/2025_01_07_172506_create_personal_access_tokens_table.php
 	resources/views/.gitkeep
+	routes/api.php
 ```
 
 Como vemos, se han incluido ficheros de configuración de _CORS_ y _Sanctum_, que nos permitirán gestionar la seguridad de nuestra API. También se han modificado los ficheros de rutas, para que se utilicen las rutas de la API, y se han modificado los controladores de autenticación para que no se utilicen las vistas.
@@ -70,7 +68,7 @@ git restore resources/views/welcome.blade.php routes/web.php
 
 ## Configuración de CORS
 
-El paquete _CORS_ nos permite configurar el acceso a nuestra API desde otros dominios. Para ello, el fichero `config/cors.php` incluye una línea que nos permite configurar los dominios que tendrán acceso a nuestra API:
+El paquete _CORS_ nos permite configurar el acceso a nuestra API desde otros dominios y puertos. Para ello, el fichero `config/cors.php` incluye una línea que nos permite configurar los dominios que tendrán acceso a nuestra API:
 
 ```php
     'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000')],
@@ -80,29 +78,46 @@ Como vemos, por defecto, se permite el acceso desde `http://localhost:3000`, que
 
 ## Configuración de Sanctum
 
-El paquete _Sanctum_ nos permite gestionar la seguridad de nuestra API. Para ello, el fichero `config/sanctum.php` incluye una línea que nos permite configurar los dominios que tendrán acceso a nuestra API:
+El paquete _Sanctum_ nos permite gestionar la seguridad de nuestra API. Para ello, el fichero `config/sanctum.php` incluye una línea que nos permite configurar los dominios y hosts que que recibirán cookies de autenticación con mantenimiento del estado:
 
 ```php
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        env('APP_URL') ? ','.parse_url(env('APP_URL'), PHP_URL_HOST) : '',
+        'localhost,localhost:3000,127.0.0.1,127.0.0.1:3000,127.0.0.1:8000,::1',
+        Sanctum::currentApplicationUrlWithPort(),
         env('FRONTEND_URL') ? ','.parse_url(env('FRONTEND_URL'), PHP_URL_HOST) : ''
     ))),
-
 ```
 
 Como vemos, por defecto, se permite el acceso desde `http://localhost:3000`, que es el puerto por defecto de _React JS_. Si el dominio desde el que accederemos es diferente a este, debemos modificar el valor de la variable de entorno `FRONTEND_URL` en el fichero `.env`.
 
-El aspecto crucial aquí es que este comando agrega las rutas para el _frontend_ y el _backend_ al archivo `.env`. La ruta del _frontend_ está relacionada con el archivo `config/sanctum.php`, donde se declaran las rutas sin estado del _backend_. Para fines de prueba, no es necesario realizar ningún cambio en el archivo `config/sanctum.php`. Sin embargo, si desea implementar su aplicación en un entorno de producción, debemos agregar las variables `SANCTUM_STATEFUL_DOMAINS` en el archivo `.env` y en el `.env.example`.
+Para fines de prueba, no es necesario realizar ningún cambio en el archivo `config/sanctum.php`, aunque es muy probable que tengamos que hacer algún cambio en un entorno de prducción.
+
+Vamos a aprovechar para hacer algún cambio adicional en el fichero `.env`:
 
 ```bash
-FRONTEND_URL=http://localhost:3000
-SANCTUM_STATEFUL_DOMAINS=localhost:3000,marcaPersonalFP.test
+APP_NAME="Marca Personal FP"
 ```
 
-La variable `APP_URL` ya existe en esos ficheros, pero conviene establecer su valor en el fichero `.env` a:
+y
 
 ```bash
 APP_URL=http://marcapersonalfp.test
 ```
+
+## Nuevo fichero de rutas
+
+Se ha creado un nuevo fichero `routes/api.php`. Este fichero es el que se utilizará para gestionar las rutas de nuestra API.
+
+De momento, el único contenido es el siguiente:
+
+```php
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
+    return $request->user();
+});
+```
+
+Ese contenido genera una única ruta `GET /api/user` que devuelve los datos del usuario autenticado, si se ha autenticado previamente o una redirección al login si no está autenticado.
