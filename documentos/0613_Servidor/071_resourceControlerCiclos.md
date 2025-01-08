@@ -2,15 +2,9 @@
 
 ## Creación del Modelo
 
-En capítulos anteriores hemos creado modelos para diferentes tablas. Estos modelos no incluían los de las tablas `ciclos` ni `familias profesionales`
+En capítulos anteriores hemos creado modelos para diferentes tablas. Entre esos modelos, hemos creado el correspondiente a la tabla `ciclos`.
 
-Comenzaremos generando el modelo de la tabla ciclos:
-
-```bash
-php artisan make:model Ciclo
-```
-
-Para poder utilizar posteriormente el método `create()` del modelo, deberemos, previamente, incluir el siguiente código en dicho modelo :
+No obstante, para poder utilizar posteriormente el método `create()` del modelo, deberemos, previamente, incluir el siguiente código en dicho modelo:
 
 ```php
     protected $fillable = [
