@@ -78,7 +78,7 @@ Como vemos, por defecto, se permite el acceso desde `http://localhost:3000`, que
 
 ## Configuración de Sanctum
 
-El paquete _Sanctum_ nos permite gestionar la seguridad de nuestra API. Para ello, el fichero `config/sanctum.php` incluye una línea que nos permite configurar los dominios y hosts que que recibirán cookies de autenticación con mantenimiento del estado:
+El paquete _Sanctum_ nos permite gestionar la seguridad de nuestra API. Para ello, el fichero `config/sanctum.php` incluye una línea que nos permite configurar los dominios y hosts que recibirán cookies de autenticación con mantenimiento del estado:
 
 ```php
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
