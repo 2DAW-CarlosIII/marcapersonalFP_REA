@@ -58,7 +58,7 @@ use Tqdev\PhpCrudApi\Config\Config;
 
 Reemplazamos la cadena _php-crud-api_ en el código anterior para que coincida con el nombre de usuario, contraseña y base de datos de nuestra configuración (preferiblemente leyéndolos de las variables de entorno).
 
-Ahora, deberíamos poder lanzar peticiones a la API, utilizando _Swuagger UI_, que se encuentra en la dirección [http://marcapersonalfp:5555](http://marcapersonalfp:5555). Para ello, deberemos elegir el archivo [`marcapersonalFP_api.yaml`](https://raw.githubusercontent.com/2DAW-CarlosIII/marcapersonalFP_REA/master/documentos/0613_Servidor/materiales/swagger/marcapersonalFP_api.yaml), como fuente para Explorar y _http://marcapersonalFP.test/api/records - Entorno React_ como servidor.
+Ahora, deberíamos poder lanzar peticiones a la API, utilizando _Swuagger UI_, que se encuentra en la dirección [http://marcapersonalfp.test:5555](http://marcapersonalfp.test:5555). Para ello, deberemos elegir el archivo [`marcapersonalFP_api.yaml`](https://raw.githubusercontent.com/2DAW-CarlosIII/marcapersonalFP_REA/master/documentos/0613_Servidor/materiales/swagger/marcapersonalFP_api.yaml), como fuente para Explorar y _http://marcapersonalFP.test/api/records - Entorno React_ como servidor.
 
 Para no tener problemas con _CORS_, debemos asignar, de momento, la dirección de _Swagger UI_, a la variable de entorno `FRONTEND_URL`:
 
