@@ -239,8 +239,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -405,8 +407,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -571,8 +575,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -737,8 +743,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -977,8 +985,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -1165,8 +1175,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -1331,8 +1343,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -1497,8 +1511,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -1695,8 +1711,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -1890,8 +1908,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -1951,8 +1971,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
@@ -2010,8 +2032,10 @@ paths:
           description: dirección de la ordenación
           required: false
           schema:
-            type: integer
-            format: int32
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         '200':
           description: Operación exitosa
