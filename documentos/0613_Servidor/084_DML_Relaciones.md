@@ -1,6 +1,6 @@
 # Insertar y actualizar con relaciones
 
-## El método save
+## El método `save()`
 
 _Eloquent_ ofrece métodos para añadir nuevos modelos a las relaciones. Por ejemplo, si queremos añadir un nuevo `ciclo` a una determinada `fasmilia_profesional`, en lugar de definir manualmente el atributo `familia_id` que le corresponde al modelo `Ciclo` podemos insertar ese `ciclo` utilizando el método `save()` de la relación:
 
@@ -17,7 +17,7 @@ $familiaProfesional->ciclos()->save($ciclo);
 
 En este caso, no accedemos a la propiedad dinámica `ciclos` , sino que llamamos al método `ciclos()` para obtener una instancia de la relación. El método `save()` añadirá automáticamente el valor apropiado para el atributo `familia_id` de la nueva instancia del modelo `Ciclo`.
 
-## El método create()
+## El método `create()`
 
 También podemos utilizar el método  `create()`, que acepta un array de atributos, para crear un modelo e insertarlo en la base de datos. La diferencia entre `save()` y `create()` es que `save()` acepta una instancia del modelo _Eloquent_ mientras que `create()` acepta un _array_ de PHP:
 
@@ -26,33 +26,29 @@ use App\Models\FamiliaProfesional;
 
 $familiaProfesional = FamiliaProfesional::find(1);
 
-$ciclos = $nivel->ciclos()->create([
+$ciclos = $familiaProfesional->ciclos()->create([
     'amount' => 1000,
 ]);
 ```
 
-## Pertenencia a las relaciones
+## Relaciones `belongsTo`
 
 Si quisiéramos asignar un modelo hijo a un modelo padre diferente al que ya tuviera asignado, podríamos utilizar el método `associate()`.
 
-En el siguiente ejemplo, el modelo FamiliaProfesional define una relación belongsTo con el modelo User. El método `associate()` asignará la clave ajena en el modelo hijo:
+En el siguiente ejemplo, el modelo `FamiliaProfesional` define una relación `belongsTo` con el modelo `User`. El método `associate()` asignará la clave ajena en el modelo hijo:
 
 ```php
-use App\Models\User;
-
-$user = User::find(10);
-
-$familiaProfesional->user()->associate($user);
-
-$familiaProfesional->save();
+        $ciclo = Ciclo::find(1);
+        $familiaProfesional = FamiliaProfesional::find(1);
+        $ciclo->familiaProfesional()->associate($familiaProfesional);
 ```
 
 Para eliminar un modelo padre de un modelo hijo utilizaremos el método `dissociate()`, que asignará null a la clave ajena:
 
 ```php
-$user->familiaProfesional()->dissociate();
+$ciclo->familiaProfesional()->dissociate();
 
-$user->save();
+$ciclo->save();
 ```
 
 ## Relaciones Muchos-a-Muchos

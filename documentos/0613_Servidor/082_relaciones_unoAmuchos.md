@@ -90,7 +90,7 @@ De las dos métodos explicados anteriormente para trabajar con relaciones **uno 
      {
 -        return parent::toArray($request);
 +        return array_merge(parent::toArray($request), [
-+            'familia_profesional' => new FamiliaProfesionalResource($this->familiaProfesional),
++            'familia_profesional' => $this->familiaProfesional,
 +        ]);
      }
  }

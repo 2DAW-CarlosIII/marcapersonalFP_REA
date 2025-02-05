@@ -2,7 +2,7 @@
 
 ## Filtrar por id
 
-En muchos de los listados que hemos realizado con _React-admin_, hemos utilizado el componente `ReferenceField`, el cual busca registros relacionados en otra tabla. Por ejemplo, el siguiente `ReferenceField` es el que se utiliza para mostrar el nombre de la `familia_profesional` asociada a un `ciclo`:
+En muchos de los listados que se pueden realizar con _React-admin_, se utiliza el componente `ReferenceField`, el cual busca registros relacionados en otra tabla. Por ejemplo, el siguiente `ReferenceField` es el que se utilizará para mostrar el nombre de la `familia_profesional` asociada a un `ciclo`:
 
 ```jsx
     <ReferenceField label="Familia Profesional" source="familia_id" reference="familias_profesionales">
@@ -33,7 +33,7 @@ Request Method: GET
 
 Como actualmente los filtros que aplicamos no tienen en cuenta los `id` enviados en la _query_, la _API_ devuelve todos los registros de la tabla `familias_profesionales`, lo que significa que, aunque se soliciten 2, se devuelven las 26 `familias_profesionales` almacenadas en la base de datos.
 
-**Debemos modificar el _helper_ que aplica los filtros para que, en el caso de que se esté enviando una petición como la anterior, se aplique un filtro por `id` en la consulta y se devuelvan únicamente los registros solicitados**:
+**Debemos modificar el _middlware_ que aplica los filtros para que, en el caso de que se esté enviando una petición como la anterior, se aplique un filtro por `id` en la consulta y se devuelvan únicamente los registros solicitados**:
 ```json
 [
     {
@@ -97,7 +97,7 @@ La forma de insertar y actualizar a través de relaciones la puedes consultar en
 
 Una vez consultada dicha documentación, realiza el siguiente ejercicio con la tabla intermedia expuesta en el título del _issue_.
 
-Actualmente, cuando realizamos el _seed_ de las tablas intermedias, elegimos valores `id` relacionados aleatoriamente de entre los que existen en cada una de las tablas. Ahora que conocemos como añadir relaciones entre dos registros utilizando las relaciones, vamos a modificar los seed existentes de las tablas intermedias. Para ello, vamos a coger todos los registros de cada una de las tablas y, por cada uno de ellos, vamos a relacionarle registros aleatorios de la tabla relacionada. El número de registros relacionados serán 0, 1 o 2.
+Actualmente, cuando realizamos el _seed_ de las tablas intermedias, elegimos valores `id` relacionados aleatoriamente de entre los que existen en cada una de las tablas. Ahora que conocemos cómo añadir relaciones entre dos registros utilizando las relaciones, vamos a modificar los _seed_ existentes de las tablas intermedias. Para ello, vamos a coger todos los registros de cada una de las tablas y, por cada uno de ellos, vamos a relacionarle registros aleatorios de la tabla relacionada. El número de registros relacionados serán 0, 1 o 2.
 
 - competencias_actividades
 - users_competencias

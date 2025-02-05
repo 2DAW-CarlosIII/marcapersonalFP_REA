@@ -64,7 +64,7 @@ Como todas las relaciones también sirven como _constructores de consultas_, pue
 $idiomas = User::find(1)->idiomas()->orderBy('name')->get();
 ```
 
-Para determinar el nombre de la tabla de la relación de la tabla intermedia, _Eloquent_ unirá los dos nombres de modelo relacionados en orden alfabético. Sin embargo, eres libre de anular esta convención. Puede hacerlo pasando un segundo argumento al método `belongsToMany()`:
+Para determinar el nombre de la tabla de la relación de la tabla intermedia, _Eloquent_ unirá los dos nombres de modelo relacionados en orden alfabético. Sin embargo, eres libre de anular esta convención. Puedes hacerlo pasando un segundo argumento al método `belongsToMany()`:
 
 ```php
 return $this->belongsToMany(Idioma::class, 'users_idiomas');
