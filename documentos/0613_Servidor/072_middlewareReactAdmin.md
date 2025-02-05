@@ -136,28 +136,14 @@ La utilización de este _Middleware_ va a requerir la creación de una propiedad
 
 ## Registro del Middleware
 
-Para que este middleware sea utilizado en las respuestas, debemos elegir para qué tipo de peticiones se debe utilizar. Este registro lo debemos hacer en el elemento `api` de la propiedad `middlewareGroups` del fichero `app/Http/Kernel.php`, indicando con ello, que el middleware se utilizará para las peticiones dirigidas a la _API_:
+Para que este middleware sea utilizado en las respuestas, debemos elegir para qué tipo de peticiones se debe utilizar. Este registro lo debemos hacer en el fichero `bootstrap/app.php`, indicando que el middleware se utilizará para las peticiones dirigidas a la _API_:
 
 ```php
-    protected $middlewareGroups = [
-        'web' => [
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
-        ],
-
-        'api' => [
-            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\ReactAdminResponse::class,
-        ],
-    ];
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            ReactAdminResponse::class, // Añadimos aquí el middleware ReactAdminResponse
+        ]);
 ```
 
 ## Ventajas de la utilización del Middleware

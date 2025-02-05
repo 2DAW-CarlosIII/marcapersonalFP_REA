@@ -148,7 +148,14 @@ class CicloController extends Controller
      */
     public function destroy(Ciclo $ciclo)
     {
-        $ciclo->delete();
+        try {
+            $ciclo->delete();
+            return response()->json(null, 204);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error: ' . $e->getMessage()
+            ], 400);
+        }
     }
 }
 ```
