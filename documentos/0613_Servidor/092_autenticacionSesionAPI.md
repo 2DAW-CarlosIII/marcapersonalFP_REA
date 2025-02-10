@@ -4,21 +4,18 @@ Aunque la norma general es utilizar la autenticación por tokens en las API, en 
 
 ## Middlewares que afectan a las sesiones
 
-Si queremos utilizar la autenticación por sesiones en la API, debemos hacer que a las rutas definidas en `routes/web.php` les afecten los middlewares `EncryptCookies` y `StartSession`. Para ello, debemos modificar el fichero `app/Http/Kernel.php`, para añadir esos dos _middleware_ en el array `api` de la propiedad `$middlewareGroups`:
+Si queremos utilizar la autenticación por sesiones en la API, debemos hacer que a las rutas definidas en `routes/api.php` les afecten los middlewares `EncryptCookies` y `StartSession`. Para ello, debemos modificar el fichero `bootstrap/app.php`, para añadir esos dos _middleware_ en el array `api` de la propiedad `$middlewareGroups`:
 
 ```diff
 
-
-        'api' => [
-            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\ReactAdminResponse::class,
-
-+             // Permitir sesiones de usuario en API
-+             \App\Http\Middleware\EncryptCookies::class,
-+             \Illuminate\Session\Middleware\StartSession::class,
-        ],
+     ->withMiddleware(function (Middleware $middleware) {
+         $middleware->api(prepend: [
+-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
++            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+             ReactAdminResponse::class,
++            Illuminate\Cookie\Middleware\EncryptCookies::class,
++            \Illuminate\Session\Middleware\StartSession::class,
+         ]);
 ```
 
 ## Adaptando el logout
