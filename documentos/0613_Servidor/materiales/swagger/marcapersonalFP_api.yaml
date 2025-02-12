@@ -82,7 +82,8 @@ tags:
   - name: user
     description: Operaciones con los usuarios
 security:
-  - bearerAuth: [] 
+  - bearerAuth: []
+  - cookieAuth: []
 paths:
   /tokens:
     post:
@@ -2542,3 +2543,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+    cookieAuth:            # arbitrary name for the security scheme
+      type: apiKey
+      in: cookie
+      name: laravel_session # cookie name
