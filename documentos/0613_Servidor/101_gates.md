@@ -2,24 +2,26 @@
 
 Tan solo como un ejemplo, mostraremos cómo podemos autorizar la modificación de un `curriculo` en el caso de que el usuario autenticado sea el asociado a dicho `curriculo`:
 
-Los `gates` los definiremos en el método `boot()` de `App\Providers\AuthServiceProvider` utilizando la clase `Gate`:
+Los `gates` los definiremos en el método `boot()` de `app/Providers/AppServiceProvider.php` utilizando la clase `Gate`:
 
 ```diff
--// use Illuminate\Support\Facades\Gate;
+ namespace App\Providers;
+
 +use App\Models\Curriculo;
 +use App\Models\User;
+ use Illuminate\Auth\Notifications\ResetPassword;
 +use Illuminate\Support\Facades\Gate;
- use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+ use Illuminate\Support\ServiceProvider;
  
- class AuthServiceProvider extends ServiceProvider
-@@ -21,6 +23,8 @@ class AuthServiceProvider extends ServiceProvider
-      */
-     public function boot(): void
-     {
--        //
+ class AppServiceProvider extends ServiceProvider
+@@ -23,5 +26,8 @@ public function boot(): void
+         ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
+             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";
+         });
 +        Gate::define('update-curriculo', function (User $user, Curriculo $curriculo) {
 +        return $user->id === $curriculo->user_id;
-+    });
++        });
+     }
  }
 ```
 
