@@ -14,41 +14,27 @@ php artisan make:policy CurriculoPolicy --model=Curriculo
 
 ## Registando Policies
 
-Una vez que la clase `policy` ha sido creada, necesita ser registrada en `App\Providers\AuthServiceProvider` en el _array_ `$policies`:
+Si el `model` y la `policy` siguen las convenciones de nomenclatura de Laravel, las `policy`serán registradas automáticamente por Laravel. No obstante, podemos registrarlas manualmente en el método `boot()` de `App\Providers\AppServiceProvider`, de manera similar a cómo lo hicimos con los `gate`:
 
-```php
-<?php
+```diff
+// app/Providers/AppServiceProvider.php
+ namespace App\Providers;
+ 
++use App\Models\Curriculo;
++use App\Policies\CurriculoPolicy;
+ use Illuminate\Auth\Notifications\ResetPassword;
++use Illuminate\Support\Facades\Gate;
+ use Illuminate\Support\ServiceProvider;
+ 
+ class AppServiceProvider extends ServiceProvider
+@@ -23,5 +26,6 @@ public function boot(): void
+         ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
+             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";
+         });
++        Gate::policy(Curriculo::class, CurriculoPolicy::class);
+     }
+ }
 
-namespace App\Providers;
-
-use App\Models\Curriculo;
-use App\Policies\CurriculoPolicy;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
-
-class AuthServiceProvider extends ServiceProvider
-{
-    /**
-     * The policy mappings for the application.
-     *
-     * @var array
-     */
-    protected $policies = [
-        Curriculo::class => CurriculoPolicy::class,
-    ];
-
-    /**
-     * Register any application authentication / authorization services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->registerPolicies();
-
-        //
-    }
-}
 ```
 
 > Fíjate que hemos eliminado las autorizaciones con Gates definidas en el apartado anterior.
@@ -186,45 +172,30 @@ de la siguiente forma:
         // Crea el curriculo...
     }
 ```
-### A través de Controller Helpers
+### A través de `Gate`
 
-Además de los método provistos por el modelo `User`, _Laravel_ ofrece un método `authorize` para cualquiera de los controladores que extiendan la clase base `App\Http\Controllers\Controller`.
+Además de los método provistos por el modelo `User`, _Laravel_ ofrece un método `authorize`, perteneciente al _facade_ `Gate`. Este método acepta, como parámetros, el método que se pretende autorizar y la instancia o clase del modelo que interviene en la autorización.
 
 El método `authorize` lanzará una excepción `Illuminate\Auth\Access\AuthorizationException` en el caso de que el usuario no tenga permisos para realizar la acción, que será convertida automáticamente a una respuesta _HTTP_ con un código de estado `403`:
 
-```php
-<?php
+```diff
+// app/Http/Controllers/API/CurriculoController.php
+ use App\Http\Resources\CurriculoResource;
+ use App\Models\Curriculo;
+ use Illuminate\Http\Request;
++use Illuminate\Support\Facades\Gate;
+ 
+ class CurriculoController extends Controller
+ {
+@@ -47,6 +48,8 @@ public function show(Curriculo $curriculo)
+      */
+     public function update(Request $request, Curriculo $curriculo)
+     {
++        Gate::authorize('update', $curriculo);
++
+         $curriculoData = json_decode($request->getContent(), true);
+         $curriculo->update($curriculoData);
 
-namespace App\Http\Controllers\API;
-
-use App\Http\Controllers\Controller;
-use App\Models\Curriculo;
-use App\Http\Resources\CurriculoResource;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-
-class CurriculoController extends Controller
-{
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Curriculo  $curriculo
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Curriculo $curriculo)
-    {
-        /* 
-        abort_if ($request->user()->cannot('update', $curriculo), 403);
-        */
-
-        $this->authorize('update', $curriculo);
-        $curriculoData = json_decode($request->getContent(), true);
-        $curriculo->update($curriculoData);
-
-        return new CurriculoResource($curriculo);
-    }
-}
 ```
 
 #### Acciones que no requieren una instancia del modelo
@@ -253,47 +224,3 @@ Como se mencionó previamente, algunos métodos, como `create` no requieren una 
         return new CurriculoResource($curriculo);
     }
 ```
-
-### Autorizando controladores de recursos
-
-Como estamos utilizando **controladores de recursos**, podemos hacer uso del método `authorizeResource` en el constructor del controlador para asociar las acciones a las policies.
-
-El método `authorizeResource` acepta el nombre de la clase  como primer argumento y, como segundo argumento, el nombre del parámetro de la ruta que contendrá el identificador del modelo. Para que esto funcione, debemos asegurarnos de que nuestro controlador de recursos se creó con la opción `--model`:
-
-```php
-<?php
-
-namespace App\Http\Controllers\API;
-
-use App\Http\Controllers\Controller;
-use App\Models\Curriculo;
-use App\Http\Resources\CurriculoResource;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-
-class CurriculoController extends Controller
-{
-    /**
-     * Create the controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->authorizeResource(Curriculo::class, 'curriculo');
-    }
-```
-
-Los métodos del controlador serán mapeados a los correspondientes métodos de la Policy:
-
-Método del controlador |	Método de la Policy
---|--
-index | viewAny
-show | view
-create | create
-store | create
-edit | update
-update | update
-destroy | delete
-
-Cuando las peticiones son enrutadas hacia el método del controlador, el método de la `Policy` relacionado será invocado automáticamente antes de que el método del controlador se ejecute.
