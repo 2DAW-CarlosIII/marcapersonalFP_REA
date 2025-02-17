@@ -93,25 +93,16 @@ Hay ocasiones, como ocurre con la acción `create` en el que no se recibe ningun
 
 ### Filtros en las Policies
 
-Algunos usuarios deberán estar autorizados a realizar cualquiera de las acciones asociadas a una Policy. Para ello, definiremos un método `before` que se ejecutará antes que cualquier otro método de la `policy`. Esta característica se suele utilizar para autorizar a los administradores a realizar cualquier acción:
+Algunos usuarios deberán estar autorizados a realizar cualquiera de las acciones sobre los modelos. Para ello, definiremos el siguiente _closure_ en `app/Providers/AppServiceProvider.php`. Esta característica se suele utilizar para autorizar a los administradores a realizar cualquier acción:
 
 ```php
-use App\Models\User;
-
-/**
- * Perform pre-authorization checks.
- *
- * @param  \App\Models\User  $user
- * @param  string  $ability
- * @return void|bool
- */
-public function before(User $user, $ability)
-{
-    if($user->email === env(ADMIN_EMAIL)) return true;
-}
+  Gate::before(function (User $user, string $ability) {
+      if ($user->isAdministrator()) {
+          return true;
+      }
+  });
 ```
-
-> El método `before()` de una clase `policy` no será llamado si la clase no contiene un método que coincida con el nombre de la capacidad que debe ser verificada.
+> Para poder utilizar el método `isAdministrador()` necesitaremos crear dicho método en el modelo `User`.
 
 ## Autorizando acciones
 
