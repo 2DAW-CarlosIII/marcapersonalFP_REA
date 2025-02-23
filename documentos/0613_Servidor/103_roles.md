@@ -1,6 +1,6 @@
 # Roles y permisos.
 
-Son numerosas las aplicaciones que combinan la autenticación de usuario con la gestión de roles y sus permisos. Esta gestión se puede simplificar con la utilización de librerías como [laravel/spatie](). Un explicación del uso básico de esa librería la podemos encontrar [aquí](https://spatie.be/index.php/docs/laravel-permission/v6/basic-usage/basic-usage).
+Son numerosas las aplicaciones que combinan la autenticación de usuario con la gestión de roles y sus permisos. Esta gestión se puede simplificar con la utilización de librerías como _Laravel-permission. Un explicación del uso básico de esa librería la podemos encontrar [aquí](https://spatie.be/docs/laravel-permission/v6/basic-usage/basic-usage).
 
 Aunque la utilización de *permisos* tiene sus ventajas, para nuestra aplicación vamos a combinar las `policies` con los tipos de usuario o roles que pueden utilizar la aplicación:
 
@@ -106,14 +106,12 @@ Además, queremos modificar la inicialización de los usuarios para tener 10 doc
 Después de los cambios anteriores, podríamos modificar el fichero de _políticas_ asociadas a `currículo` de la siguiente forma:
 
 ```diff
-// en /app/Policies/CurriculoPolicy.php
-@@ -17,7 +17,7 @@ class CurriculoPolicy
-      */
-     public function before(User $user, $ability)
-     {
--        if($user->email === env('ADMIN_EMAIL')) return true;
-+        if($user->esAdmin()) return true;
-     }
+// en app/Providers/AppServiceProvider.php
+  Gate::before(function (User $user, string $ability) {
+      if ($user->esAdmin()) {
+          return true;
+      }
+  });
  
      /**
 @@ -41,7 +41,7 @@ public function view(User $user, Curriculo $curriculo): bool
