@@ -1,6 +1,6 @@
 # Roles y permisos.
 
-Son numerosas las aplicaciones que combinan la autenticación de usuario con la gestión de roles y sus permisos. Esta gestión se puede simplificar con la utilización de librerías como _Laravel-permission. Un explicación del uso básico de esa librería la podemos encontrar [aquí](https://spatie.be/docs/laravel-permission/v6/basic-usage/basic-usage).
+Son numerosas las aplicaciones que combinan la autenticación de usuario con la gestión de roles y sus permisos. Esta gestión se puede simplificar con la utilización de librerías como _Laravel-permission_. Un explicación del uso básico de esa librería la podemos encontrar [aquí](https://spatie.be/docs/laravel-permission/v6/basic-usage/basic-usage).
 
 Aunque la utilización de *permisos* tiene sus ventajas, para nuestra aplicación vamos a combinar las `policies` con los tipos de usuario o roles que pueden utilizar la aplicación:
 
@@ -112,10 +112,11 @@ Después de los cambios anteriores, podríamos modificar el fichero de _polític
           return true;
       }
   });
- 
+
+// en app/Policies/CurriculoPolicy.php
      /**
-@@ -41,7 +41,7 @@ public function view(User $user, Curriculo $curriculo): bool
-      */
+     * Determine whether the user can create models.
+     */
      public function create(User $user): bool
      {
 -        return $user->email === env('ADMIN_EMAIL');
@@ -123,8 +124,8 @@ Después de los cambios anteriores, podríamos modificar el fichero de _polític
      }
  
      /**
-@@ -49,7 +49,7 @@ public function create(User $user): bool
-      */
+     * Determine whether the user can update the model.
+     */
      public function update(User $user, Curriculo $curriculo): bool
      {
 -        return $user->id === $curriculo->user_id;
@@ -234,13 +235,29 @@ Otra solución es trasladar el _middleware_ de autenticación a los controladore
 +
      Route::get('{tabla}/count', [CountController::class, 'count']);
 ```
-- añadir el _middleware_ de autenticación al constructor de cada controlador:
-```diff
-// en app/Http/Controllers/API/CurriculoController.php
-     public function __construct()
-     {
-+        $this->middleware('auth:sanctum')->except(['index', 'show']);
-         $this->authorizeResource(Curriculo::class, 'curriculo');
-     }
+- especificar el middleware en los controladores correspondientes. Para ello, el controlador debe implementar la interfaz `HasMiddleware` y definir un método estático `middleware` que devuelva un array con los middleware que se aplicarán a los métodos del controlador. Por ejemplo, para el controlador `CurriculoController`: 
 
+```php
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+ 
+class CurriculoController extends Controller implements HasMiddleware
+{
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum', except: ['index', 'show']),
+        ];
+    }
+ 
+    // ...
+}
 ```
