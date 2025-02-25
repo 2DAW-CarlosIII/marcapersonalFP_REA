@@ -262,3 +262,24 @@ class CurriculoController extends Controller implements HasMiddleware
     // ...
 }
 ```
+
+## Autorizar mediante _policies_
+
+La forma más sencilla de autorizar mediante _policies_ es utilizando el método `authorize()` de la clase `Gate`.
+
+Se muestra la llamada a `authorize()`del método `create()` del controlador de `Curriculos`:
+
+```
+    public function store(Request $request)
+    {
+        Gate::authorize('create', Curriculo::class);
+
+        $curriculo = json_decode($request->getContent(), true);
+        if (!$request->user()->esAdmin()) {
+            $curriculo['user_id'] = $request->user()->id;
+        }
+        $curriculo = Curriculo::create($curriculo);
+
+        return new CurriculoResource($curriculo);
+    }
+```

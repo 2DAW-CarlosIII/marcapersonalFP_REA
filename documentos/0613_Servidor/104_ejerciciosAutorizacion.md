@@ -136,7 +136,10 @@ class AutorizacionCurriculoTest extends TestCase
 
     public function test_docente_can_access_curriculo_list_and_view()
     {
-        $docente = User::where('email', 'like', '%@' . env('TEACHER_EMAIL_DOMAIN'))->first();
+        $docente = User::where([
+            ['email', 'like', '%@' . env('TEACHER_EMAIL_DOMAIN')],
+            ['email', '!=', env('ADMIN_EMAIL')],
+        ])->first();
         $this->actingAs($docente);
 
         $response = $this->curriculoIndex();
