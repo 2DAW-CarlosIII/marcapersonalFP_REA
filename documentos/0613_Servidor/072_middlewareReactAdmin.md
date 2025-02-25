@@ -87,19 +87,20 @@ A partir de esa línea, ya podremos desarrollar código que modifique la respues
 
 ```php
         $response = $next($request);
-        if($request->routeIs('*.index')) {
+        if ($request->routeIs('*.index')) {
             abort_unless(property_exists($request->route()->controller, 'modelclass'), 500, "It must exists a modelclass property in the controller.");
             $modelClassName = $request->route()->controller->modelclass;
-            $response->header('X-Total-Count',$modelClassName::count());
+            $response->header('X-Total-Count', $modelClassName::count());
         }
         try {
-            if(is_callable([$response, 'getData'])) {
+            if (is_callable([$response, 'getData'])) {
                 $responseData = $response->getData();
-                if(isset($responseData->data)) {
+                if (isset($responseData->data)) {
                     $response->setData($responseData->data);
                 }
             }
-        } catch (\Throwable $th) { }
+        } catch (\Throwable $th) {
+        }
         return $response;
 ```
 
@@ -160,11 +161,11 @@ Podemos extender nuestra solución al resto de parámetros de React-admin, modif
 - El código a ejecutar antes de `$response = $next($request);` en el middleware `/app/Http/Middleware/ReactAdminResponse.php`
     ```php
         $request->merge(['perPage' => 10]);
-        if($request->filled('_start')) {
-            if($request->filled('_end')) {
-                $request->merge(['perPage' => $request->_end - $request->_start]);
+        if ($request->filled('_start')) {
+            if ($request->filled('_end')) {
+                $request->merge(['perPage' => 1 + $request->_end - $request->_start]);
             }
-            $request->merge(['page' => $request->_start / $request->perPage + 1]);
+            $request->merge(['page' => intval($request->_start / $request->perPage) + 1]);
         }
     ```
 - El método `index` de `app/Http/Controllers/API/CicloController.php`

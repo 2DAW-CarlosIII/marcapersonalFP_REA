@@ -119,7 +119,7 @@ Después de los cambios anteriores, podríamos modificar el fichero de _polític
      */
      public function create(User $user): bool
      {
--        return $user->email === env('ADMIN_EMAIL');
+-        return str_ends_with($user->email, env('STUDENT_DOMAIN', '@alu.murciaeduca.es'));
 +        return $user->esEstudiante();
      }
  
@@ -191,6 +191,7 @@ El problema de esta solución es que, como habría que aplicarla a todos los con
 Otra solución es trasladar el _middleware_ de autenticación a los controladores, de forma que se pueda aplicar a todos los métodos excepto a los que queramos que sean accesibles a usuarios anónimos. Para ello, debemos
 
 - sacar todas las rutas `apiResource` fuera del middleware de autenticación,
+
 ```diff
 // en routes/api.php
  Route::prefix('v1')->group(function () {
