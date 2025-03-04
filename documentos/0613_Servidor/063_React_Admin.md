@@ -135,9 +135,6 @@ Al usar `useGetList`, obtiene varios beneficios más allá de un simple `fetch`:
 
 Cada vez que necesite comunicarse con un servidor, utilizará estos _proveedores_. Dado que están especializados en sus respectivos dominios y están estrechamente integrados con react-admin, le ahorrarán una cantidad significativa de tiempo y esfuerzo.
 
-[]: # (Referencias)
-[]: # (-----------------)
+## Referencias
 
-[]: # (Documentación oficial de React-Admin)
-[]: # (https://marmelab.com/react-admin/Architecture.html)
-
+[Documentación oficial de React-Admin](https://marmelab.com/react-admin/Architecture.html)
