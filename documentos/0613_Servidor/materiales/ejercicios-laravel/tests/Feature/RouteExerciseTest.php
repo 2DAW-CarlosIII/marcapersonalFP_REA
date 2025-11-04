@@ -51,7 +51,7 @@ class RouteExerciseTest extends TestCase
 
         $response->assertStatus(200)->assertSeeText($value, $escaped = true);
 
-        $response = $this->get("/proyectos/show/" . chr($id));
+        $response = $this->get("/proyectos/show/" . chr(ord('A') + $id));
         $response->assertNotFound();
 
     /**
@@ -71,7 +71,7 @@ class RouteExerciseTest extends TestCase
 
         $response->assertStatus(200)->assertSeeText($value, $escaped = true);
 
-        $response = $this->get("/proyectos/edit/" . chr($id));
+        $response = $this->get("/proyectos/edit/" . chr(ord('A') + $id));
         $response->assertNotFound();
 
     /**
@@ -88,7 +88,7 @@ class RouteExerciseTest extends TestCase
 
         $response->assertStatus(200)->assertSeeText($value, $escaped = true);
 
-        $response = $this->get("/perfil/" . chr($id));
+        $response = $this->get("/perfil/" . chr(ord('A') + $id));
         $response->assertNotFound();
     }
 
