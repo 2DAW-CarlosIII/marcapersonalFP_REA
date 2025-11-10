@@ -54,7 +54,7 @@ Hacer esto no es suficiente, ya que el _layout_ de dopetrope utiliza una serie d
 {% raw %}
 ```
 <h1>
-    <a href="{{ url(env('APP_URL', 'http://marcapersonalFP.test')) }}">
+    <a href="{{ url(config('app.url')) }}">
         <img src="{{ asset('/images/mp-logo.png') }}" alt="Logo Marca Personal FP" width="200px"/>
     </a>
 </h1>
