@@ -118,7 +118,7 @@ class ControllersExerciseTest extends TestCase
 
             $response->assertStatus(200)->assertSeeText($value, $escaped = true);
 
-            $response = $this->get("/perfil/" . chr($id));
+            $response = $this->get("/perfil/" . chr(ord('A') + $id));
             $response->assertNotFound();
     }
 }
