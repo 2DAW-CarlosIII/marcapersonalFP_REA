@@ -98,9 +98,8 @@ public function handle($request, Closure $next)
 De momento, hemos visto para que vale y como se define un Middleware, en esta sección veremos como utilizarlos. Laravel permite la utilización de Middleware de cuatro formas distintas: 
 
 1. [asociado a grupos](#middleware-asociado-a-grupos),
-1. [global](#middleware-global),
-1. [asociado a rutas o grupos de rutas](#middleware-asociado-a-rutas), y
-1. [asociado a un controlador o a un método de un controlador](#middleware-dentro-de-controladores). 
+1. [global](#middleware-global) y
+1. [asociado a rutas o grupos de rutas](#middleware-asociado-a-rutas). 
 
 En los cuatro casos será necesario registrar primero el Middleware en el fichero `bootstrap/app.php`.
 
@@ -131,7 +130,7 @@ Modifiquemos el código :
 ```
 ### Middleware asociado a grupos
 
-_Laravel_ incluye los grupos de middlewares predefinidos `web` y `api` para facilitar la aplicación de los middlewares a las rutas definidas en el archivo `routes/web.php` y `routes/api.php` respectivamente. Estos grupos se definen en el fichero `bootstrap/app.php` y se pueden modificar o ampliar. Los middleware incluidos en cada uno de los grupso son los siguientes:
+_Laravel_ incluye los grupos de middlewares predefinidos `web` y `api` para facilitar la aplicación de los middlewares a las rutas definidas en el archivo `routes/web.php` y `routes/api.php` respectivamente. Los middleware incluidos en cada uno de los grupso son los siguientes:
 
 | The `web` Middleware Group |
 | --- |
@@ -241,28 +240,6 @@ La siguiente es una lista de los alias de los middleware que vienen por defecto 
 | `subscribed` | `\Spark\Http\Middleware\VerifyBillableIsSubscribed` |
 | `throttle` | `Illuminate\Routing\Middleware\ThrottleRequests` or `Illuminate\Routing\Middleware\ThrottleRequestsWithRedis` |
 | `verified` | `Illuminate\Auth\Middleware\EnsureEmailIsVerified` |
-
-
-### Middleware dentro de controladores
-
-También es posible indicar el middleware a utilizar desde dentro de un controlador. En este caso los filtros también tendrán que estar registrador en el fichero `bootstrap/app.php`. Para utilizarlos se recomienda realizar la asignación en el método `middleware()` del controlador. Podremos indicar que se filtren todos los métodos, solo algunos, o todos excepto los indicados, por ejemplo:
-
-```php
-class UserController extends Controller
-{
-    /**
-     * Get the middleware that should be assigned to the controller.
-     */
-    public static function middleware(): array
-    {
-        return [
-            'auth',
-            new Middleware('log', only: ['index']),
-            new Middleware('subscribed', except: ['store']),
-        ];
-    }
-}
-```
 
 ## Revisar los filtros asignados
 
