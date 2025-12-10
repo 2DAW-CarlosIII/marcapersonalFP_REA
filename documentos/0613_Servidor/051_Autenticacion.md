@@ -122,10 +122,17 @@ Al instalar _Laravel/Breeze_, también se generarán todas las vistas necesarias
 
 Una vez configurado todo el sistema, añadidas las rutas y las vistas para realizar el control de usuarios ya podemos utilizarlo. Si accedemos a la ruta _login_ nos aparecerá la vista con el formulario de login, solicitando nuestro email y contraseña para acceder. El campo tipo _checkbox_ llamado `remember` nos permitirá indicar si deseamos que la sesión permanezca abierta hasta que se cierre manualmente. Es decir, aunque se cierre el navegador y pasen varios días el usuario seguiría estando autorizado.
 
-Si los datos introducidos son correctos se creará la sesión del usuario y se le redirigirá a la ruta `/dashboard`. Si queremos cambiar esta ruta tenemos que definir la constante `HOME` en el fichero `app/Providers/RouteServiceProvider.php`, por ejemplo:
+Si los datos introducidos son correctos se creará la sesión del usuario y se le redirigirá a la ruta `/dashboard`. Si queremos cambiar esta ruta tenemos que modificar la redirección del método `store()` del controlador `/app/Http/Controllers/Auth/AuthenticatedSessionController.php`, por ejemplo:
 
 ```php
-    public const HOME = '/proyectos';
+        return redirect()->intended(route('home', absolute: false));
+```
+
+En el ejemplo anterior, se supone que existe una ruta con el nombre `home`:
+
+```php
+Route::get('/', [HomeController::class, 'getHome'])
+    ->name('home');
 ```
 
 ## Registro de un usuario
