@@ -89,12 +89,14 @@ Por eso, generaremos el siguiente código en `FamiliaProfesionalController`:
     {
         $familiaProfesional = FamiliaProfesional::findOrFail($id);
 
-        // TODO: Eliminar el imagen anterior si existiera
-        $path = $request->file('imagen')->store('imagens', ['disk' => 'public']);
-        $familiaProfesional->imagen = $path;
-        $familiaProfesional->save();
+        $datosEditados = $request->all();
 
-        $familiaProfesional->update($request->all());
+        if ($request->hasFile('imagen')) {
+            $path = $request->file('imagen')->store('imagenes', ['disk' => 'public']);
+            $datosEditados['imagen'] = $familiaProfesional->imagen = $path;
+        }
+
+        $familiaProfesional->update($datosEditados);
         return redirect()->action([self::class, 'getShow'], ['id' => $familiaProfesional->id]);
     }
 ```
