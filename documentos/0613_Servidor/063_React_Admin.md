@@ -1,5 +1,7 @@
 # React-admin
 
+> Utiliza las secciones relacionadas con _React-Admin_ únicamente si no vas a utilizar ningún otro framework de cliente.
+
 _React-admin_ es un _framework_ que cubre la mayoría de las necesidades de las aplicaciones típicas de administración y _B2B_. Es un gran ahorro de tiempo que desbloquea tu creatividad y te ayuda a construir grandes aplicaciones. Sus características únicas y sesgadas lo convierten en la mejor opción para los desarrolladores de **Single-Page Apps**.
 
 ## Conceptos clave
