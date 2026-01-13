@@ -28,6 +28,7 @@ Vamos a modificar el método `index()` de `UserController` para que, si se recib
     }
 ```
 Para no tener que repetir 4 veces el método `orWhere`, podemos crear un _array_ con los campos que queramos consultar y recorrerlos con un `foreach`:
+
 ```php
     public function index(Request $request)
     {
@@ -148,6 +149,6 @@ mientras que el método `index()` de `CicloController` quedaría de la siguiente
 
 Se propone como ejercicios:
 
-1.- Utilizar el _helper_ desde todos los controladores.
-2.- Crear un nuevo método en la clase `FilterHelper` en la que se centralice la utilización de los parámetros `_sort` y `_order`.
-3.- Desarrollar otro método para obtener el valor que se debe asignar a la cabecera `X-Total-Count` de las respuestas, que contabilice únicamente los registros filtrados.
+1. Utilizar el _helper_ desde todos los controladores.
+2. Crear un nuevo método en la clase `FilterHelper` en la que se centralice la utilización de los parámetros `_sort` y `_order`.
+3. Desarrollar otro método para obtener el valor que se debe asignar a la cabecera `X-Total-Count` de las respuestas, que contabilice únicamente los registros filtrados.

@@ -10,8 +10,8 @@ Para editar este fichero, podemos utilizar _Swagger Editor_, y para probar su fu
 
 Para poder utilizar _Swagger_ tenemos dos opciones:
 
-1.- Integrar _Swagger_ en el proyecto _Laravel_
-2.- Levantar el contenedor de _Swagger_ que incluye _Laradock_.
+1. Integrar _Swagger_ en el proyecto _Laravel_
+2. Levantar el contenedor de _Swagger_ que incluye _Laradock_.
 
 ## Integrar _Swagger_ en el proyecto _Laravel_
 

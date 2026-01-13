@@ -12,8 +12,9 @@ También se puede observar que la respuesta no es del agrado del dataProvider ut
 Como la API funciona correctamente, no debemos modificar el controlador para que, desde ahí, se modifique la respuesta. Hay que tener en cuenta que la petición `/api/v1/ciclos` es una de las muchas que nuestro _backend_ debe resolver. Por lo tanto, la misma corrección que hagamos para este _endpoint_ debería servir para todas las respuestas:
 
 1. Podríamos modificar cada método `index()` de los controladores de aplicaciones con un código similar al siguiente:
+
     ```php
-        /**
+    /**
      * Display a listing of the resource.
      */
     public function index()
@@ -25,6 +26,7 @@ Como la API funciona correctamente, no debemos modificar el controlador para que
         return $response;
     }
     ```
+
 2. Crearemos un Middleware para capturar todas las respuestas y formatearlas para el frontend que estemos utilizando.
 
 Claramente, **la opción que tiene mayores ventajas es la segunda**, que es la que desarrollaremos aquí.
