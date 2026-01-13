@@ -8,6 +8,70 @@ Para la definición de la API, hemos utilizado la herramienta [Swagger](https://
 
 Para editar este fichero, podemos utilizar _Swagger Editor_, y para probar su funcionalidad, utilizaremos _Swagger UI_.
 
+Para poder utilizar _Swagger_ tenemos dos opciones:
+
+1.- Integrar _Swagger_ en el proyecto _Laravel_
+2.- Levantar el contenedor de _Swagger_ que incluye _Laradock_.
+
+## Integrar _Swagger_ en el proyecto _Laravel_
+
+Para integrar _Swagger_ en un proyecto _Laravel_, debemos instalar el paquete [L5-Swagger](https://github.com/DarkaOnLine/L5-Swagger), siguiendo las instrucciones:
+
+```bash
+composer require "darkaonline/l5-swagger"
+php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"
+```
+
+Posteriormente, editamos el archivo de configuración `config/l5-swagger.php` , asegurándonos de configurar correctamente las siguientes opciones:
+
+```php
+                /*
+
+
+
+                 * File name of the generated json documentation file
+
+
+                 */
+
+
+                'docs_json' => 'marcapersonalFP_api.json',
+
+
+
+
+
+                /*
+
+
+                 * File name of the generated YAML documentation file
+
+
+                 */
+
+
+                'docs_yaml' => 'marcapersonalFP_api.yaml',
+
+
+
+
+
+                /*
+
+
+                 * Set this to `json` or `yaml` to determine which documentation file to use in UI
+
+
+                 */
+
+
+                'format_to_use_for_docs' => env('L5_FORMAT_TO_USE_FOR_DOCS', 'yaml'),
+```
+
+Por último, creamos la carpeta `storage/api-docs` y, en ella, colocamos el fichero _YAML_ de la API, que se encuentra en la ruta [https://raw.githubusercontent.com/2DAW-CarlosIII/marcapersonalFP_REA/refs/heads/master/documentos/0613_Servidor/materiales/swagger/marcapersonalFP_api.yaml](https://raw.githubusercontent.com/2DAW-CarlosIII/marcapersonalFP_REA/refs/heads/master/documentos/0613_Servidor/materiales/swagger/marcapersonalFP_api.yaml)
+
+## Levantar el contenedor de _Swagger_ que incluye _Laradock_.
+
 Vamos a levantar el contenedor _Swagger UI_ ejecutando el siguiente comando desde el directorio en el que tenemos `laradock`:
 
 ```bash
