@@ -1,6 +1,6 @@
 # Breeze API
 
-En el capítulo dedicado a la [autenticación](./052_Autenticacion.md) ya instalamos el paquete [`laravel/breeze`](https://laravel.com/docs/starter-kits#laravel-breeze), que nos facilitó la gestión de usuarios.
+En el capítulo dedicado a la [autenticación](./051_Autenticacion.md) ya instalamos el paquete [`laravel/breeze`](https://laravel.com/docs/starter-kits#laravel-breeze), que nos facilitó la gestión de usuarios.
 
 En este capítulo, vamos a reinstalar `laravel/breeze` pero desechando el código referente a las vistas, ya que nuestro objetivo es crear una _API_ que envíe y reciba datos sin ningún código referente a las vistas.
 
