@@ -113,7 +113,7 @@ paths:
               schema:
                 type: object
                 example:
-                  token: 
+                  token:
                     Bearer
                     4_qr0e87r890e7r9n8qewr7b98qe7rb9q8ew7rbq980e7rbqfdsuyb
         '403':
@@ -193,7 +193,7 @@ paths:
           schema:
             type: string
       responses:
-        '200': 
+        '200':
           description: Operación exitosa
           content:
             application/json:
@@ -215,27 +215,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: string
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -383,27 +383,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: string
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -551,27 +551,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: string
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -719,27 +719,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: string
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -961,27 +961,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: string
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -1151,27 +1151,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: string
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -1319,27 +1319,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: string
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -1487,27 +1487,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: string
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -1687,27 +1687,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: string
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -1883,28 +1883,28 @@ paths:
           schema:
             type: integer
             format: int32
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -1946,28 +1946,28 @@ paths:
           schema:
             type: integer
             format: int32
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
@@ -2008,27 +2008,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: _start
+        - name: page
           in: query
-          description: posición del registro inicial a mostrar
+          description: número de página a mostrar
           required: false
           schema:
             type: integer
             format: int32
-        - name: _end
+        - name: per_page
           in: query
-          description: posición del registro final a mostrar
+          description: número de registros por página
           required: false
           schema:
             type: integer
             format: int32
-        - name: _sort
+        - name: sort
           in: query
           description: columna por la que ordenar
           required: false
           schema:
             type: string
-        - name: _order
+        - name: order
           in: query
           description: dirección de la ordenación
           required: false
