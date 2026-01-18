@@ -62,24 +62,38 @@ Por último, crearemos una _ruta de recurso_ para una _API_. Para ello, incorpor
 
 ```php
 Route::prefix('v1')->group(function () {
-    Route::apiResource('ciclos', CicloController::class);
+    Route::apiResource('ciclos', App\Http\Controllers\Api\CicloController::class);
 });
 ```
 
 > A partir de este momento, incluiremos todas las rutas en un grupo de rutas con el prefijo `v1` por lo que necesitaremos actualizar el valor de la variable de entorno `VITE_JSON_SERVER_URL` al valor `http://marcapersonalfp.test/api/v1`.
 
-Para poder utilizar la clase `CicloController`, deberemos añadir el use correspondiente:
-
-```php
-use App\Http\Controllers\API\CustomerController;
-```
-
 > En el caso de modelos, como `FamiliaProfesional`, cuya tabla no se forma con el plural del nombre del modelo, hay que recordar que hay que definir la propiedad `protected $table = 'familias_profesionales';`. Además, en estos casos, el nombre del modelo que se va a enviar como parámetro a los métodos del controlador hay que especificarlo en el `Route::apiResource`. El `Route::apiResource` correspondiente a `familias_profesionales` quedaría así:
 ```php
-    Route::apiResource('familias_profesionales', FamiliaProfesionalController::class)->parameters([
+    Route::apiResource('familias_profesionales', App\Http\Controllers\Api\FamiliaProfesionalController::class)->parameters([
         'familias_profesionales' => 'familiaProfesional'
     ]);
 ``` 
+
+### Recursos anidadados
+
+Sometimes you may need to define routes to a nested resource. For example, a photo resource may have multiple comments that may be attached to the photo. To nest the resource controllers, you may use "dot" notation in your route declaration:
+
+A veces, podemos necesitar definir rutas para un recurso anidado. Por ejemplo, un recurso `familia_profesional` puede tener asociados múltiples `ciclos`. Para anidar los controladores de recursos, podemos usar la notación de "punto" en la declaración de la ruta:
+
+```php
+Route::prefix('v1')->group(function () {
+    Route::apiResource('familias_profesionales', App\Http\Controllers\Api\FamiliaProfesionalController::class)
+    ->parameters([
+        'familias_profesionales' => 'familiaProfesional'
+    ]);
+
+    Route::apiResource('familias_profesionales.ciclos', App\Http\Controllers\Api\CicloController::class)
+    ->parameters([
+        'familias_profesionales' => 'familiaProfesional'
+    ]);
+});
+```
 
 ## Funcionalidad
 
@@ -159,3 +173,21 @@ class CicloController extends Controller
     }
 }
 ```
+
+### Argumentos en los recursos anidados
+
+En el caso de los recursos anidados, como `familias_profesionales.ciclos`, los métodos del controlador recibirán, además del modelo correspondiente al recurso, el modelo del recurso padre. Por ejemplo, el método `index` del controlador `CicloController` recibirá una instancia de `FamiliaProfesional` como primer parámetro:
+
+```php
+    public function index(Request $request, FamiliaProfesional $familiaProfesional)
+    {
+        return CicloResource::collection(
+            Ciclo::where('familia_id', $familiaProfesional->id)
+            ->orderBy($request->_sort ?? 'id', $request->_order ?? 'asc')
+            ->paginate($request->perPage));
+    }
+```
+
+De esta forma, podremos filtrar los ciclos que se devuelven en función de la familia profesional a la que pertenecen.
+
+> _Más adelante veremos cómo filtrar estos recursos a través de las relaciones existentes entre los modelos._
