@@ -62,7 +62,7 @@ Por último, crearemos una _ruta de recurso_ para una _API_. Para ello, incorpor
 
 ```php
 Route::prefix('v1')->group(function () {
-    Route::apiResource('ciclos', App\Http\Controllers\Api\CicloController::class);
+    Route::apiResource('ciclos', App\Http\Controllers\API\CicloController::class);
 });
 ```
 
@@ -70,25 +70,23 @@ Route::prefix('v1')->group(function () {
 
 > En el caso de modelos, como `FamiliaProfesional`, cuya tabla no se forma con el plural del nombre del modelo, hay que recordar que hay que definir la propiedad `protected $table = 'familias_profesionales';`. Además, en estos casos, el nombre del modelo que se va a enviar como parámetro a los métodos del controlador hay que especificarlo en el `Route::apiResource`. El `Route::apiResource` correspondiente a `familias_profesionales` quedaría así:
 ```php
-    Route::apiResource('familias_profesionales', App\Http\Controllers\Api\FamiliaProfesionalController::class)->parameters([
+    Route::apiResource('familias_profesionales', App\Http\Controllers\API\FamiliaProfesionalController::class)->parameters([
         'familias_profesionales' => 'familiaProfesional'
     ]);
 ``` 
 
 ### Recursos anidadados
 
-Sometimes you may need to define routes to a nested resource. For example, a photo resource may have multiple comments that may be attached to the photo. To nest the resource controllers, you may use "dot" notation in your route declaration:
-
 A veces, podemos necesitar definir rutas para un recurso anidado. Por ejemplo, un recurso `familia_profesional` puede tener asociados múltiples `ciclos`. Para anidar los controladores de recursos, podemos usar la notación de "punto" en la declaración de la ruta:
 
 ```php
 Route::prefix('v1')->group(function () {
-    Route::apiResource('familias_profesionales', App\Http\Controllers\Api\FamiliaProfesionalController::class)
+    Route::apiResource('familias_profesionales', App\Http\Controllers\API\FamiliaProfesionalController::class)
     ->parameters([
         'familias_profesionales' => 'familiaProfesional'
     ]);
 
-    Route::apiResource('familias_profesionales.ciclos', App\Http\Controllers\Api\CicloController::class)
+    Route::apiResource('familias_profesionales.ciclos', App\Http\Controllers\API\CicloController::class)
     ->parameters([
         'familias_profesionales' => 'familiaProfesional'
     ]);
