@@ -120,8 +120,8 @@ class CicloController extends Controller
     public function index(Request $request)
     {
         return CicloResource::collection(
-            Ciclo::orderBy($request->_sort ?? 'id', $request->_order ?? 'asc')
-            ->paginate($request->perPage));
+            Ciclo::orderBy($request->sort ?? 'id', $request->order ?? 'asc')
+            ->paginate($request->per_page));
     }
 
     /**
@@ -181,8 +181,8 @@ En el caso de los recursos anidados, como `familias_profesionales.ciclos`, los m
     {
         return CicloResource::collection(
             Ciclo::where('familia_id', $familiaProfesional->id)
-            ->orderBy($request->_sort ?? 'id', $request->_order ?? 'asc')
-            ->paginate($request->perPage));
+            ->orderBy($request->sort ?? 'id', $request->order ?? 'asc')
+            ->paginate($request->per_page));
     }
 ```
 
