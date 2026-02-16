@@ -67,5 +67,6 @@ Los contenidos que se presentan a continuación constituyen un desarrollo que, i
 11. [Manejo de Ficheros en la API](./11_manejarFicheros.md)
 12. [Consumiendo API externas](./12_apiExterna.md)
     1. [Ejercicios API externas](./121_ejerciciosAPI.md)
+    2. [Practica guiada con ePortfolio](./122_hibridas_guiada_ePortfolio.md)
 13. [Enviando correos electrónicos](./13_email.md)
     1. [Ejercicios de correo electrónico](./131_ejerciciosEmail.md)
