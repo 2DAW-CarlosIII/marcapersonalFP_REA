@@ -26,16 +26,6 @@ En esta práctica vas a ampliar tu aplicación ePortfolio con las siguientes fun
 
 ---
 
-### Librerías principales que usaremos:
-
-1. **Guzzle HTTP Client** - Cliente HTTP para consumir APIs
-2. **Laravel Charts (ConsoleTVs/Charts)** - Visualización de datos
-3. **Laravel Excel (Maatwebsite)** - Exportación de datos
-4. **Laravel Sanctum** - Autenticación API
-5. **Barryvdh/DomPDF** - Generación de PDFs
-
----
-
 ## Preparación del entorno
 
 A partir del punto en el que cada uno de los estudiantes se haya quedado en la replicación del ePortfolio, vamos a crear una rama llamada `aplicacionesHibridas`.
@@ -47,24 +37,6 @@ git switch -C aplicacionesHibridas
 ---
 
 ## PARTE 1: Consumo de APIs Externas (2 horas)
-
-### Sesión 1.1: Instalación de Dependencias y Configuración
-
-#### Paso 1.1: Instalar Guzzle HTTP Client
-
-```bash
-composer require guzzlehttp/guzzle
-```
-
----
-
-### Sesión 1.2: Crear Servicio de Importación desde JSON Resume
-
-#### Contexto: ¿Qué es un Servicio en Laravel?
-
-Un Servicio en Laravel es una clase que encapsula la lógica de negocio de una funcionalidad específica. Se utiliza para organizar el código y hacerlo más reutilizable y fácil de mantener. Los Servicios suelen contener métodos que realizan tareas específicas y pueden ser inyectados en controladores, comandos y otros lugares donde se necesiten.
-
-Suelen nombrarse con un sufijo “Service”, como “ResumeImportService”, y se ubican en el directorio `app/Services`.
 
 #### Contexto: ¿Qué es JSON Resume?
 
@@ -99,7 +71,24 @@ Ejemplo de formato JSON Resume:
 }
 ```
 
-#### Paso 1.3: Crear el Servicio de Importación
+### Paso 1.1: Instalar Guzzle HTTP Client
+
+```bash
+composer require guzzlehttp/guzzle
+```
+
+---
+
+### Paso 1.2: Crear Servicio de Importación desde JSON Resume
+
+#### Contexto: ¿Qué es un Servicio en Laravel?
+
+Un Servicio en Laravel es una clase que encapsula la lógica de negocio de una funcionalidad específica. Se utiliza para organizar el código y hacerlo más reutilizable y fácil de mantener. Los Servicios suelen contener métodos que realizan tareas específicas y pueden ser inyectados en controladores, comandos y otros lugares donde se necesiten.
+
+Suelen nombrarse con un sufijo “Service”, como “ResumeImportService”, y se ubican en el directorio `app/Services`.
+
+
+### Paso 1.3: Crear el Servicio de Importación
 
 Crea un nuevo servicio en `app/Services/ResumeImportService.php`:
 
@@ -310,7 +299,7 @@ class ResumeImportService
 4. **importFromGitHub**: Consume la API pública de GitHub (no requiere autenticación)
 5. **Manejo de errores**: Usa try-catch y logging para debugging
 
-#### Paso 1.4: Crear el Controlador de Importación
+### Paso 1.4: Crear el Controlador de Importación
 
 Crea `app/Http/Controllers/PortfolioImportController.php`:
 
@@ -385,7 +374,7 @@ class PortfolioImportController extends Controller
             DB::commit();
             
             return redirect()
-                ->route('portfolio.index')
+                ->route('portfolio.import.form')
                 ->with('success', 'Portfolio importado correctamente desde JSON Resume');
                 
         } catch (\Exception $e) {
@@ -433,7 +422,7 @@ class PortfolioImportController extends Controller
             DB::commit();
             
             return redirect()
-                ->route('portfolio.index')
+                ->route('portfolio.import.form')
                 ->with('success', "Se importaron " . count($data['projects']) . " proyectos desde GitHub");
                 
         } catch (\Exception $e) {
@@ -445,7 +434,7 @@ class PortfolioImportController extends Controller
 }
 ```
 
-#### Paso 1.5: Crear las Rutas
+### Paso 1.5: Crear las Rutas
 
 Añade en `routes/web.php`:
 
@@ -467,7 +456,7 @@ Route::middleware(['auth'])->group(function () {
 });
 ```
 
-#### Paso 1.6: Crear la Vista de Importación
+### Paso 1.6: Crear la Vista de Importación
 
 Crea `resources/views/portfolio/import.blade.php`:
 
@@ -644,6 +633,237 @@ Crea `resources/views/portfolio/import.blade.php`:
 </div>
 @endsection
 ```
+
+### Paso 1.7: Mostrar los mensajes flash en el layout principal
+
+Componente reutilizable y agnóstico para mostrar mensajes flash en cualquier layout de Laravel. El CSS viene en fichero separado para poder enlazarlo desde el `<head>`.
+
+---
+
+#### Estructura de ficheros
+
+```
+app/
+├── View/
+│   └── Components/
+│       └── FlashMessages.php
+
+resources/
+├── views/
+│   └── components/
+│       └── flash-messages.blade.php
+
+public/
+└── css/
+    └── flash-messages.css
+```
+
+---
+
+#### 1.7.1. El componente Blade
+
+Para crear el componente, ejecuta:
+
+```bash
+php artisan make:component FlashMessages
+```
+Esto generará la clase asociada al componente en el fichero `app/View/Components/FlashMessages.php`:
+
+```php
+<?php
+
+namespace App\View\Components;
+
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class FlashMessages extends Component
+{
+    /**
+     * Create a new component instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.flash-messages');
+    }
+}
+```
+
+Además, crea el fichero de la vista en `resources/views/components/flash-messages.blade.php`. Modifica el contenido para que muestre los mensajes flash de la sesión:
+
+```blade
+@props([
+    'types' => ['success', 'error', 'warning', 'info'],
+])
+
+@php
+    $messages = collect($types)
+        ->filter(fn ($type) => session()->has($type))
+        ->map(fn ($type) => [
+            'type'    => $type,
+            'message' => session($type),
+        ]);
+@endphp
+
+@if ($messages->isNotEmpty())
+    <div class="flash-container" role="alert" aria-live="polite">
+        @foreach ($messages as $flash)
+            <div class="flash flash--{{ $flash['type'] }}" data-flash>
+                <span class="flash__icon" aria-hidden="true"></span>
+                <p class="flash__message">{{ $flash['message'] }}</p>
+                <button
+                    class="flash__close"
+                    type="button"
+                    aria-label="Cerrar"
+                    onclick="this.closest('[data-flash]').remove()"
+                >
+                    &times;
+                </button>
+            </div>
+        @endforeach
+    </div>
+@endif
+```
+
+> **`@props`** declara los tipos reconocibles. Puedes sobreescribirlos al usar el componente si tu app usa claves distintas.
+
+---
+
+#### 1.7.2. El CSS
+
+Crea el fichero **`public/css/flash-messages.css`** con el siguiente contenido:
+
+```css
+/* ──────────────────────────────────────────
+   Flash Messages — standalone stylesheet
+   ────────────────────────────────────────── */
+
+.flash-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 48rem;
+    margin-inline: auto;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.flash {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid transparent;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    animation: flash-in 0.25s ease;
+}
+
+@keyframes flash-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Tipos */
+.flash--success {
+    background-color: #f0fdf4;
+    border-color: #22c55e;
+    color: #15803d;
+}
+
+.flash--error {
+    background-color: #fef2f2;
+    border-color: #ef4444;
+    color: #b91c1c;
+}
+
+.flash--warning {
+    background-color: #fffbeb;
+    border-color: #f59e0b;
+    color: #b45309;
+}
+
+.flash--info {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+    color: #1d4ed8;
+}
+
+/* Icono (emoji por defecto, fácil de sobreescribir) */
+.flash__icon::before {
+    font-style: normal;
+}
+.flash--success .flash__icon::before { content: "✓"; }
+.flash--error   .flash__icon::before { content: "✕"; }
+.flash--warning .flash__icon::before { content: "⚠"; }
+.flash--info    .flash__icon::before { content: "ℹ"; }
+
+/* Mensaje */
+.flash__message {
+    flex: 1;
+    margin: 0;
+}
+
+/* Botón de cierre */
+.flash__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.6;
+    color: inherit;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+}
+.flash__close:hover { opacity: 1; }
+```
+
+---
+
+#### 1.7.3. Enlazar el CSS en el layout
+
+```blade
+<head>
+    ...
+    <link rel="stylesheet" href="{{ asset('css/flash-messages.css') }}">
+</head>
+```
+
+---
+
+#### 1.7.4. Usar el componente en el layout
+
+Coloca la etiqueta `<x-flash-messages />` justo después del `<body>` o antes del `@yield('content')`:
+
+##### Autodesvanecimiento con JS
+
+Añade este pequeño script al final del layout o en tu `app.js`:
+
+```js
+document.querySelectorAll('[data-flash]').forEach(el => {
+    setTimeout(() => {
+        el.style.transition = 'opacity 0.4s'
+        el.style.opacity = '0'
+        setTimeout(() => el.remove(), 400)
+    }, 4000) // ms antes de desaparecer
+})
+```
+
+---
+
 
 #### Checkpoint Parte 1
 
