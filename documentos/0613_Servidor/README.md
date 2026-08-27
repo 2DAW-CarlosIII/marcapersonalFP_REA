@@ -6,6 +6,8 @@ Los contenidos que se presentan a continuación constituyen un desarrollo que, i
 >
 > **Leyenda:** 🆕 = contenido nuevo pendiente de desarrollo · 🔁 = contenido existente pendiente de reubicar/renumerar a su bloque.
 
+**Antes de empezar:** todo el módulo comparte el mismo entorno (Docker + Laradock). Prepáralo siguiendo [0. Instalación y preparación del entorno](./00_instalacionEntorno.md) — en la máquina virtual del módulo ya viene preinstalado.
+
 | Bloque | Resultado de Aprendizaje | Horas |
 |-------:|--------------------------|------:|
 | 1 | Selección de arquitecturas y herramientas (RA1) — *fuera del REA* | 8 |
@@ -141,4 +143,4 @@ Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonal
 
 ## Máquina Virtual
 
-Para el desarrollo de la aplicación se facilita una máquina virtual con Debian, Docker, PHP y Composer, Visual Studio Code, NodeJS, depuración con XDebug y Laradock preinstalado. (Ver detalles en el README del repositorio.)
+Para el desarrollo de la aplicación se facilita una máquina virtual con Debian, Docker, Visual Studio Code y Laradock preinstalado (PHP, Composer, Node/npm y depuración con XDebug se ejecutan dentro de los contenedores de Laradock, no instalados en el sistema — ver [0. Instalación y preparación del entorno](./00_instalacionEntorno.md)).

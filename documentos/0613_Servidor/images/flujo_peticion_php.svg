@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 840 320"
+   width="100%"
+   height="100%"
+   version="1.1"
+   id="svg17"
+   sodipodi:docname="flujo_peticion.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview17"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.0312484"
+     inkscape:cx="411.56955"
+     inkscape:cy="30.276947"
+     inkscape:window-width="2560"
+     inkscape:window-height="1351"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg17" />
+  <defs
+     id="defs4">
+    <!-- Filtro para sombreado suave de las tarjetas -->
+    <filter
+       id="shadow"
+       x="-5%"
+       y="-5%"
+       width="110%"
+       height="115%"
+       filterUnits="userSpaceOnUse">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="4"
+         id="feGaussianBlur1" />
+      <feOffset
+         dx="0"
+         dy="4"
+         id="feOffset1" />
+      <feComponentTransfer
+         id="feComponentTransfer1">
+        <feFuncA
+           type="linear"
+           slope="0.1"
+           id="feFuncA1" />
+      </feComponentTransfer>
+      <feMerge
+         id="feMerge2">
+        <feMergeNode
+           id="feMergeNode1" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode2" />
+      </feMerge>
+    </filter>
+    <!-- Marcadores de flechas auto-orientables según la dirección de la línea -->
+    <marker
+       id="arrow-blue"
+       viewBox="0 0 10 10"
+       refX="6"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto">
+      <path
+         d="M 0 1.5 L 8 5 L 0 8.5 z"
+         fill="#2563EB"
+         id="path2" />
+    </marker>
+    <marker
+       id="arrow-gray"
+       viewBox="0 0 10 10"
+       refX="6"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto">
+      <path
+         d="M 0 1.5 L 8 5 L 0 8.5 z"
+         fill="#4B5563"
+         id="path3" />
+    </marker>
+    <marker
+       id="arrow-green"
+       viewBox="0 0 10 10"
+       refX="6"
+       refY="5"
+       markerWidth="6"
+       markerHeight="6"
+       orient="auto">
+      <path
+         d="M 0 1.5 L 8 5 L 0 8.5 z"
+         fill="#059669"
+         id="path4" />
+    </marker>
+    <filter
+       inkscape:label="Raised Border"
+       inkscape:menu="Bevels"
+       inkscape:menu-tooltip="Strongly raised border around a flat surface"
+       height="1.22"
+       width="1.1711111"
+       y="-0.11"
+       x="-0.085555556"
+       style="color-interpolation-filters:sRGB;"
+       id="filter24">
+      <feGaussianBlur
+         stdDeviation="4"
+         result="result1"
+         id="feGaussianBlur19" />
+      <feComposite
+         in="result1"
+         in2="result1"
+         result="result4"
+         operator="in"
+         id="feComposite19" />
+      <feGaussianBlur
+         stdDeviation="2"
+         result="result6"
+         in="result4"
+         id="feGaussianBlur20" />
+      <feComposite
+         operator="xor"
+         in="result6"
+         in2="result4"
+         result="result8"
+         id="feComposite20" />
+      <feComposite
+         operator="atop"
+         result="fbSourceGraphic"
+         in="result4"
+         in2="result8"
+         id="feComposite21" />
+      <feSpecularLighting
+         specularExponent="10"
+         specularConstant="1.3"
+         surfaceScale="3"
+         lighting-color="rgb(255,255,255)"
+         result="result1"
+         in="fbSourceGraphic"
+         id="feSpecularLighting21">
+        <feDistantLight
+           azimuth="235"
+           elevation="55"
+           id="feDistantLight21" />
+      </feSpecularLighting>
+      <feComposite
+         operator="atop"
+         result="result2"
+         in="result1"
+         in2="fbSourceGraphic"
+         id="feComposite22" />
+      <feComposite
+         k3="1"
+         k2="1"
+         operator="arithmetic"
+         result="result4"
+         in="fbSourceGraphic"
+         in2="result2"
+         id="feComposite23" />
+      <feComposite
+         operator="over"
+         in="result4"
+         in2="SourceGraphic"
+         id="feComposite24" />
+      <feBlend
+         mode="multiply"
+         in2="result2"
+         id="feBlend24" />
+    </filter>
+    <filter
+       inkscape:label="Raised Border"
+       inkscape:menu="Bevels"
+       inkscape:menu-tooltip="Strongly raised border around a flat surface"
+       height="1.22"
+       width="1.1711111"
+       y="-0.11"
+       x="-0.085555556"
+       style="color-interpolation-filters:sRGB;"
+       id="filter30">
+      <feGaussianBlur
+         stdDeviation="4"
+         result="result1"
+         id="feGaussianBlur24" />
+      <feComposite
+         in="result1"
+         in2="result1"
+         result="result4"
+         operator="in"
+         id="feComposite25" />
+      <feGaussianBlur
+         stdDeviation="2"
+         result="result6"
+         in="result4"
+         id="feGaussianBlur25" />
+      <feComposite
+         operator="xor"
+         in="result6"
+         in2="result4"
+         result="result8"
+         id="feComposite26" />
+      <feComposite
+         operator="atop"
+         result="fbSourceGraphic"
+         in="result4"
+         in2="result8"
+         id="feComposite27" />
+      <feSpecularLighting
+         specularExponent="10"
+         specularConstant="1.3"
+         surfaceScale="3"
+         lighting-color="rgb(255,255,255)"
+         result="result1"
+         in="fbSourceGraphic"
+         id="feSpecularLighting27">
+        <feDistantLight
+           azimuth="235"
+           elevation="55"
+           id="feDistantLight27" />
+      </feSpecularLighting>
+      <feComposite
+         operator="atop"
+         result="result2"
+         in="result1"
+         in2="fbSourceGraphic"
+         id="feComposite28" />
+      <feComposite
+         k3="1"
+         k2="1"
+         operator="arithmetic"
+         result="result4"
+         in="fbSourceGraphic"
+         in2="result2"
+         id="feComposite29" />
+      <feComposite
+         operator="over"
+         in="result4"
+         in2="SourceGraphic"
+         id="feComposite30" />
+      <feBlend
+         mode="multiply"
+         in2="result2"
+         id="feBlend30" />
+    </filter>
+    <filter
+       inkscape:label="Raised Border"
+       inkscape:menu="Bevels"
+       inkscape:menu-tooltip="Strongly raised border around a flat surface"
+       height="1.22"
+       width="1.1711111"
+       y="-0.11"
+       x="-0.085555556"
+       style="color-interpolation-filters:sRGB;"
+       id="filter36">
+      <feGaussianBlur
+         stdDeviation="4"
+         result="result1"
+         id="feGaussianBlur30" />
+      <feComposite
+         in="result1"
+         in2="result1"
+         result="result4"
+         operator="in"
+         id="feComposite31" />
+      <feGaussianBlur
+         stdDeviation="2"
+         result="result6"
+         in="result4"
+         id="feGaussianBlur31" />
+      <feComposite
+         operator="xor"
+         in="result6"
+         in2="result4"
+         result="result8"
+         id="feComposite32" />
+      <feComposite
+         operator="atop"
+         result="fbSourceGraphic"
+         in="result4"
+         in2="result8"
+         id="feComposite33" />
+      <feSpecularLighting
+         specularExponent="10"
+         specularConstant="1.3"
+         surfaceScale="3"
+         lighting-color="rgb(255,255,255)"
+         result="result1"
+         in="fbSourceGraphic"
+         id="feSpecularLighting33">
+        <feDistantLight
+           azimuth="235"
+           elevation="55"
+           id="feDistantLight33" />
+      </feSpecularLighting>
+      <feComposite
+         operator="atop"
+         result="result2"
+         in="result1"
+         in2="fbSourceGraphic"
+         id="feComposite34" />
+      <feComposite
+         k3="1"
+         k2="1"
+         operator="arithmetic"
+         result="result4"
+         in="fbSourceGraphic"
+         in2="result2"
+         id="feComposite35" />
+      <feComposite
+         operator="over"
+         in="result4"
+         in2="SourceGraphic"
+         id="feComposite36" />
+      <feBlend
+         mode="multiply"
+         in2="result2"
+         id="feBlend36" />
+    </filter>
+  </defs>
+  <!-- Fondo general del canvas (gris ultra claro) -->
+  <rect
+     width="100%"
+     height="100%"
+     fill="#F9FAFB"
+     rx="16"
+     id="rect4" />
+  <!-- 1. BLOQUE NAVEGADOR (CLIENTE) -->
+  <g
+     filter="url(#shadow)"
+     id="g8"
+     style="filter:url(#filter24)">
+    <rect
+       x="40"
+       y="80"
+       width="180"
+       height="140"
+       rx="12"
+       fill="#EBF5FF"
+       stroke="#3B82F6"
+       stroke-width="2"
+       id="rect5" />
+    <!-- Barra superior del navegador -->
+    <path
+       d="M 40 92 A 12 12 0 0 1 52 80 L 208 80 A 12 12 0 0 1 220 92 L 220 105 L 40 105 Z"
+       fill="#DBEAFE"
+       id="path5" />
+    <!-- Botones de control del navegador (Rojo, Amarillo, Verde) -->
+    <circle
+       cx="55"
+       cy="92"
+       r="4"
+       fill="#EF4444"
+       id="circle5" />
+    <circle
+       cx="67"
+       cy="92"
+       r="4"
+       fill="#F59E0B"
+       id="circle6" />
+    <circle
+       cx="79"
+       cy="92"
+       r="4"
+       fill="#10B981"
+       id="circle7" />
+    <!-- Barra de direcciones simulada -->
+    <rect
+       x="95"
+       y="87"
+       width="110"
+       height="10"
+       rx="4"
+       fill="#FFFFFF"
+       id="rect7" />
+    <!-- Textos -->
+    <text
+       x="130"
+       y="150"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="18"
+       font-weight="700"
+       fill="#1E40AF"
+       text-anchor="middle"
+       id="text7">Navegador</text>
+    <text
+       x="130"
+       y="175"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="13"
+       font-weight="500"
+       fill="#3B82F6"
+       text-anchor="middle"
+       id="text8">Cliente / Browser</text>
+  </g>
+  <!-- 2. BLOQUE SERVIDOR WEB (NGINX) -->
+  <g
+     filter="url(#shadow)"
+     id="g10"
+     style="filter:url(#filter30)">
+    <rect
+       x="330"
+       y="80"
+       width="180"
+       height="140"
+       rx="12"
+       fill="#ECFDF5"
+       stroke="#10B981"
+       stroke-width="2"
+       id="rect8" />
+    <!-- Decoración de cabecera -->
+    <path
+       d="M 330 92 A 12 12 0 0 1 342 80 L 498 80 A 12 12 0 0 1 510 92 L 510 105 L 330 105 Z"
+       fill="#D1FAE5"
+       id="path8" />
+    <!-- Textos -->
+    <text
+       x="420"
+       y="145"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="18"
+       font-weight="700"
+       fill="#065F46"
+       text-anchor="middle"
+       id="text9">Servidor Web</text>
+    <text
+       x="420"
+       y="175"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="16"
+       font-weight="700"
+       fill="#10B981"
+       text-anchor="middle"
+       id="text10">nginx</text>
+  </g>
+  <!-- 3. BLOQUE INTÉRPRETE PHP (PHP-FPM) -->
+  <g
+     filter="url(#shadow)"
+     id="g12"
+     style="filter:url(#filter36)">
+    <rect
+       x="620"
+       y="80"
+       width="180"
+       height="140"
+       rx="12"
+       fill="#F5F3FF"
+       stroke="#8B5CF6"
+       stroke-width="2"
+       id="rect10" />
+    <!-- Decoración de cabecera -->
+    <path
+       d="M 620 92 A 12 12 0 0 1 632 80 L 788 80 A 12 12 0 0 1 800 92 L 800 105 L 620 105 Z"
+       fill="#EDE9FE"
+       id="path10" />
+    <!-- Textos -->
+    <text
+       x="710"
+       y="145"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="18"
+       font-weight="700"
+       fill="#5B21B6"
+       text-anchor="middle"
+       id="text11">Intérprete PHP</text>
+    <text
+       x="710"
+       y="175"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="16"
+       font-weight="700"
+       fill="#8B5CF6"
+       text-anchor="middle"
+       id="text12">php-fpm</text>
+  </g>
+  <!-- LÍNEAS DE FLUJO Y ETIQUETAS -->
+  <!-- Flujo 1: Navegador -> nginx (Petición) -->
+  <g
+     id="g13">
+    <path
+       d="M 220 125 L 330 125"
+       fill="none"
+       stroke="#2563EB"
+       stroke-width="2.5"
+       marker-end="url(#arrow-blue)"
+       id="path12" />
+    <text
+       x="275"
+       y="115"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="11"
+       font-weight="600"
+       fill="#2563EB"
+       text-anchor="middle"
+       id="text13">petición HTTP</text>
+  </g>
+  <!-- Flujo 2: nginx -> php-fpm (Ejecución) -->
+  <g
+     id="g14">
+    <path
+       d="M 510 125 L 620 125"
+       fill="none"
+       stroke="#4B5563"
+       stroke-width="2"
+       marker-end="url(#arrow-gray)"
+       id="path13" />
+    <text
+       x="565"
+       y="115"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="11"
+       font-weight="600"
+       fill="#4B5563"
+       text-anchor="middle"
+       id="text14">ejecuta el .php</text>
+  </g>
+  <!-- Flujo 3: php-fpm -> nginx (Retorno HTML) -->
+  <g
+     id="g15">
+    <path
+       d="M 620 175 L 510 175"
+       fill="none"
+       stroke="#059669"
+       stroke-width="2"
+       marker-end="url(#arrow-green)"
+       id="path14" />
+    <text
+       x="565"
+       y="165"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="11"
+       font-weight="600"
+       fill="#059669"
+       text-anchor="middle"
+       id="text15">HTML</text>
+  </g>
+  <!-- Flujo 4: nginx -> Navegador (Respuesta HTTP) -->
+  <g
+     id="g17">
+    <path
+       d="M 330 175 L 220 175"
+       fill="none"
+       stroke="#059669"
+       stroke-width="2.5"
+       marker-end="url(#arrow-green)"
+       id="path15" />
+    <text
+       x="275"
+       y="165"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="11"
+       font-weight="600"
+       fill="#059669"
+       text-anchor="middle"
+       id="text16">respuesta HTTP</text>
+    <text
+       x="275"
+       y="195"
+       font-family="system-ui, -apple-system, sans-serif"
+       font-size="11"
+       font-weight="600"
+       fill="#047857"
+       text-anchor="middle"
+       id="text17">(HTML)</text>
+  </g>
+</svg>
