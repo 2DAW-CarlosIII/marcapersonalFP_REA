@@ -37,8 +37,8 @@ Material de apoyo conservado: [Introducción](./01_introduccion.md).
 
 Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonalFP* en PHP plano.
 
-1. 🆕 PHP embebido en HTML: etiquetas `<?php ?>` y tecnologías asociadas
-2. 🆕 Sintaxis, sentencias y salida (`echo`/`print`)
+1. [PHP embebido en HTML: etiquetas `<?php ?>` y tecnologías asociadas](./RA2_1_phpEmbebido.md)
+2. [Sintaxis, sentencias y salida (`echo`/`print`)](./RA2_2_sintaxisSalida.md)
 3. 🆕 Tipos de datos y conversiones; variables y constantes; operadores
 4. 🆕 Ámbitos de las variables
 5. 🆕 *Proyecto:* listado de currículos desde un array

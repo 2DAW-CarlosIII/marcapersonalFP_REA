@@ -110,10 +110,10 @@ Con la página abierta en el navegador, usa **"Ver código fuente de la página"
 
 Junto a cada ejercicio del bloque encontrarás un test que puedes ejecutar para saber, al instante, si tu solución es correcta — sin esperar a que el profesor la revise. No hace falta entender cómo está escrito el test (eso lo veremos como contenido en el Bloque 7, con TDD); de momento solo lo **ejecutas** y lees el resultado. La preparación (`vanilla_php/composer.json`, `phpunit.xml`, PHPUnit instalado) ya viene hecha en la máquina virtual — ver la sección *Proyecto `vanilla_php` y PHPUnit* de [0. Instalación y preparación del entorno](./00_instalacionEntorno.md).
 
-Para el ejercicio 1 (*Primer script*), copia el archivo [RA2_1_HolaMundoTest.php](./materiales/ejercicios-vanilla/tests/RA2_1_HolaMundoTest.php) a la carpeta `vanilla_php/tests/` de tu proyecto y ejecuta desde un terminal situado en la carpeta `laradock/`:
+Para el ejercicio 1 (*Primer script*), copia el archivo [RA2_1_HolaMundoTest.php](./materiales/ejercicios-vanilla/tests/RA2_1_HolaMundoTest.php) a la carpeta `vanilla_php/tests/` de tu proyecto y ejecuta, desde un terminal situado en la carpeta `laradock/`, ese fichero de test en concreto:
 
 ```bash
-docker compose exec --workdir /var/www/vanilla_php workspace vendor/bin/phpunit
+docker compose exec --workdir /var/www/vanilla_php workspace vendor/bin/phpunit tests/RA2_1_HolaMundoTest.php
 ```
 
 Si todo está bien: `OK (2 tests, 4 assertions)`. Si algo falla, PHPUnit te dice **cuál** de las dos comprobaciones no pasa y por qué.
