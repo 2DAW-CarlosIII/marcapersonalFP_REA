@@ -37,9 +37,8 @@ class RA2_2_SintaxisSalidaTest extends TestCase
             substr_count($html, '2000 horas'),
             'Las horas del ciclo deberían aparecer dos veces (una por echo, otra por print).'
         );
-        $this->assertGreaterThanOrEqual(
-            2,
-            substr_count($html, '<strong>'),
+        $this->assertTrue(
+            substr_count($html, '<strong>') >= 2,
             'Cada ficha debería resaltar el nombre del ciclo con <strong>.'
         );
     }
