@@ -41,7 +41,7 @@ Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonal
 2. [Sintaxis, sentencias y salida (`echo`/`print`)](./RA2_2_sintaxisSalida.md)
 3. [Tipos de datos y conversiones; variables y constantes; operadores](./RA2_3_tiposVariablesOperadores.md)
 4. [Ámbitos de las variables](./RA2_4_ambitos.md)
-5. 🆕 *Proyecto:* listado de currículos desde un array
+5. *Proyecto:* [listado de currículos desde un array](./RA2_5_proyectoListado.md)
 
 ## Bloque 3. Programación basada en lenguajes de marcas con código embebido (RA3)
 
