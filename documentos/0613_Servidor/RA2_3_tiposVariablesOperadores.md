@@ -47,7 +47,7 @@ Una **constante** es un valor con nombre que, a diferencia de una variable, **no
 
 ```php
 <?php
-  define('NOMBRE_CENTRO', 'IES Ejemplo');   // función: válida en cualquier punto del script
+  define('NOMBRE_CENTRO', 'CIFP Carlos III');   // función: válida en cualquier punto del script
   const CODIGO_CENTRO = '30012345';         // palabra clave: se resuelve al cargar el script
 
   echo '<p>Centro: ', NOMBRE_CENTRO, ' (código ', CODIGO_CENTRO, ')</p>';

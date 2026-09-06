@@ -21,7 +21,7 @@ class RA2_3_TiposVariablesOperadoresTest extends TestCase
         );
 
         // Ejercicio 2: constantes
-        $this->assertStringContainsString('IES Ejemplo', $html, 'Falta el echo de la constante NOMBRE_CENTRO.');
+        $this->assertStringContainsString('CIFP Carlos III', $html, 'Falta el echo de la constante NOMBRE_CENTRO.');
         $this->assertStringContainsString('30012345', $html, 'Falta el echo de la constante CODIGO_CENTRO.');
 
         // Ejercicio 1: var_dump muestra tipo y valor exactos
