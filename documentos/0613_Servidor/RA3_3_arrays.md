@@ -239,4 +239,4 @@ Si todo está bien: `OK (2 tests, 9 assertions)`.
 
 ---
 
-**Siguiente:** 3.4. Funciones
+**Siguiente:** [3.4. Funciones](./RA3_4_funciones.md)
