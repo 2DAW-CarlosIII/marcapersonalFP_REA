@@ -102,4 +102,4 @@ Si todo el Bloque 2 está resuelto: `OK (10 tests, 32 assertions)`.
 
 ---
 
-**Siguiente:** Bloque 3 — Programación basada en lenguajes de marcas con código embebido (RA3).
+**Siguiente:** [3.1. Tomas de decisión](./RA3_1_decisiones.md) (Bloque 3 — Programación basada en lenguajes de marcas con código embebido, RA3)
