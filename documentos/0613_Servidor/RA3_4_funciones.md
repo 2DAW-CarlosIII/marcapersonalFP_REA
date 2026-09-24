@@ -266,4 +266,4 @@ Si todo está bien: `OK (8 tests, 17 assertions)`.
 
 ---
 
-**Siguiente:** 3.5. Programación Orientada a Objetos en PHP
+**Siguiente:** [3.5. Programación Orientada a Objetos en PHP](./RA3_5_poo.md)
