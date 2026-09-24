@@ -226,4 +226,4 @@ Si todo está bien: `OK (2 tests, 9 assertions)`.
 
 ---
 
-**Siguiente:** 3.3. Arrays y tipos compuestos
+**Siguiente:** [3.3. Arrays y tipos compuestos](./RA3_3_arrays.md)

@@ -47,7 +47,7 @@ Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonal
 
 1. [Tomas de decisión](./RA3_1_decisiones.md)
 2. [Bucles](./RA3_2_bucles.md)
-3. 🆕 Arrays y tipos compuestos
+3. [Arrays y tipos compuestos](./RA3_3_arrays.md)
 4. 🆕 Funciones
 5. 🆕 Programación Orientada a Objetos en PHP
 6. 🆕 Formularios web: recuperación (`$_GET`/`$_POST`), procesamiento y validación
