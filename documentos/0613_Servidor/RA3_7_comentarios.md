@@ -158,4 +158,4 @@ Si todo está bien: `OK (4 tests, 10 assertions)`.
 
 ---
 
-**Siguiente:** 3.8. Proyecto: alta y validación de un currículo
+**Siguiente:** [3.8. Proyecto: alta y validación de un currículo](./RA3_8_proyectoAltaCurriculo.md)
