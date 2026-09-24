@@ -467,4 +467,4 @@ Si todo está bien: `OK (9 tests, 23 assertions)`.
 
 ---
 
-**Siguiente:** 3.6. Formularios web: recuperación, procesamiento y validación
+**Siguiente:** [3.6. Formularios web: recuperación, procesamiento y validación](./RA3_6_formularios.md)

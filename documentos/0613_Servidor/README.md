@@ -50,7 +50,7 @@ Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonal
 3. [Arrays y tipos compuestos](./RA3_3_arrays.md)
 4. [Funciones](./RA3_4_funciones.md)
 5. [Programación Orientada a Objetos en PHP](./RA3_5_poo.md)
-6. 🆕 Formularios web: recuperación (`$_GET`/`$_POST`), procesamiento y validación
+6. [Formularios web: recuperación (`$_GET`/`$_POST`), procesamiento y validación](./RA3_6_formularios.md)
 7. 🆕 Comentarios
 8. 🆕 *Proyecto:* alta y validación de un currículo
 
