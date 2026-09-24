@@ -119,7 +119,7 @@ Seguimos con el mismo proyecto `vanilla_php`; si lo necesitas, repasa [2.1. PHP 
 
 ## Ejercicios
 
-1. **Ámbito local.** Crea `vanilla_php/public/RA2_ambitos.php` con la función `mostrarCiclo()` de esta sección y su llamada. Compruébalo en el navegador. Después, descomenta la línea `echo $nombreCiclo;` de fuera de la función, recarga y observa el aviso de PHP (`Undefined variable`). Explica en un comentario por qué ocurre. Cuando termines, vuelve a comentar esa línea para que el resto de ejercicios funcione sin avisos.
+1. **Ámbito local.** Crea `vanilla_php/public/RA2_ambitos.php` con la función `mostrarCiclo()` de esta sección y su llamada. Compruébalo en el navegador. Después, descomenta la línea `echo $nombreCiclo;` de fuera de la función, recarga y observa el aviso de PHP (`Undefined variable`; si no lo ves, activa `display_errors` como se explica en la [nota de 2.2](./RA2_2_sintaxisSalida.md#ejercicios)). Explica en un comentario por qué ocurre. Cuando termines, vuelve a comentar esa línea para que el resto de ejercicios funcione sin avisos.
 2. **Ámbito global con `global`.** Debajo, añade `$totalCiclosMostrados`, `registrarVisita()` y las tres llamadas de esta sección, terminando con el `echo` del total.
 3. **Constantes y ámbito.** Añade la constante `NOMBRE_CENTRO` y la función `pie()` de esta sección, y llama a `pie()`.
 4. **Variables estáticas.** Añade `contadorVisitas()` de esta sección y llámala tres veces seguidas. Comprueba el resultado y después **recarga la página varias veces**: ¿por qué el contador vuelve a empezar por 1 en cada recarga en vez de seguir por el 4, el 5...?

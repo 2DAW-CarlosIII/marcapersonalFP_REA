@@ -113,7 +113,7 @@ WORKSPACE_NODE_VERSION=22
 
 (`22` es la versión LTS activa; ajusta el número si para cuando impartas el curso hay una LTS más reciente). Node y npm quedan disponibles **dentro del contenedor `workspace`**, igual que Composer — no hace falta instalar nada en el sistema.
 
-## 7. Activar la depuración con Xdebug
+## 7. Depuración: errores en pantalla y Xdebug
 
 En el `.env`:
 
@@ -174,6 +174,22 @@ xdebug.var_display_max_depth=-1
 
 **Una configuración, todo el curso.** Xdebug se activa a nivel del intérprete PHP (dentro de `php-fpm`), así que depura por igual los scripts *vanilla* de los Bloques 2–3 (`vanilla_php/public/RA2_*.php`) y las peticiones de _Laravel_ del Bloque 4 en adelante (`public/index.php` del proyecto Laravel) — no hay que tocar nada al cambiar de uno a otro.
 
+**Mostrar los errores de PHP en el navegador.** Laradock desactiva `display_errors` (lo correcto en producción): ante un error el navegador solo recibe una página en blanco, con un código 500. Lo hace `php-fpm/laravel.ini`, que se copia a `/usr/local/etc/php/conf.d/` y **se lee después del `php.ini`**, así que prevalece incluso aunque `php-fpm/php8.4.ini` ya traiga `display_errors = On`. En desarrollo interesa lo contrario: edita `php-fpm/laravel.ini` y cambia la línea
+
+```ini
+display_errors=Off
+```
+
+por
+
+```ini
+display_errors=On
+```
+
+Igual que `xdebug.ini`, este fichero se copia a la imagen **al construirla**, así que el cambio se aplica con la reconstrucción del paso 9 (`docker compose up -d --build php-fpm`). Es un ajuste del intérprete, así que vale para todo el curso; en _Laravel_ (Bloque 4), en cambio, el propio framework toma el control de los errores (según el `APP_DEBUG` de su `.env`), por lo que este ajuste apenas le afecta. Solo es apropiado en una máquina de desarrollo, nunca en producción.
+
+> **Por qué no basta con el `php.ini` ni con `ini_set()`.** PHP lee primero el `php.ini` y después los ficheros de `conf.d/`, y el último valor gana: para saber qué fichero fija cada directiva, usa `docker compose exec php-fpm php --ini` (qué ficheros se leen) y `docker compose exec php-fpm grep -rn display_errors /usr/local/etc/php/` (dónde se define). Y `ini_set('display_errors', '1')` dentro del propio script no sirve para los _errores de sintaxis_ (_Parse error_): PHP falla al compilar el fichero, antes de ejecutar ninguna línea, y el `ini_set()` nunca llega a ejecutarse.
+
 ## 8. Ajustes de MariaDB
 
 - Edita `mariadb/my.cnf` y asigna **256M** a `innodb_log_file_size` (en lugar de los 4048M por defecto, excesivos para una VM de desarrollo).
@@ -188,7 +204,7 @@ docker compose up -d nginx php-fpm workspace mariadb phpmyadmin
 
 (Verifica con `docker compose config --services` los nombres exactos de los servicios en tu versión de Laradock, por si difieren.)
 
-> **Si ya tenías los contenedores levantados y cambias algo del `.env` o de un `xdebug.ini` después**, un simple reinicio no basta para todo. `PHP_VERSION`, `WORKSPACE_INSTALL_NODE`/`NODE_VERSION`, `*_INSTALL_XDEBUG` y el propio contenido de `xdebug.ini` se incorporan a la imagen **en tiempo de build** (`COPY`/`ARG` en el `Dockerfile`), así que necesitan reconstrucción; en cambio `DOCKER_HOST_IP` o los puertos de Xdebug solo necesitan recrear el contenedor. Un único comando cubre ambos casos (la caché de capas de Docker evita reconstruir lo que no cambió):
+> **Si ya tenías los contenedores levantados y cambias algo del `.env`, de un `xdebug.ini` o de `laravel.ini` después**, un simple reinicio no basta para todo. `PHP_VERSION`, `WORKSPACE_INSTALL_NODE`/`NODE_VERSION`, `*_INSTALL_XDEBUG` y el propio contenido de `xdebug.ini` y de `laravel.ini` se incorporan a la imagen **en tiempo de build** (`COPY`/`ARG` en el `Dockerfile`), así que necesitan reconstrucción; en cambio `DOCKER_HOST_IP` o los puertos de Xdebug solo necesitan recrear el contenedor. Un único comando cubre ambos casos (la caché de capas de Docker evita reconstruir lo que no cambió):
 > ```bash
 > docker compose up -d --build workspace php-fpm
 > ```
@@ -208,7 +224,13 @@ docker compose exec workspace node --version
 docker compose exec workspace npm --version
 ```
 
-Y, para Xdebug, la comprobación de `dockerhost` del paso 7.
+Y, para Xdebug, la comprobación de `dockerhost` del paso 7. Para los errores en pantalla (paso 7):
+
+```bash
+docker compose exec php-fpm php -r 'var_dump(ini_get("display_errors"));'
+```
+
+Debe devolver `string(1) "1"`; con `display_errors` desactivado devuelve `string(0) ""`.
 
 ## 11. Proyecto `vanilla_php` y PHPUnit (Bloques 2 y 3)
 

@@ -79,8 +79,21 @@ Seguimos trabajando sobre el mismo proyecto `vanilla_php` de la sección anterio
 
 1. **Ficha de ciclo con `echo`.** Crea `vanilla_php/public/RA2_sintaxisSalida.php` con las tres variables (`$nombreCiclo`, `$familia`, `$horas`) y la sentencia `echo` de esta sección. Ábrelo en `http://localhost/RA2_sintaxisSalida.php` y comprueba el resultado.
 2. **La misma ficha con `print`.** En el mismo fichero, debajo del `echo` anterior, añade un segundo párrafo con la sentencia `print` + concatenación que construye la misma frase. El resultado debe verse dos veces en la página, una por cada directiva.
-3. **`print` como expresión.** Añade al final del fichero: `$resultado = print "Hola";` seguido de `echo $resultado;`. Observa el resultado en el navegador y anota, en un comentario, qué valor imprime `$resultado` y por qué. Prueba después a sustituir `print` por `echo` en esa misma línea (`$resultado = echo "Hola";`) y fíjate en el error que da PHP: ¿qué te dice eso sobre la diferencia entre ambas?
+3. **`print` como expresión.** Añade al final del fichero: `$resultado = print "Hola";` seguido de `echo $resultado;`. Observa el resultado en el navegador y anota, en un comentario, qué valor imprime `$resultado` y por qué. Prueba después a sustituir `print` por `echo` en esa misma línea (`$resultado = echo "Hola";`) y fíjate en el error que da PHP: ¿qué te dice eso sobre la diferencia entre ambas? Si no ves ningún error, lee la nota de debajo. Cuando termines, **deshaz ese cambio** (vuelve a `print`): un error de sintaxis impide ejecutar el fichero entero y los ejercicios 1 y 2 dejarían de funcionar.
 4. **Investiga.** ¿Qué ventaja práctica citan las fuentes oficiales de PHP a favor de `echo` frente a `print`? Escribe la respuesta en un comentario del fichero.
+
+> **Si no ves el error (ejercicio 3).** Por defecto PHP no muestra los errores en el navegador (`display_errors` desactivado): en lugar del mensaje verás una página en blanco y, si abres las herramientas del navegador (`F12`, pestaña _Red_), un código 500. Si tu máquina virtual no lo tiene ya activado, cámbialo así:
+>
+> 1. Abre `laradock/php-fpm/laravel.ini` (dentro de `~/Documentos/laravel/`) y cambia la línea `display_errors=Off` por `display_errors=On`.
+> 2. Reconstruye el contenedor de PHP, desde la carpeta `laradock/`:
+>
+>    ```bash
+>    docker compose up -d --build php-fpm
+>    ```
+>
+> 3. Recarga la página: ahora aparece el mensaje de error de PHP.
+>
+> No sirve `ini_set()` dentro del propio script: un error de sintaxis (_Parse error_) impide que se ejecute ni una sola línea. Déjalo activado el resto del curso, te será muy útil. En producción se hace justo lo contrario: los errores no se muestran en pantalla, se registran. Más detalles en el paso 7 de [0. Instalación y preparación del entorno](./00_instalacionEntorno.md).
 
 ## Comprueba tu solución automáticamente (opcional)
 

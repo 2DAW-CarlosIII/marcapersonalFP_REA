@@ -520,7 +520,7 @@ vanilla_php/
       <section>
         <h2>Ejercicios (2/2)</h2>
         <ol class="pasos compacta" start="3">
-          <li><strong><code>print</code> como expresión.</strong> Añade al final del fichero <code>$resultado = print "Hola";</code> seguido de <code>echo $resultado;</code>. Observa el resultado y anota, en un comentario, qué valor imprime <code>$resultado</code> y por qué. Después sustituye <code>print</code> por <code>echo</code> en esa línea y fíjate en el error que da PHP: ¿qué te dice sobre la diferencia entre ambas?</li>
+          <li><strong><code>print</code> como expresión.</strong> Añade al final del fichero <code>$resultado = print "Hola";</code> seguido de <code>echo $resultado;</code>. Observa el resultado y anota, en un comentario, qué valor imprime <code>$resultado</code> y por qué. Después sustituye <code>print</code> por <code>echo</code> en esa línea y fíjate en el error que da PHP: ¿qué te dice sobre la diferencia entre ambas? Al terminar, <strong>deshaz el cambio</strong>.</li>
           <li><strong>Investiga.</strong> ¿Qué ventaja práctica citan las fuentes oficiales de PHP a favor de <code>echo</code> frente a <code>print</code>? Escribe la respuesta en un comentario del fichero.</li>
         </ol>
         <aside class="notes">
@@ -536,7 +536,29 @@ vanilla_php/
         </aside>
       </section>
 
-      <!-- 17 · Autocorrección -->
+      <!-- 17 · Si no ves el error -->
+      <section>
+        <h2>¿No ves el error?</h2>
+        <p class="small-text">Por defecto PHP no muestra los errores en el navegador (<code>display_errors</code> desactivado): verás una <strong>página en blanco</strong>, con un código <strong>500</strong>.</p>
+        <p class="label muted">En <code>laradock/php-fpm/laravel.ini</code>:</p>
+        <pre class="medio"><code class="language-ini" data-trim>
+display_errors=On
+        </code></pre>
+        <p class="label muted">Y, desde la carpeta <code>laradock/</code>:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose up -d --build php-fpm
+        </code></pre>
+        <p class="small-text muted">No sirve <code>ini_set()</code> dentro del script: un <em>Parse error</em> impide que se ejecute ninguna línea.</p>
+        <aside class="notes">
+          Relacionado con el ejercicio 3. Con display_errors desactivado, PHP responde con un 500 y el cuerpo vacío en lugar del mensaje del Parse error.
+          Laradock incluye php-fpm/laravel.ini con display_errors=Off; se copia a conf.d, que PHP lee después del php.ini, así que gana
+          aunque php8.4.ini tenga display_errors = On. Los .ini se copian a la imagen al construirla (igual que xdebug.ini): no basta con reiniciar, hay que reconstruir php-fpm.
+          Conviene dejarlo activado durante el resto del curso. En producción se hace lo contrario: los errores se registran, no se muestran.
+          El mismo ajuste se necesita en 2.4 (aviso "Undefined variable").
+        </aside>
+      </section>
+
+      <!-- 18 · Autocorrección -->
       <section>
         <h2>Comprueba tu solución (opcional)</h2>
         <ol class="pasos">
@@ -551,7 +573,7 @@ docker compose exec --workdir /var/www/vanilla_php workspace \
         <p class="small-text">Si todo está bien: <code class="nw">OK (2 tests, 6 assertions)</code></p>
       </section>
 
-      <!-- 18 · Siguiente -->
+      <!-- 19 · Siguiente -->
       <section>
         <p class="small-text muted">Siguiente</p>
         <h2>2.3. Tipos de datos, variables y constantes, operadores</h2>
