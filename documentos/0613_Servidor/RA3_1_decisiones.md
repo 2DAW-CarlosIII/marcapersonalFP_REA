@@ -2,6 +2,8 @@
 
 > **Bloque 3 · Programación basada en lenguajes de marcas con código embebido (RA3).** Seguimos construyendo _marcapersonalFP v0_ en PHP plano. En el Bloque 2 nuestros scripts eran secuencias de sentencias que se ejecutaban siempre, de arriba abajo; en este bloque aprenderemos a **decidir** y **repetir**, a organizar los datos en **arrays**, **funciones** y **clases**, y a **recibir datos del usuario** mediante formularios. Terminaremos con un formulario de alta de currículos que valida lo que recibe. En el Bloque 4 reconstruiremos esa misma pieza con _Laravel_ y veremos que **el framework automatiza lo que aquí hacemos a mano**.
 
+**Presentación de apoyo** (_RevealJS_): [RA3_1_decisiones_slides.html](./materiales/slides/RA3_1_decisiones_slides.html)
+
 ## Decidir qué se ejecuta
 
 Hasta ahora, cada sentencia de nuestros scripts se ejecutaba siempre, una detrás de otra. Una **toma de decisión** (o **estructura condicional**) hace que un grupo de sentencias se ejecute **solo si se cumple una condición**. Es la primera vez que la página que genera el servidor puede ser **distinta según los datos**: recuerda de 2.1 que el navegador solo recibe el HTML resultante, así que el código de la rama que no se ejecuta ni siquiera llega al cliente.
