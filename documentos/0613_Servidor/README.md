@@ -51,7 +51,7 @@ Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonal
 4. [Funciones](./RA3_4_funciones.md)
 5. [Programación Orientada a Objetos en PHP](./RA3_5_poo.md)
 6. [Formularios web: recuperación (`$_GET`/`$_POST`), procesamiento y validación](./RA3_6_formularios.md)
-7. 🆕 Comentarios
+7. [Comentarios](./RA3_7_comentarios.md)
 8. 🆕 *Proyecto:* alta y validación de un currículo
 
 ## Bloque 4. Desarrollo de aplicaciones web con código embebido: introducción a Laravel (RA4 + RA5)
