@@ -46,7 +46,7 @@ Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonal
 ## Bloque 3. Programación basada en lenguajes de marcas con código embebido (RA3)
 
 1. [Tomas de decisión](./RA3_1_decisiones.md)
-2. 🆕 Bucles
+2. [Bucles](./RA3_2_bucles.md)
 3. 🆕 Arrays y tipos compuestos
 4. 🆕 Funciones
 5. 🆕 Programación Orientada a Objetos en PHP
