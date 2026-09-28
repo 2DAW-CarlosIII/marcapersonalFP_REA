@@ -1,5 +1,7 @@
 # 3.6. Formularios web: recuperación, procesamiento y validación
 
+**Presentación de apoyo** (_RevealJS_): [RA3_6_formularios_slides.html](./materiales/slides/RA3_6_formularios_slides.html)
+
 ## El formulario: una nueva petición
 
 Hasta ahora, los datos de nuestras páginas estaban escritos en el propio script. Con un **formulario**, por fin es el **usuario** quien los aporta. Recuerda el modelo de 2.1: el navegador hace una petición y el servidor devuelve HTML. Un formulario no cambia ese modelo, solo lo aprovecha: al enviarlo, el navegador hace **una nueva petición HTTP** que lleva dentro los datos escritos, y el servidor la procesa y responde con una nueva página.
