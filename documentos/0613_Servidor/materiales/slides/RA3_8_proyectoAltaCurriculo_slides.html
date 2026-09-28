@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>3.8. Proyecto: alta y validación de un currículo · marcapersonalFP v0</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 3 · RA3</p>
+        <h1 class="titulo">3.8. Proyecto:<br>alta de un currículo</h1>
+        <p class="muted">Cierre del Bloque 3 · formulario + validación + POO</p>
+        <p class="small-text muted">La segunda pieza de <em>marcapersonalFP</em> v0</p>
+        <aside class="notes">
+          Proyecto de integración: no aparece ningún concepto nuevo de importancia, se combinan los de todo el bloque.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · De v0 al alta -->
+      <section>
+        <h2>De un listado a un alta</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>2.5</h3>
+            <p class="small-text">Un <strong>listado</strong> de currículos, desde un array escrito en el código.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>3.8</h3>
+            <p class="small-text">Un <strong>alta</strong>: el servidor <strong>valida</strong> lo que escribe un alumno y crea un <code>Curriculo</code>.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:1em">Proyecto de integración: nada nuevo de importancia, se combina todo lo del bloque.</p>
+      </section>
+
+      <!-- 3 · Qué aporta cada apartado -->
+      <section>
+        <h2>Qué aporta cada apartado</h2>
+        <table class="sin-salto">
+          <tbody>
+            <tr class="fragment"><th>3.1 Decisiones</th><td>Validar campos; formulario o resultado</td></tr>
+            <tr class="fragment"><th>3.2 Bucles</th><td>Opciones del desplegable, lista de errores</td></tr>
+            <tr class="fragment"><th>3.3 Arrays</th><td>Catálogo de ciclos, datos recibidos, errores</td></tr>
+            <tr class="fragment"><th>3.4 Funciones</th><td>Tipos, <code>strict_types</code>, <code>src/</code></td></tr>
+            <tr class="fragment"><th>3.5 POO</th><td><code>Ciclo</code>, <code>Curriculo</code> y <code>ValidadorCurriculo</code></td></tr>
+            <tr class="fragment"><th>3.6 Formularios</th><td><code>$_POST</code>, <code>filter_var()</code>, <code>e()</code></td></tr>
+            <tr class="fragment"><th>3.7 Comentarios</th><td>Docblocks en la clase nueva</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 4 · El diseño -->
+      <section>
+        <h2>El diseño: tres campos</h2>
+        <ul class="small-text">
+          <li class="fragment"><strong>Alumno</strong> (obligatorio, máximo 100 caracteres)</li>
+          <li class="fragment"><strong>Ciclo</strong> (obligatorio, uno de los del centro), en un <code>&lt;select&gt;</code></li>
+          <li class="fragment"><strong>Vídeo de presentación</strong> (opcional; si va, URL <code>https://</code>)</li>
+        </ul>
+        <p class="small-text muted fragment" style="margin-top:1em">Corresponden a lo que necesita el constructor de <code>Curriculo</code> (3.5).</p>
+      </section>
+
+      <!-- 5 · Por qué una clase -->
+      <section>
+        <h2>¿Función o clase para validar?</h2>
+        <p class="small-text">En 3.6, <code>validarCiclo()</code>: reglas fijas, función. Ahora una regla depende de <strong>datos</strong>: el ciclo tiene que estar entre los del centro.</p>
+        <pre class="compacto"><code class="language-php" data-trim>
+&lt;?php
+  $validador = new ValidadorCurriculo($ciclos);
+  $errores = $validador-&gt;validar($_POST);
+?&gt;
+        </code></pre>
+        <p class="small-text muted">El catálogo se pasa una vez, en el constructor, y queda en una propiedad privada.</p>
+      </section>
+
+      <!-- 6 · Dos métodos -->
+      <section>
+        <h2><code>ValidadorCurriculo</code>: dos métodos</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3><code>validar()</code></h3>
+            <p class="small-text">Devuelve los errores por campo, como <code>validarCiclo()</code>.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3><code>crearCurriculo()</code></h3>
+            <p class="small-text">Construye el <code>Curriculo</code> a partir de datos <strong>ya validados</strong>.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:1em">Separar "comprobar" de "construir" deja que la página decida entre medias. <code>Ciclo</code> y <code>Curriculo</code> no cambian: siguen como en 3.5.</p>
+      </section>
+
+      <!-- 7 · mb_strlen -->
+      <section>
+        <h2>Contar caracteres, no bytes</h2>
+        <p class="small-text">Para 100 caracteres no sirve <code>strlen()</code>, que cuenta <strong>bytes</strong>: en UTF-8, la <code>ó</code> ocupa 2.</p>
+        <pre class="medio"><code class="language-php" data-trim>
+&lt;?php
+  strlen('López');      // 6
+  mb_strlen('López');   // 5
+?&gt;
+        </code></pre>
+        <p class="small-text muted"><strong><code>mb_strlen()</code></strong> (<em>multibyte</em>) cuenta caracteres.</p>
+      </section>
+
+      <!-- 8 · Escapar + validar -->
+      <section>
+        <h2>Escapar <strong>y</strong> validar</h2>
+        <p class="small-text"><code>e()</code> impide que un dato se interprete como HTML, pero no basta para una URL en un <code>href</code>:</p>
+        <pre class="compacto"><code class="language-plaintext" data-trim>
+javascript:alert('XSS')
+        </code></pre>
+        <p class="small-text muted fragment">Sin ningún carácter que escapar, y al hacer clic <strong>ejecutaría código</strong>. Por eso, además de <code>FILTER_VALIDATE_URL</code>, exigimos <code>str_starts_with($video, 'https://')</code>.</p>
+        <p class="small-text fragment">Escapar y validar no son alternativas: <strong>las dos cosas</strong>.</p>
+      </section>
+
+      <!-- 9 · Dónde se guarda -->
+      <section>
+        <h2>¿Y dónde se guarda el currículo?</h2>
+        <p class="statement" style="font-size:1.3em">En <strong>ninguna parte</strong>.</p>
+        <p class="small-text muted fragment" style="margin-top:1.2em">Recuerda 2.4: cada petición ejecuta el script desde cero. El objeto existe solo mientras se genera la página; si recargas, ya no está.</p>
+        <p class="small-text fragment">Hacen falta una <strong>base de datos</strong> (Bloque 5) y una <strong>sesión</strong> (Bloque 4, para el patrón POST/Redirect/GET de 3.6). Por ahora: <strong>validar y mostrar</strong>.</p>
+      </section>
+
+      <!-- 10 · ValidadorCurriculo: código -->
+      <section>
+        <h2>La clase <code>ValidadorCurriculo</code></h2>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="|7-9|11-13">
+&lt;?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/Curriculo.php';
+
+class ValidadorCurriculo
+{
+    public function __construct(
+        private readonly array $ciclos,
+    ) {
+    }
+
+    public function validar(array $datos): array { /* ... */ }
+    public function crearCurriculo(array $datos, int $id): Curriculo { /* ... */ }
+}
+        </code></pre>
+        <p class="small-text muted"><code>private readonly array $ciclos</code>: el catálogo se fija al crear el validador y no se puede cambiar desde fuera.</p>
+      </section>
+
+      <!-- 11 · Entorno -->
+      <section>
+        <h2>Seguimos en <code>vanilla_php</code></h2>
+        <p class="small-text">Mismo proyecto, con las clases de 3.5 y <code>e()</code> de 3.6. Al terminar:</p>
+        <pre class="ancho"><code class="language-plaintext" data-trim>
+vanilla_php/
+├── public/RA3_altaCurriculo.php   ← la página (nuevo)
+└── src/
+    ├── Modelo.php, Publicable.php, Ciclo.php, Curriculo.php   (3.5)
+    ├── RA3_formularios.php                                     (3.6, por e())
+    └── ValidadorCurriculo.php     ← la clase de validación (nuevo)
+        </code></pre>
+      </section>
+
+      <!-- 12 · Ejercicios 1-2 -->
+      <section>
+        <h2>Ejercicios (1/2)</h2>
+        <ol class="pasos compacta">
+          <li><strong>La clase <code>ValidadorCurriculo</code>.</strong> <code>src/ValidadorCurriculo.php</code>, con <code>validar()</code> y <code>crearCurriculo()</code>.</li>
+          <li><strong>La página.</strong> <code>public/RA3_altaCurriculo.php</code>: catálogo de 4 ciclos, formulario, validación y resultado.</li>
+        </ol>
+      </section>
+
+      <!-- 13 · Ejercicio 3 -->
+      <section>
+        <h2>Ejercicios (2/2)</h2>
+        <ol class="pasos compacta" start="3">
+          <li><strong>Pruébalo.</strong> Formulario vacío; un nombre con espacios al principio y al final; vídeo sin <code>https://</code> y <code>javascript:alert('XSS')</code> (quitando <code>type="url"</code> con F12); cambiar el <code>value</code> del desplegable por <code>FP</code> con F12; datos correctos, con y sin vídeo. Anota en un comentario qué error produce cada uno.</li>
+          <li><strong>Investiga: de PHP plano a Laravel.</strong> ¿Qué reglas de validación de Laravel expresarían cada regla de <code>validar()</code>? Escribe el array que le pasarías a <code>$request-&gt;validate([...])</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 14 · De v0 a Laravel -->
+      <section>
+        <h2>De <em>v0</em> a <em>Laravel</em></h2>
+        <table class="sin-salto">
+          <tbody>
+            <tr class="fragment"><th>Un script en <code>public/</code></th><td>Rutas y controladores</td></tr>
+            <tr class="fragment"><th><code>&lt;?php if(): ?&gt;</code>, <code>&lt;?= e() ?&gt;</code></th><td>Blade: <code>@if</code>, <code>&#123;&#123; &#125;&#125;</code></td></tr>
+            <tr class="fragment"><th><code>require_once</code></th><td>Autoload de Composer</td></tr>
+            <tr class="fragment"><th><code>class Curriculo extends Modelo</code></th><td>Modelos Eloquent</td></tr>
+            <tr class="fragment"><th>Catálogo escrito en el código</th><td><code>Ciclo::all()</code>, desde la BD</td></tr>
+            <tr class="fragment"><th><code>ValidadorCurriculo::validar()</code></th><td><code>$request-&gt;validate([...])</code></td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:1em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+      </section>
+
+      <!-- 15 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA3_8_ProyectoAltaCurriculoTest.php</code> a <code>vanilla_php/tests/</code></li>
+          <li>Desde la carpeta <code>laradock/</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec --workdir /var/www/vanilla_php workspace \
+  vendor/bin/phpunit tests/RA3_8_ProyectoAltaCurriculoTest.php
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 y 2</strong>.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">OK (9 tests, 22 assertions)</code></p>
+      </section>
+
+      <!-- 16 · Todos los tests del bloque -->
+      <section>
+        <h2>Todos los tests del Bloque 3</h2>
+        <p class="small-text">Con los ocho tests copiados, para lanzar <strong>solo</strong> los del Bloque 3, usa <code>--filter</code>:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec --workdir /var/www/vanilla_php workspace \
+  vendor/bin/phpunit --filter RA3_
+        </code></pre>
+        <p class="small-text">Si todo el Bloque 3 está resuelto: <code class="nw">OK (44 tests, 114 assertions)</code></p>
+        <p class="small-text muted fragment">Y <code>phpunit</code> sin opciones, como en 2.5, lanza también los del Bloque 2.</p>
+      </section>
+
+      <!-- 17 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>Bloque 4 · Desarrollo de aplicaciones web con código embebido: introducción a <em>Laravel</em> (RA4 + RA5)</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>

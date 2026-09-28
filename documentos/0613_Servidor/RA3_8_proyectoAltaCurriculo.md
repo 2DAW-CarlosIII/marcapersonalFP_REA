@@ -1,5 +1,7 @@
 # 3.8. Proyecto: alta y validación de un currículo
 
+**Presentación de apoyo** (_RevealJS_): [RA3_8_proyectoAltaCurriculo_slides.html](./materiales/slides/RA3_8_proyectoAltaCurriculo_slides.html)
+
 Cerramos el Bloque 3 con la segunda pieza de _marcapersonalFP v0_. En 2.5 construimos un **listado** de currículos a partir de un array escrito en el código; ahora construiremos el **alta**: un formulario en el que un alumno introduce los datos de su currículo, el servidor los **valida** y, si son correctos, crea con ellos un objeto `Curriculo` y muestra el resultado.
 
 Es un proyecto de integración: no aparece ningún concepto nuevo de importancia, sino que se combinan los de todo el bloque.
