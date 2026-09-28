@@ -1,5 +1,7 @@
 # 3.3. Arrays y tipos compuestos
 
+**Presentación de apoyo** (_RevealJS_): [RA3_3_arrays_slides.html](./materiales/slides/RA3_3_arrays_slides.html)
+
 ## Tipos escalares y tipos compuestos
 
 En 2.3 trabajamos con tipos **escalares** (`int`, `float`, `string`, `bool`): cada variable guarda **un único valor**. Allí anunciamos dos tipos **compuestos**, capaces de agrupar varios valores bajo un mismo nombre:
