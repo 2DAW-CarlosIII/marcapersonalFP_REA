@@ -1,5 +1,7 @@
 # 3.4. Funciones
 
+**Presentación de apoyo** (_RevealJS_): [RA3_4_funciones_slides.html](./materiales/slides/RA3_4_funciones_slides.html)
+
 ## Qué es una función
 
 En 2.4 adelantamos la sintaxis mínima de una función —un bloque de código con nombre que solo se ejecuta cuando se llama— para entender el ámbito de las variables, y en 2.5 escribimos `mostrarCurriculo(array $curriculo)` para no repetir el mismo `echo` tres veces. Ahora las formalizamos. Una función sirve para:
