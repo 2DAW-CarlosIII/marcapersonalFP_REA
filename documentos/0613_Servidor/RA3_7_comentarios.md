@@ -1,5 +1,7 @@
 # 3.7. Comentarios
 
+**Presentación de apoyo** (_RevealJS_): [RA3_7_comentarios_slides.html](./materiales/slides/RA3_7_comentarios_slides.html)
+
 ## Para qué sirve un comentario
 
 Llevamos todo el Bloque 2 y buena parte del 3 escribiendo comentarios sin detenernos en ellos: para anotar lo que esperabas en un ejercicio, para explicar un ejemplo... Un **comentario** es texto que el intérprete **ignora**: no se ejecuta ni produce salida. Existe solo para las personas (y, como veremos, para algunas herramientas) que leen el código.
