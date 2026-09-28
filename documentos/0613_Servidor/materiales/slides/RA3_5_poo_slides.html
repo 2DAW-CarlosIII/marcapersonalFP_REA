@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>3.5. Programación Orientada a Objetos en PHP · marcapersonalFP v0</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 3 · RA3</p>
+        <h1 class="titulo">3.5. Programación<br>Orientada a Objetos</h1>
+        <p class="muted">Clases, objetos, herencia, interfaces</p>
+        <p class="small-text muted">Seguimos con <em>marcapersonalFP</em> v0 en PHP plano</p>
+        <aside class="notes">
+          RA3, CE d (POO, exigida por el contenido c del currículo). Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · De los arrays a los objetos -->
+      <section>
+        <h2>De los arrays a los objetos</h2>
+        <p class="small-text">Hemos representado un currículo con un array asociativo. Funciona, pero:</p>
+        <ul class="small-text">
+          <li class="fragment">Nada garantiza su forma: <code>$curriculo['alumo']</code> no da ningún error al crearlo</li>
+          <li class="fragment">No se puede declarar su tipo con precisión: <code>array $curriculos</code> acepta cualquier array</li>
+          <li class="fragment">Datos y operaciones van por separado: <code>titulacion()</code> no está unida al ciclo</li>
+        </ul>
+      </section>
+
+      <!-- 3 · Clase y objeto -->
+      <section>
+        <h2>Clase y objeto</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>Clase</h3>
+            <p class="small-text">El <strong>molde</strong>: qué datos tiene (<strong>propiedades</strong>) y qué sabe hacer (<strong>métodos</strong>).</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>Objeto</h3>
+            <p class="small-text">Una <strong>instancia</strong> concreta: el ciclo DAW y el ciclo DAM son dos objetos de la clase <code>Ciclo</code>.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:1em">El tipo compuesto <code>object</code> de 2.3 y 3.3. Base de todo <em>Laravel</em>: cada tabla de la BD, una clase.</p>
+      </section>
+
+      <!-- 4 · Una primera clase -->
+      <section>
+        <h2>Una primera clase</h2>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="|4-6|8-12">
+&lt;?php
+declare(strict_types=1);
+
+class Ciclo
+{
+    public string $codCiclo;
+    public string $nombre;
+    public string $grado;
+
+    public function __construct(string $codCiclo, string $nombre, string $grado)
+    {
+        $this-&gt;codCiclo = $codCiclo;
+        $this-&gt;nombre   = $nombre;
+        $this-&gt;grado    = $grado;
+    }
+}
+        </code></pre>
+        <aside class="notes">
+          Propiedad tipada: solo admite valores de ese tipo (las variables sueltas no lo permitían, 2.3).
+          __construct: constructor, método especial que se ejecuta al crear el objeto.
+          $this: el propio objeto; $this->codCiclo es "la propiedad codCiclo de este objeto".
+        </aside>
+      </section>
+
+      <!-- 5 · new y -> -->
+      <section>
+        <h2><code>new</code> y <code>-&gt;</code></h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|2-3|5-6">
+&lt;?php
+  $daw = new Ciclo('DAW', 'Desarrollo de Aplicaciones Web', 'Superior');
+  $dam = new Ciclo('DAM', 'Desarrollo de Aplicaciones Multiplataforma', 'Superior');
+
+  echo $daw-&gt;nombre;   // Desarrollo de Aplicaciones Web
+  echo $dam-&gt;codCiclo; // DAM
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Convención: clases en <em>PascalCase</em> (<code>Ciclo</code>); propiedades y métodos en <em>camelCase</em>.</p>
+      </section>
+
+      <!-- 6 · Promoción de propiedades -->
+      <section>
+        <h2>Promoción de propiedades</h2>
+        <p class="small-text">Declarar, repetir como parámetro y asignar es repetitivo. Desde PHP 8, un parámetro con visibilidad se convierte <strong>a la vez</strong> en propiedad.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|4-8">
+&lt;?php
+class Ciclo
+{
+    public function __construct(
+        public string $codCiclo,
+        public string $nombre,
+        public string $grado,
+    ) {
+    }
+}
+        </code></pre>
+        <p class="small-text muted">Exactamente equivalente a la diapositiva anterior. Lo usaremos siempre que podamos.</p>
+      </section>
+
+      <!-- 7 · Métodos -->
+      <section>
+        <h2>Métodos</h2>
+        <p class="small-text">Una función dentro de una clase, que trabaja con los datos <strong>de su objeto</strong>, a través de <code>$this</code>.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|6-9|12">
+&lt;?php
+class Ciclo
+{
+    // ... constructor ...
+
+    public function titulacion(): string
+    {
+        return $this-&gt;grado === 'Superior' ? 'Técnico Superior' : 'Técnico';
+    }
+}
+
+$daw = new Ciclo('DAW', 'Desarrollo de Aplicaciones Web', 'Superior');
+echo $daw-&gt;titulacion();   // Técnico Superior
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Compara con <code>titulacion($grado)</code> de 3.4: ahora el ciclo <strong>ya lo conoce</strong>.</p>
+      </section>
+
+      <!-- 8 · Visibilidad -->
+      <section>
+        <h2>Visibilidad</h2>
+        <table>
+          <thead><tr><th>Visibilidad</th><th>Accesible desde…</th></tr></thead>
+          <tbody>
+            <tr class="fragment"><td><code>public</code></td><td>Cualquier sitio</td></tr>
+            <tr class="fragment"><td><code>protected</code></td><td>La propia clase y sus herederas</td></tr>
+            <tr class="fragment"><td><code>private</code></td><td>Solo la propia clase</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:1em"><strong>Encapsulación</strong>: ocultar los datos internos (<code>private</code>) y ofrecer solo los métodos necesarios.</p>
+      </section>
+
+      <!-- 9 · Encapsulación: ejemplo -->
+      <section>
+        <h2>Controlar cómo cambia el estado</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|3|9-12|17">
+&lt;?php
+class Curriculo
+{
+    private bool $publicado = false;
+
+    public function __construct(public string $alumno) {
+    }
+
+    public function publicar(): void
+    {
+        $this-&gt;publicado = true;
+    }
+
+    public function estaPublicado(): bool
+    {
+        return $this-&gt;publicado;
+    }
+}
+// $curriculo->publicado = false;  // Error: Cannot access private property
+?&gt;
+        </code></pre>
+        <p class="small-text muted">No queremos que nadie "despublique" asignando <code>false</code> a mano.</p>
+      </section>
+
+      <!-- 10 · readonly -->
+      <section>
+        <h2>Propiedades de solo lectura: <code>readonly</code></h2>
+        <p class="small-text">Se puede <strong>leer</strong>, pero <strong>asignar solo una vez</strong>, dentro de la clase.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|4-6|10">
+&lt;?php
+class Ciclo
+{
+    public function __construct(
+        public readonly string $codCiclo,
+        public readonly string $nombre,
+    ) {
+    }
+}
+$daw = new Ciclo('DAW', 'Desarrollo de Aplicaciones Web');
+// $daw->codCiclo = 'DAM';  // Error: Cannot modify readonly property
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Con <code>private</code> + métodos controlamos <strong>cómo</strong> cambia; con <code>readonly</code>, que <strong>no cambia</strong>.</p>
+      </section>
+
+      <!-- 11 · Constantes de clase -->
+      <section>
+        <h2>Constantes de clase</h2>
+        <p class="small-text">En 2.3: <code>const</code> —a diferencia de <code>define()</code>— puede usarse dentro de una clase. Pertenece a la clase, no a cada objeto.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|3-4|10">
+&lt;?php
+class Ciclo
+{
+    public const GRADO_MEDIO    = 'Medio';
+    public const GRADO_SUPERIOR = 'Superior';
+
+    public function titulacion(): string
+    {
+        return $this-&gt;grado === self::GRADO_SUPERIOR ? 'Técnico Superior' : 'Técnico';
+    }
+}
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Se accede con <code>::</code>: fuera, <code>Ciclo::GRADO_SUPERIOR</code>; dentro, <code>self::…</code>. Un error tipográfico da un error inmediato, a diferencia de un string mal escrito.</p>
+      </section>
+
+      <!-- 12 · Métodos estáticos: fábrica -->
+      <section>
+        <h2>Métodos estáticos: fábrica</h2>
+        <p class="small-text">Pertenecen a la clase, sin crear ningún objeto. Un <strong>método de fábrica</strong> construye un objeto a partir de otros datos.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|6-9|12">
+&lt;?php
+class Ciclo
+{
+    // ...
+
+    public static function desdeArray(array $datos): self
+    {
+        return new self($datos['codCiclo'], $datos['nombre'], $datos['grado']);
+    }
+}
+
+$dam = Ciclo::desdeArray(['codCiclo' =&gt; 'DAM', 'nombre' =&gt; '…', 'grado' =&gt; 'Superior']);
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Dentro no existe <code>$this</code>. En el Bloque 4: <code>Ciclo::find(1)</code>, <code>Ciclo::create([...])</code>.</p>
+        <aside class="notes">
+          Una propiedad static es compartida por todos los objetos de la clase. Igual que la variable static de una función (2.4), no sobrevive
+          entre peticiones: cada petición ejecuta el script desde cero.
+        </aside>
+      </section>
+
+      <!-- 13 · Los objetos no se copian -->
+      <section>
+        <h2>Los objetos no se copian</h2>
+        <p class="small-text">En 3.3, asignar un array copiaba. Con objetos <strong>no</strong>: la variable guarda un <strong>identificador</strong>.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|2-3|5-6">
+&lt;?php
+  $curriculo = new Curriculo('Ana López');
+  $otro = $curriculo;
+
+  $otro-&gt;publicar();
+  echo $curriculo-&gt;estaPublicado() ? 'publicado' : 'en borrador';   // publicado
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Las dos variables apuntan <strong>al mismo objeto</strong>. Para una copia independiente: <code>clone $curriculo</code>.</p>
+      </section>
+
+      <!-- 14 · Composición -->
+      <section>
+        <h2>Objetos dentro de objetos</h2>
+        <p class="small-text">Un currículo <strong>tiene</strong> un ciclo (<strong>composición</strong>).</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|5|9">
+&lt;?php
+class Curriculo
+{
+    public function __construct(
+        public readonly Ciclo $ciclo,
+        public readonly ?string $videoCurriculum = null,
+    ) {
+    }
+}
+// $curriculo->ciclo->nombre
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Una clase como <strong>tipo declarado</strong>, igual que <code>int</code> o <code>string</code>: si le pasas otra cosa, <code>TypeError</code>.</p>
+      </section>
+
+      <!-- 15 · Herencia -->
+      <section>
+        <h2>Herencia: <code>extends</code></h2>
+        <p class="small-text">Todas las entidades del proyecto comparten cosas (un <code>id</code>). Una clase <strong>padre</strong>, y las demás <strong>heredan</strong>.</p>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="|2-9|11|17-19">
+&lt;?php
+abstract class Modelo
+{
+    public function __construct(public readonly int $id) {
+    }
+
+    abstract public function descripcion(): string;
+}
+
+class Ciclo extends Modelo
+{
+    public function __construct(
+        int $id,
+        public readonly string $codCiclo,
+        public readonly string $nombre,
+    ) {
+        parent::__construct($id);
+    }
+
+    public function descripcion(): string
+    {
+        return $this-&gt;codCiclo . ' — ' . $this-&gt;nombre;
+    }
+}
+?&gt;
+        </code></pre>
+        <aside class="notes">
+          $daw->id funciona aunque Ciclo no declare id. Si la hija define constructor propio, debe llamar a parent::__construct(...).
+          $id en el constructor de Ciclo no lleva visibilidad: no es propiedad nueva, solo un parámetro que se pasa al padre.
+        </aside>
+      </section>
+
+      <!-- 16 · abstract -->
+      <section>
+        <h2><code>abstract</code></h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>Clase abstracta</h3>
+            <p class="small-text">No se puede instanciar (<code>new Modelo(1)</code> da error): solo sirve de base.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>Método abstracto</h3>
+            <p class="small-text">Declara su firma sin cuerpo y <strong>obliga</strong> a cada hija a implementarlo.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:1em">Un objeto de una clase hija es también del tipo de la padre: un parámetro <code>Modelo</code> acepta un <code>Ciclo</code> o un <code>Curriculo</code>.</p>
+        <p class="small-text fragment"><strong>Puente al Bloque 4.</strong> <code>class Ciclo extends Model</code>: la clase padre la escribe <em>Laravel</em>.</p>
+      </section>
+
+      <!-- 17 · Interfaces -->
+      <section>
+        <h2>Interfaces: "sabe hacer"</h2>
+        <p class="small-text">La herencia expresa "<strong>es un</strong>". Una interfaz expresa "<strong>sabe hacer</strong>", sin implementar.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|2-5|7">
+&lt;?php
+interface Publicable
+{
+    public function publicar(): void;
+    public function estaPublicado(): bool;
+}
+
+class Curriculo extends Modelo implements Publicable
+{
+    // publicar() y estaPublicado(), como antes
+}
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Una clase hereda de <strong>una</strong> padre, pero implementa <strong>varias</strong> interfaces. <code>$curriculo instanceof Publicable</code> comprueba en tiempo de ejecución.</p>
+      </section>
+
+      <!-- 18 · Organizar en ficheros -->
+      <section>
+        <h2>Organizar las clases en ficheros</h2>
+        <p class="small-text">Como en 3.4, en <code>src/</code>, que <strong>solo define</strong>. Convención: <strong>una clase por fichero</strong>, con su mismo nombre: <code>src/Ciclo.php</code>, <code>src/Curriculo.php</code>…</p>
+        <p class="small-text muted">Cada fichero carga con <code>require_once</code> lo que necesita: <code>Ciclo.php</code> necesita <code>Modelo.php</code>, porque hereda de ella.</p>
+        <p class="small-text fragment"><strong>Puente al Bloque 4.</strong> En Laravel, <code>App\Models\Ciclo</code> vive en <code>app/Models/Ciclo.php</code>: esa correspondencia nombre-ruta es la que permite al <em>autoload</em> de Composer cargar sin <code>require_once</code>.</p>
+      </section>
+
+      <!-- 19 · Entorno -->
+      <section>
+        <h2>Seguimos en <code>vanilla_php</code></h2>
+        <p class="small-text">Misma carpeta <code>src/</code> de 3.4. Al terminar los ejercicios:</p>
+        <pre class="medio"><code class="language-plaintext" data-trim>
+vanilla_php/src/
+├── RA3_funciones.php   (de 3.4)
+├── Modelo.php
+├── Publicable.php
+├── Ciclo.php
+└── Curriculo.php
+        </code></pre>
+      </section>
+
+      <!-- 20 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/2)</h2>
+        <p class="small-text muted">1-4 en <code>src/</code> (con <code>declare(strict_types=1);</code>, sin salida). El 5, la página.</p>
+        <ol class="pasos compacta">
+          <li><strong>Clase abstracta.</strong> <code>src/Modelo.php</code>.</li>
+          <li><strong>Interfaz.</strong> <code>src/Publicable.php</code>.</li>
+          <li><strong><code>Ciclo</code>.</strong> <code>src/Ciclo.php</code>: hereda de <code>Modelo</code>, sus constantes, <code>titulacion()</code>, <code>descripcion()</code> y <code>desdeArray()</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 21 · Ejercicios 4-5 -->
+      <section>
+        <h2>Ejercicios (2/3)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong><code>Curriculo</code>.</strong> <code>src/Curriculo.php</code>: hereda de <code>Modelo</code>, implementa <code>Publicable</code>, contiene un <code>Ciclo</code>.</li>
+          <li><strong>La página.</strong> <code>public/RA3_poo.php</code>. Antes de recargar, anota si esperas "publicado" o "en borrador" (se llamó a <code>publicar()</code> a través de una segunda variable).</li>
+        </ol>
+      </section>
+
+      <!-- 22 · Ejercicios 5b-6 -->
+      <section>
+        <h2>Ejercicios (3/3)</h2>
+        <p class="small-text muted">Sigue con el 5: prueba de una en una y lee el error (bórrala antes de la siguiente):</p>
+        <pre class="compacto"><code class="language-php" data-trim>
+$daw-&gt;codCiclo = 'DAM';
+new Modelo(2);
+echo Ciclo::GRADO_SUPERIRO;
+        </code></pre>
+        <ol class="pasos compacta" start="6">
+          <li><strong>Investiga.</strong> Los <em>backed enums</em> (PHP 8.1): <code>enum Grado: string</code>. ¿Qué ventaja frente a <code>string</code> + constantes? No cambies las clases.</li>
+        </ol>
+        <aside class="notes">
+          Ejercicio 5: "publicado" (mismo objeto, no copia). $daw->codCiclo = 'DAM': Error, Cannot modify readonly property Ciclo::$codCiclo.
+          new Modelo(2): Error, Cannot instantiate abstract class Modelo. Ciclo::GRADO_SUPERIRO: Error, Undefined constant Ciclo::GRADO_SUPERIRO.
+        </aside>
+      </section>
+
+      <!-- 23 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA3_5_PooTest.php</code> a <code>vanilla_php/tests/</code></li>
+          <li>Desde la carpeta <code>laradock/</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec --workdir /var/www/vanilla_php workspace \
+  vendor/bin/phpunit tests/RA3_5_PooTest.php
+        </code></pre>
+        <p class="small-text">Como en 3.4: carga tus clases y crea objetos para comprobar su comportamiento directamente. Solo el último test pide la página.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">OK (9 tests, 23 assertions)</code></p>
+      </section>
+
+      <!-- 24 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>3.6. Formularios web</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>

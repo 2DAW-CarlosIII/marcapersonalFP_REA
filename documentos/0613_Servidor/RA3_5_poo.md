@@ -1,5 +1,7 @@
 # 3.5. Programación Orientada a Objetos en PHP
 
+**Presentación de apoyo** (_RevealJS_): [RA3_5_poo_slides.html](./materiales/slides/RA3_5_poo_slides.html)
+
 ## De los arrays a los objetos
 
 Hasta ahora hemos representado un currículo o un ciclo con un array asociativo. Funciona, pero tiene limitaciones que en un proyecto real se notan pronto:
