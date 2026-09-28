@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>3.2. Bucles · marcapersonalFP v0</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 3 · RA3</p>
+        <h1 class="titulo">3.2. Bucles</h1>
+        <p class="muted"><code>while</code> · <code>do-while</code> · <code>for</code> · <code>foreach</code></p>
+        <p class="small-text muted">Seguimos con <em>marcapersonalFP</em> v0 en PHP plano</p>
+        <aside class="notes">
+          RA3, CE b. Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · Repetir sin copiar y pegar -->
+      <section>
+        <h2>Repetir sin copiar y pegar</h2>
+        <p class="small-text">Así terminamos el listado de currículos en 2.5:</p>
+        <pre class="medio"><code class="language-php" data-trim>
+&lt;?php
+  mostrarCurriculo($curriculos[0]);
+  mostrarCurriculo($curriculos[1]);
+  mostrarCurriculo($curriculos[2]);
+?&gt;
+        </code></pre>
+        <p class="small-text muted fragment">Con tres, asumible. Y sobre todo: <strong>no sabemos de antemano cuántos habrá</strong>.</p>
+      </section>
+
+      <!-- 3 · Qué es un bucle -->
+      <section>
+        <h2>Bucle</h2>
+        <p class="statement" style="font-size:1.1em">Repite un bloque de sentencias<br>mientras se cumpla una condición,<br>o una vez por cada elemento.</p>
+        <p class="small-text muted fragment" style="margin-top:1.2em">Cada repetición: una <strong>iteración</strong>. PHP tiene cuatro bucles: <code>while</code>, <code>do-while</code>, <code>for</code> y <code>foreach</code>.</p>
+      </section>
+
+      <!-- 4 · while -->
+      <section>
+        <h2><code>while</code></h2>
+        <p class="small-text">Comprueba la condición <strong>antes</strong> de cada iteración. Adecuado cuando no sabemos cuántas veces hará falta repetir.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|2-4|6-9|11">
+&lt;?php
+  $horasCiclo    = 2000;
+  $horasPorAnio  = 700;
+  $horasCursadas = 0;
+  $anios         = 0;
+
+  while ($horasCursadas &lt; $horasCiclo) {
+    $horasCursadas += $horasPorAnio;
+    $anios++;
+  }
+
+  echo '&lt;p&gt;Años necesarios: ', $anios, '&lt;/p&gt;';   // 3
+?&gt;
+        </code></pre>
+        <aside class="notes">
+          $anios++ es el operador de incremento (ya usado sin detenerse en 2.4): suma 1, equivale a $anios += 1. $anios-- resta 1.
+        </aside>
+      </section>
+
+      <!-- 5 · Bucles infinitos -->
+      <section>
+        <h2>Cuidado con los bucles infinitos</h2>
+        <p class="small-text">Si nada dentro del bucle hace que la condición llegue a ser <code>false</code>, no termina nunca.</p>
+        <p class="small-text muted fragment">En el servidor, PHP lo corta al superar un tiempo máximo de ejecución: la petición acaba en error. Lo investigarás en el último ejercicio.</p>
+      </section>
+
+      <!-- 6 · do-while -->
+      <section>
+        <h2><code>do-while</code></h2>
+        <p class="small-text">Comprueba la condición <strong>después</strong>: el bloque se ejecuta <strong>al menos una vez</strong>.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|3-5|5">
+&lt;?php
+  $intentos = 0;
+
+  do {
+    $intentos++;
+    echo '&lt;p&gt;Intento ', $intentos, '&lt;/p&gt;';
+  } while ($intentos &lt; 0);   // falsa desde el principio
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Aun así, se ve "Intento 1". En aplicaciones web se usa poco; conviene reconocerlo.</p>
+      </section>
+
+      <!-- 7 · for -->
+      <section>
+        <h2><code>for</code></h2>
+        <p class="small-text">Cuando hay un <strong>contador</strong>: inicialización, condición y actualización, en una sola línea.</p>
+        <pre class="medio"><code class="language-plaintext" data-trim>
+for (inicialización; condición; actualización) {
+    // sentencias
+}
+        </code></pre>
+        <ol class="pasos compacta">
+          <li>La <strong>inicialización</strong>: una sola vez, al principio</li>
+          <li>La <strong>condición</strong>: antes de cada iteración</li>
+          <li>La <strong>actualización</strong>: al final de cada iteración</li>
+        </ol>
+      </section>
+
+      <!-- 8 · for: ejemplo -->
+      <section>
+        <h2>Un desplegable de años</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|2|3-5|6">
+&lt;?php
+  echo '&lt;select name="promocion"&gt;';
+  for ($anio = 2020; $anio &lt;= 2025; $anio++) {
+    echo '&lt;option value="', $anio, '"&gt;', $anio, '&lt;/option&gt;';
+  }
+  echo '&lt;/select&gt;';
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Seis opciones, de 2020 a 2025, generadas por el servidor. Cambiar el rango es tocar un número.</p>
+      </section>
+
+      <!-- 9 · foreach -->
+      <section>
+        <h2><code>foreach</code>: recorrer un array</h2>
+        <p class="small-text">Sin contador y sin condición: una vez por cada elemento. La respuesta al ejercicio de investigación de 2.5.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|8-10">
+&lt;?php
+  $curriculos = [
+    ['alumno' =&gt; 'Ana López', 'ciclo' =&gt; 'DAW', 'video' =&gt; '…'],
+    ['alumno' =&gt; 'Marcos Pérez', 'ciclo' =&gt; 'DAM', 'video' =&gt; '…'],
+    ['alumno' =&gt; 'Laura García', 'ciclo' =&gt; 'ASIR', 'video' =&gt; '…'],
+  ];
+
+  echo '&lt;ul&gt;';
+  foreach ($curriculos as $curriculo) {
+    echo '&lt;li class="curriculo"&gt;', $curriculo['alumno'], ' — ', $curriculo['ciclo'], '&lt;/li&gt;';
+  }
+  echo '&lt;/ul&gt;';
+?&gt;
+        </code></pre>
+        <p class="small-text muted">Da igual 3 o 300 currículos: el código es el mismo. Si el array está vacío, el bloque no se ejecuta ninguna vez.</p>
+      </section>
+
+      <!-- 10 · foreach con clave -->
+      <section>
+        <h2><code>foreach</code> con clave</h2>
+        <p class="small-text">Con un array asociativo, también la clave: <code>clave =&gt; valor</code>.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|4-6">
+&lt;?php
+  $curriculo = ['alumno' =&gt; 'Ana López', 'ciclo' =&gt; 'DAW', 'video' =&gt; '…'];
+
+  echo '&lt;dl&gt;';
+  foreach ($curriculo as $campo =&gt; $valor) {
+    echo '&lt;dt&gt;', $campo, '&lt;/dt&gt;&lt;dd&gt;', $valor, '&lt;/dd&gt;';
+  }
+  echo '&lt;/dl&gt;';
+?&gt;
+        </code></pre>
+        <p class="small-text muted">En un array indexado, la clave es la posición (<code>0</code>, <code>1</code>, <code>2</code>…). 3.3 verá los arrays en profundidad.</p>
+        <aside class="notes">
+          ¿for o foreach para un array? Se podría con for ($i = 0; $i < count($curriculos); $i++) y $curriculos[$i], pero foreach es más corto,
+          no necesita contador y funciona también con arrays asociativos, que no tienen posiciones. Para recorrer arrays, usar siempre foreach.
+        </aside>
+      </section>
+
+      <!-- 11 · break y continue -->
+      <section>
+        <h2><code>break</code> y <code>continue</code></h2>
+        <div class="cols">
+          <div class="panel">
+            <h3><code>continue</code></h3>
+            <p class="small-text">Salta el resto de <strong>esta</strong> iteración y pasa a la siguiente.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3><code>break</code></h3>
+            <p class="small-text">Termina el bucle <strong>por completo</strong>.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:1em">Es la primera vez que combinamos un bucle y una decisión: lo haremos constantemente.</p>
+      </section>
+
+      <!-- 12 · break y continue: código -->
+      <section>
+        <h2>En código</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="|3-5|12-15">
+&lt;?php
+  // continue: listar solo los currículos que tienen vídeo
+  foreach ($curriculos as $curriculo) {
+    if ($curriculo['video'] === '') {
+      continue;
+    }
+    echo '&lt;li&gt;', $curriculo['alumno'], '&lt;/li&gt;';
+  }
+
+  // break: parar en cuanto encontramos el primer currículo de DAM
+  foreach ($curriculos as $curriculo) {
+    if ($curriculo['ciclo'] === 'DAM') {
+      echo '&lt;p&gt;Primer currículo de DAM: ', $curriculo['alumno'], '&lt;/p&gt;';
+      break;
+    }
+  }
+?&gt;
+        </code></pre>
+      </section>
+
+      <!-- 13 · Sintaxis alternativa -->
+      <section>
+        <h2>Bucles en el HTML: sintaxis alternativa</h2>
+        <p class="small-text">Como en 3.1 con <code>if</code>: <code>foreach (...): ... endforeach;</code> (también <code>for:</code>/<code>endfor;</code>, <code>while:</code>/<code>endwhile;</code>).</p>
+        <pre class="ancho"><code class="language-php-template" data-trim data-line-numbers="|4|5|8">
+&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;Alumno&lt;/th&gt;&lt;th&gt;Ciclo&lt;/th&gt;&lt;/tr&gt;
+  &lt;?php foreach ($curriculos as $curriculo): ?&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;?= $curriculo['alumno'] ?&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;?= $curriculo['ciclo'] ?&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;?php endforeach; ?&gt;
+&lt;/table&gt;
+        </code></pre>
+      </section>
+
+      <!-- 14 · <?= ?> -->
+      <section>
+        <h2>La etiqueta corta <code>&lt;?= ?&gt;</code></h2>
+        <p class="small-text">Equivale a <code>&lt;?php echo ...; ?&gt;</code>: pensada para insertar un valor en medio del HTML.</p>
+        <p class="small-text muted fragment">Con ella y la sintaxis alternativa, la página se lee como HTML con "huecos" que rellena el servidor.</p>
+        <p class="small-text fragment">En el Bloque 4, <em>Blade</em>: <code>@foreach ... @endforeach</code> y <code>&#123;&#123; $curriculo['alumno'] &#125;&#125;</code>.</p>
+        <p class="small-text muted fragment" style="margin-top:1em"><strong>Aviso.</strong> <code>&lt;?= ?&gt;</code> escribe el valor tal cual. Cuando los datos vengan del usuario (3.6) habrá que <strong>escaparlos</strong>. <em>Blade</em>, con <code>&#123;&#123; &#125;&#125;</code>, lo hace automáticamente.</p>
+      </section>
+
+      <!-- 15 · Lo esencial -->
+      <section>
+        <h2>Lo esencial</h2>
+        <ul>
+          <li><code>while</code>: comprueba <strong>antes</strong>; <code>do-while</code>: comprueba <strong>después</strong> (al menos una vez)</li>
+          <li><code>for</code>: cuando hay un contador con inicio, fin y paso</li>
+          <li><code>foreach</code>: para recorrer arrays, <strong>siempre</strong></li>
+          <li><code>continue</code> salta la iteración; <code>break</code> termina el bucle</li>
+          <li>Sintaxis alternativa + <code>&lt;?= ?&gt;</code> para HTML con "huecos"</li>
+        </ul>
+      </section>
+
+      <!-- 16 · Entorno -->
+      <section>
+        <h2>Seguimos en <code>vanilla_php</code></h2>
+        <p class="small-text">Mismo proyecto del Bloque 2. ¿No lo tienes levantado? Repasa <em>Preparación del entorno de trabajo</em> en 2.1.</p>
+        <pre class="medio"><code class="language-plaintext" data-trim>
+vanilla_php/
+└── public/
+    ├── RA3_decisiones.php   ← de 3.1
+    └── RA3_bucles.php       ← el de esta sección
+        </code></pre>
+        <p class="small-text muted">Se abre en <code>http://localhost/RA3_bucles.php</code></p>
+      </section>
+
+      <!-- 17 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/2)</h2>
+        <p class="small-text muted">Todos en <code>RA3_bucles.php</code>, uno debajo de otro.</p>
+        <ol class="pasos compacta">
+          <li><strong><code>for</code>.</strong> El desplegable de años de promoción (2020 a 2025).</li>
+          <li><strong><code>while</code>.</strong> El cálculo de años a tiempo parcial. Antes de recargar, calcula a mano las iteraciones y anótalo en un comentario.</li>
+          <li><strong><code>foreach</code>.</strong> El array <code>$curriculos</code> de 2.5 y el listado con <code>&lt;li class="curriculo"&gt;</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 18 · Ejercicios 4-6 -->
+      <section>
+        <h2>Ejercicios (2/2)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong><code>foreach</code> con clave.</strong> La lista de definiciones (<code>&lt;dl&gt;</code>) con cada campo de un currículo.</li>
+          <li><strong><code>continue</code> y sintaxis alternativa.</strong> Un cuarto currículo <strong>sin vídeo</strong> y una tabla que muestre solo los que tienen vídeo. Mira el código fuente (<kbd>Ctrl</kbd>+<kbd>U</kbd>): ¿cuántas filas <code>con-video</code>? ¿Aparece Pablo Ruiz?</li>
+          <li><strong>Investiga.</strong> ¿Qué es <code>max_execution_time</code>? Averigua su valor con <code>ini_get()</code> en un script aparte. ¿Qué le pasaría a una petición con un bucle infinito? <strong>No</strong> dejes un bucle infinito en <code>RA3_bucles.php</code>.</li>
+        </ol>
+        <aside class="notes">
+          Ejercicio 5: 3 filas con-video (Ana López, Marcos Pérez, Laura García); Pablo Ruiz no aparece, porque su video es '' y continue salta esa iteración.
+        </aside>
+      </section>
+
+      <!-- 19 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA3_2_BuclesTest.php</code> a <code>vanilla_php/tests/</code></li>
+          <li>Desde la carpeta <code>laradock/</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec --workdir /var/www/vanilla_php workspace \
+  vendor/bin/phpunit tests/RA3_2_BuclesTest.php
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 a 5</strong>.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">OK (2 tests, 9 assertions)</code></p>
+      </section>
+
+      <!-- 20 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>3.3. Arrays y tipos compuestos</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>

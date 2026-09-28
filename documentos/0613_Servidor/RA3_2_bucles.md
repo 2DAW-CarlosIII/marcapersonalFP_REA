@@ -1,5 +1,7 @@
 # 3.2. Bucles
 
+**Presentación de apoyo** (_RevealJS_): [RA3_2_bucles_slides.html](./materiales/slides/RA3_2_bucles_slides.html)
+
 ## Repetir sin copiar y pegar
 
 Recuerda cómo terminamos el listado de currículos en 2.5:
