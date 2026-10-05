@@ -1,6 +1,6 @@
 # 2.1. PHP embebido en HTML
 
-> **Bloque 2 · Inserción de código en páginas web (RA2).** En este bloque construimos la **primera versión de _marcapersonalFP_ en PHP plano** (la llamaremos _v0_). Aquí no hay framework todavía: escribiremos PHP "a mano", embebido en HTML, para entender qué ocurre por debajo. Más adelante, en el Bloque 4, reconstruiremos lo mismo con _Laravel_ y comprobaremos que **el framework automatiza lo que aquí hacemos a mano**.
+> **Bloque 2 · Inserción de código en páginas web (RA2).** En este bloque construimos la **primera versión de _marcapersonalFP_ en PHP plano** (la llamaremos _v0_). Aquí no hay framework todavía: escribiremos PHP "a mano", embebido en HTML, para entender qué ocurre por debajo. Más adelante, en el Bloque 5, reconstruiremos lo mismo con _Laravel_ y comprobaremos que **el framework automatiza lo que aquí hacemos a mano**.
 
 **Presentación de apoyo** (_RevealJS_): [RA2_1_phpEmbebido_slides.html](./materiales/slides/RA2_1_phpEmbebido_slides.html)
 
@@ -67,7 +67,7 @@ Todo el HTML se envía sin cambios; solo el fragmento `<?php echo date(...); ?>`
 
 ## Preparación del entorno de trabajo
 
-Durante **todo el curso** usaremos el mismo entorno: la **máquina virtual con _Laradock_** (Docker + _nginx_ + _php-fpm_) que se facilita con el REA. Trabajar siempre en el mismo sitio nos ahorra sorpresas: lo que aquí escribimos en PHP plano convivirá, en el Bloque 4, con el proyecto _Laravel_ en el mismo servidor.
+Durante **todo el curso** usaremos el mismo entorno: la **máquina virtual con _Laradock_** (Docker + _nginx_ + _php-fpm_) que se facilita con el REA. Trabajar siempre en el mismo sitio nos ahorra sorpresas: lo que aquí escribimos en PHP plano convivirá, en el Bloque 5, con el proyecto _Laravel_ en el mismo servidor.
 
 > Si no te han facilitado la máquina virtual con la configuración necesaria para seguir este REA, sigue antes [0. Instalación y preparación del entorno](./00_instalacionEntorno.md). Aquí asumimos que Laradock ya está instalado.
 
@@ -82,7 +82,7 @@ Por eso necesitamos **los dos** levantados. Como en _Laradock_ `nginx` depende d
 docker compose up -d nginx php-fpm
 ```
 
-Nuestro proyecto de estos bloques se llama **`vanilla_php`** (ya viene creado en la VM, en `~/Documentos/laravel/vanilla_php/`, junto a la carpeta `laradock/`): se llama así porque aquí escribimos PHP **"vanilla"** — el lenguaje puro, tal cual lo procesa el intérprete, sin ningún _framework_ de por medio — en contraste con el **"con framework"** que llegará en el Bloque 4 con _Laravel_, donde buena parte de este trabajo se automatiza.
+Nuestro proyecto de estos bloques se llama **`vanilla_php`** (ya viene creado en la VM, en `~/Documentos/laravel/vanilla_php/`, junto a la carpeta `laradock/`): se llama así porque aquí escribimos PHP **"vanilla"** — el lenguaje puro, tal cual lo procesa el intérprete, sin ningún _framework_ de por medio — en contraste con el **"con framework"** que llegará en el Bloque 5 con _Laravel_, donde buena parte de este trabajo se automatiza.
 
 > A partir de aquí, cada vez que en este bloque veas una ruta como `vanilla_php/public/...`, se entiende relativa a `~/Documentos/laravel/` — la carpeta de trabajo de la VM donde vive tanto `laradock/` como cada proyecto del curso.
 
@@ -110,7 +110,7 @@ Con la página abierta en el navegador, usa **"Ver código fuente de la página"
 
 ## Comprueba tu solución automáticamente (opcional)
 
-Junto a cada ejercicio del bloque encontrarás un test que puedes ejecutar para saber, al instante, si tu solución es correcta — sin esperar a que el profesor la revise. No hace falta entender cómo está escrito el test (eso lo veremos como contenido en el Bloque 7, con TDD); de momento solo lo **ejecutas** y lees el resultado. La preparación (`vanilla_php/composer.json`, `phpunit.xml`, PHPUnit instalado) ya viene hecha en la máquina virtual — ver la sección *Proyecto `vanilla_php` y PHPUnit* de [0. Instalación y preparación del entorno](./00_instalacionEntorno.md).
+Junto a cada ejercicio del bloque encontrarás un test que puedes ejecutar para saber, al instante, si tu solución es correcta — sin esperar a que el profesor la revise. No hace falta entender cómo está escrito el test (eso lo veremos como contenido en el Bloque 8, con TDD); de momento solo lo **ejecutas** y lees el resultado. La preparación (`vanilla_php/composer.json`, `phpunit.xml`, PHPUnit instalado) ya viene hecha en la máquina virtual — ver la sección *Proyecto `vanilla_php` y PHPUnit* de [0. Instalación y preparación del entorno](./00_instalacionEntorno.md).
 
 Para el ejercicio 1 (*Primer script*), copia el archivo [RA2_1_HolaMundoTest.php](./materiales/ejercicios-vanilla/tests/RA2_1_HolaMundoTest.php) a la carpeta `vanilla_php/tests/` de tu proyecto y ejecuta, desde un terminal situado en la carpeta `laradock/`, ese fichero de test en concreto:
 

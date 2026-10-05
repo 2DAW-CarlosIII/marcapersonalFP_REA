@@ -361,7 +361,7 @@
         <p class="small-text muted">Cada corchete baja un nivel. El <code>$curriculos</code> de 2.5 también era multidimensional.</p>
         <aside class="notes">
           Para recorrer un nivel interior: foreach ($ciclo['modulos'] as $codigo => $nombre) { ... }, exactamente como cualquier otro array.
-          Los arrays multidimensionales son la forma más habitual de representar una lista de registros, la que obtendremos de una base de datos (Bloque 5).
+          Los arrays multidimensionales son la forma más habitual de representar una lista de registros, la que obtendremos de una base de datos (Bloque 6).
         </aside>
       </section>
 
@@ -458,7 +458,7 @@
         </code></pre>
         <p class="small-text muted fragment">Lo recordaremos en 3.5: con los <strong>objetos</strong> no ocurre lo mismo.</p>
         <aside class="notes">
-          Puente al Bloque 4: Laravel envuelve los arrays en colecciones (Collection), con métodos encadenables:
+          Puente al Bloque 5: Laravel envuelve los arrays en colecciones (Collection), con métodos encadenables:
           collect($curriculos)->pluck('alumno')->sort() hace lo mismo que array_column() + sort(). Por debajo sigue habiendo un array de PHP.
         </aside>
       </section>

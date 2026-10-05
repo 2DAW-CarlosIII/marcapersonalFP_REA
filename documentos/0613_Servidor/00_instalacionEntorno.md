@@ -1,6 +1,6 @@
 # 0. Instalación y preparación del entorno
 
-Todo el módulo, desde el Bloque 2 hasta el Bloque 8, se trabaja sobre **el mismo entorno**: una máquina con _Docker_ y _Laradock_ (_nginx_ + _php-fpm_ + base de datos + herramientas de línea de comandos). Esta página describe cómo se construye ese entorno **desde una instalación mínima de Debian**. Si estás usando la máquina virtual que se entrega con el módulo, **ya lo tienes preinstalado** y puedes ir directamente al [Bloque 2](./RA2_1_phpEmbebido.md); esta guía sirve como referencia y para reconstruir el entorno si hiciera falta.
+Todo el módulo, desde el Bloque 2 hasta el Bloque 9, se trabaja sobre **el mismo entorno**: una máquina con _Docker_ y _Laradock_ (_nginx_ + _php-fpm_ + base de datos + herramientas de línea de comandos). Esta página describe cómo se construye ese entorno **desde una instalación mínima de Debian**. Si estás usando la máquina virtual que se entrega con el módulo, **ya lo tienes preinstalado** y puedes ir directamente al [Bloque 2](./RA2_1_phpEmbebido.md); esta guía sirve como referencia y para reconstruir el entorno si hiciera falta.
 
 ## Punto de partida
 
@@ -102,7 +102,7 @@ Edita el `.env` de la carpeta `laradock`:
 
 ## 6. Node.js y npm en el contenedor `workspace`
 
-Aunque en el Bloque 2 solo usaremos PHP, **Node y npm harán falta más adelante**: el arranque de _Breeze_ (Bloque 4) compila sus assets con _Vite_/npm, y _React-Admin_ (Bloque 7) también depende de un toolchain de Node. Como todo el módulo comparte el mismo entorno, se instalan ahora junto con lo demás en vez de a mitad de curso.
+Aunque en el Bloque 2 solo usaremos PHP, **Node y npm harán falta más adelante**: el arranque de _Breeze_ (Bloque 5) compila sus assets con _Vite_/npm, y _React-Admin_ (Bloque 8) también depende de un toolchain de Node. Como todo el módulo comparte el mismo entorno, se instalan ahora junto con lo demás en vez de a mitad de curso.
 
 En el `.env`:
 
@@ -172,7 +172,7 @@ xdebug.var_display_max_depth=-1
 >
 > Ambos deben devolver la IP que pusiste en `DOCKER_HOST_IP`.
 
-**Una configuración, todo el curso.** Xdebug se activa a nivel del intérprete PHP (dentro de `php-fpm`), así que depura por igual los scripts *vanilla* de los Bloques 2–3 (`vanilla_php/public/RA2_*.php`) y las peticiones de _Laravel_ del Bloque 4 en adelante (`public/index.php` del proyecto Laravel) — no hay que tocar nada al cambiar de uno a otro.
+**Una configuración, todo el curso.** Xdebug se activa a nivel del intérprete PHP (dentro de `php-fpm`), así que depura por igual los scripts *vanilla* de los Bloques 2–4 (`vanilla_php/public/RA2_*.php`) y las peticiones de _Laravel_ del Bloque 5 en adelante (`public/index.php` del proyecto Laravel) — no hay que tocar nada al cambiar de uno a otro.
 
 **Mostrar los errores de PHP en el navegador.** Laradock desactiva `display_errors` (lo correcto en producción): ante un error el navegador solo recibe una página en blanco, con un código 500. Lo hace `php-fpm/laravel.ini`, que se copia a `/usr/local/etc/php/conf.d/` y **se lee después del `php.ini`**, así que prevalece incluso aunque `php-fpm/php8.4.ini` ya traiga `display_errors = On`. En desarrollo interesa lo contrario: edita `php-fpm/laravel.ini` y cambia la línea
 
@@ -186,7 +186,7 @@ por
 display_errors=On
 ```
 
-Igual que `xdebug.ini`, este fichero se copia a la imagen **al construirla**, así que el cambio se aplica con la reconstrucción del paso 9 (`docker compose up -d --build php-fpm`). Es un ajuste del intérprete, así que vale para todo el curso; en _Laravel_ (Bloque 4), en cambio, el propio framework toma el control de los errores (según el `APP_DEBUG` de su `.env`), por lo que este ajuste apenas le afecta. Solo es apropiado en una máquina de desarrollo, nunca en producción.
+Igual que `xdebug.ini`, este fichero se copia a la imagen **al construirla**, así que el cambio se aplica con la reconstrucción del paso 9 (`docker compose up -d --build php-fpm`). Es un ajuste del intérprete, así que vale para todo el curso; en _Laravel_ (Bloque 5), en cambio, el propio framework toma el control de los errores (según el `APP_DEBUG` de su `.env`), por lo que este ajuste apenas le afecta. Solo es apropiado en una máquina de desarrollo, nunca en producción.
 
 > **Por qué no basta con el `php.ini` ni con `ini_set()`.** PHP lee primero el `php.ini` y después los ficheros de `conf.d/`, y el último valor gana: para saber qué fichero fija cada directiva, usa `docker compose exec php-fpm php --ini` (qué ficheros se leen) y `docker compose exec php-fpm grep -rn display_errors /usr/local/etc/php/` (dónde se define). Y `ini_set('display_errors', '1')` dentro del propio script no sirve para los _errores de sintaxis_ (_Parse error_): PHP falla al compilar el fichero, antes de ejecutar ninguna línea, y el `ini_set()` nunca llega a ejecutarse.
 
@@ -232,11 +232,11 @@ docker compose exec php-fpm php -r 'var_dump(ini_get("display_errors"));'
 
 Debe devolver `string(1) "1"`; con `display_errors` desactivado devuelve `string(0) ""`.
 
-## 11. Proyecto `vanilla_php` y PHPUnit (Bloques 2 y 3)
+## 11. Proyecto `vanilla_php` y PHPUnit (Bloques 2 a 4)
 
-`~/Documentos/laravel/` no es un proyecto único: es la carpeta de trabajo donde a lo largo del curso se irán creando varios proyectos — el de PHP «vanilla» de los Bloques 2 y 3, y más adelante el proyecto _Laravel_ de _marcapersonalFP_ (Bloque 4), además de otros que puedan surgir. Por eso cada proyecto vive en su propia subcarpeta, y esta primera se llama **`vanilla_php`**.
+`~/Documentos/laravel/` no es un proyecto único: es la carpeta de trabajo donde a lo largo del curso se irán creando varios proyectos — el de PHP «vanilla» de los Bloques 2 a 4, y más adelante el proyecto _Laravel_ de _marcapersonalFP_ (Bloque 5), además de otros que puedan surgir. Por eso cada proyecto vive en su propia subcarpeta, y esta primera se llama **`vanilla_php`**.
 
-> **"Vanilla" frente a "con framework".** En programación, "vanilla" (del inglés, "sabor base, sin nada añadido") significa escribir código usando solo las herramientas propias del lenguaje, sin ningún _framework_ de por medio: aquí, PHP tal cual lo procesa el intérprete, embebido en HTML. Un _framework_ (como _Laravel_, en el Bloque 4) es una capa de librerías y convenciones que automatiza buena parte de ese trabajo (rutas, plantillas, acceso a datos…) a cambio de que sigas sus reglas. Empezar en `vanilla_php` deja ver qué hace cada línea antes de delegarlo en un framework.
+> **"Vanilla" frente a "con framework".** En programación, "vanilla" (del inglés, "sabor base, sin nada añadido") significa escribir código usando solo las herramientas propias del lenguaje, sin ningún _framework_ de por medio: aquí, PHP tal cual lo procesa el intérprete, embebido en HTML. Un _framework_ (como _Laravel_, en el Bloque 5) es una capa de librerías y convenciones que automatiza buena parte de ese trabajo (rutas, plantillas, acceso a datos…) a cambio de que sigas sus reglas. Empezar en `vanilla_php` deja ver qué hace cada línea antes de delegarlo en un framework.
 
 Crea la carpeta y su estructura:
 
@@ -261,7 +261,7 @@ mkdir -p vanilla_php/public vanilla_php/tests
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="vendor/autoload.php">
     <testsuites>
-        <testsuite name="Bloques 2-3">
+        <testsuite name="Bloques 2-4">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
@@ -280,7 +280,7 @@ Verifica:
 docker compose exec --workdir /var/www/vanilla_php workspace vendor/bin/phpunit --version
 ```
 
-Como `~/Documentos/laravel/` ahora aloja varios proyectos, hay que decirle a _nginx_ cuál está activo. Para los Bloques 2 y 3, edita `laradock/nginx/sites/default.conf` y cambia:
+Como `~/Documentos/laravel/` ahora aloja varios proyectos, hay que decirle a _nginx_ cuál sirve en su sitio por defecto (`http://localhost`): será `vanilla_php`, el proyecto de los Bloques 2 a 4. Edita `laradock/nginx/sites/default.conf` y cambia:
 
 ```nginx
 root /var/www/public;
@@ -294,9 +294,9 @@ root /var/www/vanilla_php/public;
 
 Este fichero está montado como volumen (no forma parte de la imagen), así que no hace falta reconstruir nada — basta con `docker compose restart nginx` si los contenedores ya estaban levantados, o simplemente arrancarlos por primera vez en el paso siguiente.
 
-Cada ejercicio de los Bloques 2 y 3 tiene su test correspondiente en [`materiales/ejercicios-vanilla/tests/`](./materiales/ejercicios-vanilla/tests/) — el propio bloque indica, en cada caso, qué fichero copiar a `vanilla_php/tests/` y con qué comando ejecutarlo.
+Cada ejercicio de los Bloques 2 a 4 tiene su test correspondiente en [`materiales/ejercicios-vanilla/tests/`](./materiales/ejercicios-vanilla/tests/) — el propio bloque indica, en cada caso, qué fichero copiar a `vanilla_php/tests/` y con qué comando ejecutarlo.
 
-> **Esto es temporal.** Tanto `vanilla_php/composer.json`/`phpunit.xml` como el `root` de _nginx_ apuntando a `vanilla_php/public` son específicos de la etapa PHP vanilla. En el Bloque 4, al crear el proyecto _Laravel_ de _marcapersonalFP_ en su propia subcarpeta (`composer create-project`), se repite el mismo gesto — apuntar el `root` de _nginx_ a la subcarpeta activa — y se pasa a usar `php artisan test` en lugar de `vendor/bin/phpunit` directamente.
+> **¿Y el proyecto _Laravel_?** `vanilla_php/composer.json` y `phpunit.xml` son específicos de la etapa PHP vanilla. En el Bloque 5, el proyecto _Laravel_ de _marcapersonalFP_ se crea en su propia subcarpeta (`marcapersonalfp`) y recibe **su propio sitio** de _nginx_ (`http://marcapersonalfp.test`), así que este `default.conf` sigue sirviendo `vanilla_php` y los dos proyectos conviven. Allí los tests se lanzan con `php artisan test` en lugar de `vendor/bin/phpunit`.
 
 ## 12. Limpiar la MV si se va a exportar
 

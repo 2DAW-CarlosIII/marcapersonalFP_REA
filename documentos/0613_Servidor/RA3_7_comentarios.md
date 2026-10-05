@@ -102,7 +102,7 @@ En 3.4 vimos que los tipos declarados documentan la función por sí solos. Ento
 
 PHP **no comprueba** los docblocks al ejecutar: son comentarios. Pero los leen el editor (para autocompletar `$curriculo['...']`), los analizadores estáticos como _PHPStan_ (que sí detectan si pasas algo que no encaja), los generadores de documentación y los asistentes de programación con IA. Por eso la práctica habitual es: **tipos declarados siempre que se pueda, y docblock cuando aportan algo que los tipos no pueden expresar**, o cuando hay que explicar un comportamiento que no se deduce de la firma. Un docblock que solo repite `@param string $codCiclo` sin añadir nada es, como los comentarios del principio, ruido.
 
-> **Puente al Bloque 4.** El código de _Laravel_ está lleno de docblocks: al pasar el ratón por encima de un método del framework en tu editor, lo que ves es su docblock. Y en el Bloque 6, la documentación de la API con _OpenAPI/Swagger_ llevará esta misma idea —describir formalmente qué recibe y qué devuelve algo— a los servicios web.
+> **Puente al Bloque 5.** El código de _Laravel_ está lleno de docblocks: al pasar el ratón por encima de un método del framework en tu editor, lo que ves es su docblock. Y en el Bloque 7, la documentación de la API con _OpenAPI/Swagger_ llevará esta misma idea —describir formalmente qué recibe y qué devuelve algo— a los servicios web.
 
 ## Preparación del entorno de trabajo
 

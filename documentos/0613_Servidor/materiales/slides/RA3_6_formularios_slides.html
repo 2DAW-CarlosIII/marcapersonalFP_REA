@@ -373,7 +373,7 @@
         <h2>Regla de este REA</h2>
         <p class="statement" style="font-size:1.1em">Todo dato externo se <strong>escapa al mostrarlo</strong>,<br>con <code>e()</code>.</p>
         <p class="small-text muted fragment" style="margin-top:1.2em">Cuesta poco y cierra la puerta al XSS.</p>
-        <p class="small-text fragment"><strong>Puente al Bloque 4.</strong> Laravel tiene un <em>helper</em> <code>e()</code> igual, y <code>&#123;&#123; $ciclo &#125;&#125;</code> de <em>Blade</em> lo llama automáticamente.</p>
+        <p class="small-text fragment"><strong>Puente al Bloque 5.</strong> Laravel tiene un <em>helper</em> <code>e()</code> igual, y <code>&#123;&#123; $ciclo &#125;&#125;</code> de <em>Blade</em> lo llama automáticamente.</p>
       </section>
 
       <!-- 10 · Validar -->
@@ -446,10 +446,10 @@ function validarCiclo(array $datos): array {
       <!-- 14 · Después de validar -->
       <section>
         <h2>¿Y después de validar?</h2>
-        <p class="small-text">Lo normal: <strong>guardar</strong> (Bloque 5) y <strong>redirigir</strong> con GET — el patrón <strong>POST/Redirect/GET</strong>, que evita duplicar el alta al pulsar F5.</p>
+        <p class="small-text">Lo normal: <strong>guardar</strong> (Bloque 6) y <strong>redirigir</strong> con GET — el patrón <strong>POST/Redirect/GET</strong>, que evita duplicar el alta al pulsar F5.</p>
         <p class="small-text muted fragment">Para un mensaje tras redirigir hace falta recordar algo entre peticiones (2.4): una <strong>sesión</strong>, que llega en el Bloque 4.</p>
         <p class="small-text fragment">Por ahora, tras validar: <strong>mostrar el resultado</strong> en la misma respuesta.</p>
-        <p class="small-text muted fragment" style="margin-top:0.8em"><strong>Puente al Bloque 4.</strong> <code>$request-&gt;validate([...])</code>, <code>old('nombre')</code>, <code>redirect()-&gt;with(...)</code>, y protección <strong>CSRF</strong> con <code>@csrf</code>.</p>
+        <p class="small-text muted fragment" style="margin-top:0.8em"><strong>Puente al Bloque 5.</strong> <code>$request-&gt;validate([...])</code>, <code>old('nombre')</code>, <code>redirect()-&gt;with(...)</code>, y protección <strong>CSRF</strong> con <code>@csrf</code>.</p>
       </section>
 
       <!-- 15 · Entorno -->

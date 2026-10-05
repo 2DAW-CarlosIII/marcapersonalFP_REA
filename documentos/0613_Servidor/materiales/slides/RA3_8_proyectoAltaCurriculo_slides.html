@@ -377,7 +377,7 @@ javascript:alert('XSS')
         <h2>¿Y dónde se guarda el currículo?</h2>
         <p class="statement" style="font-size:1.3em">En <strong>ninguna parte</strong>.</p>
         <p class="small-text muted fragment" style="margin-top:1.2em">Recuerda 2.4: cada petición ejecuta el script desde cero. El objeto existe solo mientras se genera la página; si recargas, ya no está.</p>
-        <p class="small-text fragment">Hacen falta una <strong>base de datos</strong> (Bloque 5) y una <strong>sesión</strong> (Bloque 4, para el patrón POST/Redirect/GET de 3.6). Por ahora: <strong>validar y mostrar</strong>.</p>
+        <p class="small-text fragment">Hacen falta una <strong>base de datos</strong> (Bloque 6) y una <strong>sesión</strong> (Bloque 4, para el patrón POST/Redirect/GET de 3.6). Por ahora: <strong>validar y mostrar</strong>.</p>
       </section>
 
       <!-- 10 · ValidadorCurriculo: código -->
@@ -443,8 +443,8 @@ vanilla_php/
             <tr class="fragment"><th>Un script en <code>public/</code></th><td>Rutas y controladores</td></tr>
             <tr class="fragment"><th><code>&lt;?php if(): ?&gt;</code>, <code>&lt;?= e() ?&gt;</code></th><td>Blade: <code>@if</code>, <code>&#123;&#123; &#125;&#125;</code></td></tr>
             <tr class="fragment"><th><code>require_once</code></th><td>Autoload de Composer</td></tr>
-            <tr class="fragment"><th><code>class Curriculo extends Modelo</code></th><td>Modelos Eloquent</td></tr>
-            <tr class="fragment"><th>Catálogo escrito en el código</th><td><code>Ciclo::all()</code>, desde la BD</td></tr>
+            <tr class="fragment"><th><code>class Curriculo extends Modelo</code></th><td>Modelos Eloquent (Bloque 6)</td></tr>
+            <tr class="fragment"><th>Catálogo escrito en el código</th><td><code>Ciclo::all()</code>, desde la BD (Bloque 6)</td></tr>
             <tr class="fragment"><th><code>ValidadorCurriculo::validar()</code></th><td><code>$request-&gt;validate([...])</code></td></tr>
           </tbody>
         </table>
@@ -481,7 +481,7 @@ docker compose exec --workdir /var/www/vanilla_php workspace \
       <!-- 17 · Siguiente -->
       <section>
         <p class="small-text muted">Siguiente</p>
-        <h2>Bloque 4 · Desarrollo de aplicaciones web con código embebido: introducción a <em>Laravel</em> (RA4 + RA5)</h2>
+        <h2>Bloque 4 · Desarrollo de aplicaciones web utilizando código embebido (RA4): estado, sesiones y autenticación</h2>
       </section>
 
     </div>

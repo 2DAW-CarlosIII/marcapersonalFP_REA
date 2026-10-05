@@ -1,6 +1,6 @@
 # 3.1. Tomas de decisión
 
-> **Bloque 3 · Programación basada en lenguajes de marcas con código embebido (RA3).** Seguimos construyendo _marcapersonalFP v0_ en PHP plano. En el Bloque 2 nuestros scripts eran secuencias de sentencias que se ejecutaban siempre, de arriba abajo; en este bloque aprenderemos a **decidir** y **repetir**, a organizar los datos en **arrays**, **funciones** y **clases**, y a **recibir datos del usuario** mediante formularios. Terminaremos con un formulario de alta de currículos que valida lo que recibe. En el Bloque 4 reconstruiremos esa misma pieza con _Laravel_ y veremos que **el framework automatiza lo que aquí hacemos a mano**.
+> **Bloque 3 · Programación basada en lenguajes de marcas con código embebido (RA3).** Seguimos construyendo _marcapersonalFP v0_ en PHP plano. En el Bloque 2 nuestros scripts eran secuencias de sentencias que se ejecutaban siempre, de arriba abajo; en este bloque aprenderemos a **decidir** y **repetir**, a organizar los datos en **arrays**, **funciones** y **clases**, y a **recibir datos del usuario** mediante formularios. Terminaremos con un formulario de alta de currículos que valida lo que recibe. En el Bloque 5 reconstruiremos esa misma pieza con _Laravel_ y veremos que **el framework automatiza lo que aquí hacemos a mano**.
 
 **Presentación de apoyo** (_RevealJS_): [RA3_1_decisiones_slides.html](./materiales/slides/RA3_1_decisiones_slides.html)
 
@@ -164,7 +164,7 @@ Cuando lo que depende de la condición es **un fragmento grande de HTML**, meter
 <?php endif; ?>
 ```
 
-Es la forma natural de "decidir qué HTML se envía" en una página con código embebido: el servidor envía uno u otro párrafo, nunca los dos. Existe también para `elseif:`, y veremos sus equivalentes para los bucles en 3.2. Retén la idea: en el Bloque 4, las plantillas _Blade_ de _Laravel_ tienen `@if ... @else ... @endif`, que el framework traduce precisamente a esta sintaxis alternativa.
+Es la forma natural de "decidir qué HTML se envía" en una página con código embebido: el servidor envía uno u otro párrafo, nunca los dos. Existe también para `elseif:`, y veremos sus equivalentes para los bucles en 3.2. Retén la idea: en el Bloque 5, las plantillas _Blade_ de _Laravel_ tienen `@if ... @else ... @endif`, que el framework traduce precisamente a esta sintaxis alternativa.
 
 ## Preparación del entorno de trabajo
 

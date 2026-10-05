@@ -86,7 +86,7 @@ Cada par de corchetes baja un nivel: `$ciclo['modulos']` es el array de módulos
 ?>
 ```
 
-El array `$curriculos` de 2.5 también era multidimensional: un array indexado cuyos elementos son arrays asociativos. Es la forma más habitual de representar una **lista de registros**, y la que obtendremos cuando leamos filas de una base de datos (Bloque 5).
+El array `$curriculos` de 2.5 también era multidimensional: un array indexado cuyos elementos son arrays asociativos. Es la forma más habitual de representar una **lista de registros**, y la que obtendremos cuando leamos filas de una base de datos (Bloque 6).
 
 ## Funciones habituales de arrays
 
@@ -184,7 +184,7 @@ Un detalle con consecuencias: al asignar un array a otra variable (o al pasarlo 
 
 Lo recordaremos en 3.5: con los **objetos** no ocurre lo mismo.
 
-> **Puente al Bloque 4.** _Laravel_ envuelve los arrays en **colecciones** (`Collection`), con métodos encadenables: `collect($curriculos)->pluck('alumno')->sort()` hace lo mismo que `array_column()` + `sort()`. Por debajo, sigue habiendo un array de PHP como los de este apartado.
+> **Puente al Bloque 5.** _Laravel_ envuelve los arrays en **colecciones** (`Collection`), con métodos encadenables: `collect($curriculos)->pluck('alumno')->sort()` hace lo mismo que `array_column()` + `sort()`. Por debajo, sigue habiendo un array de PHP como los de este apartado.
 
 ## Preparación del entorno de trabajo
 

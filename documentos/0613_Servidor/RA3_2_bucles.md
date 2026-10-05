@@ -14,7 +14,7 @@ Recuerda cómo terminamos el listado de currículos en 2.5:
 ?>
 ```
 
-Con tres currículos es asumible; con cien, absurdo. Y, sobre todo, **no sabemos de antemano cuántos habrá**: cuando los datos vengan de una base de datos (Bloque 5), la página tendrá que funcionar igual con cero currículos que con mil. Un **bucle** repite un bloque de sentencias mientras se cumpla una condición, o una vez por cada elemento de una colección. Cada repetición se llama **iteración**.
+Con tres currículos es asumible; con cien, absurdo. Y, sobre todo, **no sabemos de antemano cuántos habrá**: cuando los datos vengan de una base de datos (Bloque 6), la página tendrá que funcionar igual con cero currículos que con mil. Un **bucle** repite un bloque de sentencias mientras se cumpla una condición, o una vez por cada elemento de una colección. Cada repetición se llama **iteración**.
 
 PHP tiene cuatro bucles. Los tres primeros (`while`, `do-while` y `for`) repiten **mientras se cumpla una condición**; el cuarto (`foreach`) recorre **los elementos de un array**, y será, con diferencia, el que más usemos.
 
@@ -174,7 +174,7 @@ Como vimos en 3.1 con `if (): ... endif;`, los bucles también tienen **sintaxis
 </table>
 ```
 
-Aquí aparece además la **etiqueta corta de salida** `<?= ... ?>`, que equivale a `<?php echo ...; ?>`: pensada justo para insertar un valor en medio del HTML. Con ella y la sintaxis alternativa, la página se lee como HTML con "huecos" que rellena el servidor. En el Bloque 4, _Blade_ lo hará con `@foreach ... @endforeach` y `{{ $curriculo['alumno'] }}`: de nuevo, la misma idea que aquí escribimos a mano.
+Aquí aparece además la **etiqueta corta de salida** `<?= ... ?>`, que equivale a `<?php echo ...; ?>`: pensada justo para insertar un valor en medio del HTML. Con ella y la sintaxis alternativa, la página se lee como HTML con "huecos" que rellena el servidor. En el Bloque 5, _Blade_ lo hará con `@foreach ... @endforeach` y `{{ $curriculo['alumno'] }}`: de nuevo, la misma idea que aquí escribimos a mano.
 
 > **Aviso.** `<?= ... ?>` escribe el valor **tal cual** en el HTML. Mientras los datos los escribamos nosotros no hay problema, pero en cuanto vengan del usuario (3.6) habrá que **escaparlos** para evitar ataques. _Blade_, con `{{ }}`, lo hace automáticamente.
 

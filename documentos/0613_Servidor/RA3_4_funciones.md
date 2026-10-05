@@ -174,7 +174,7 @@ Dos reglas para ese fichero de funciones:
 1. **Va fuera de `public/`**, en una carpeta **`vanilla_php/src/`**. _nginx_ solo sirve lo que hay en `public/` (2.1): el código de `src/` se puede cargar desde PHP, pero nadie puede pedirlo desde el navegador.
 2. **Solo define, no ejecuta.** No contiene `echo` ni HTML: solo `declare`, funciones (y, en 3.5, clases). Cargarlo no produce ningún efecto; es la página quien decide qué llamar. Gracias a eso, un test puede cargarlo también y llamar a las funciones directamente, sin petición HTTP.
 
-> **Puente al Bloque 4.** En un proyecto _Laravel_ no escribirás `require_once`: _Composer_ genera un **cargador automático** (_autoload_) que incluye cada fichero la primera vez que se usa lo que define. Es la versión automatizada de lo que aquí hacemos a mano.
+> **Puente al Bloque 5.** En un proyecto _Laravel_ no escribirás `require_once`: _Composer_ genera un **cargador automático** (_autoload_) que incluye cada fichero la primera vez que se usa lo que define. Es la versión automatizada de lo que aquí hacemos a mano.
 
 ## Preparación del entorno de trabajo
 

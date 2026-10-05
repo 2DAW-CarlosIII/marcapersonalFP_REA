@@ -15,7 +15,7 @@ La **Programación Orientada a Objetos** (POO) resuelve estas tres cosas agrupan
 - Una **clase** es la definición —el molde— de un tipo de dato nuevo: qué datos tiene (**propiedades**) y qué sabe hacer (**métodos**).
 - Un **objeto** es una **instancia** concreta de una clase: el ciclo DAW y el ciclo DAM son dos objetos de la clase `Ciclo`.
 
-Es el tipo compuesto `object` que anunciamos en 2.3 y 3.3. Y es, además, la base de todo _Laravel_: en el Bloque 4, cada tabla de la base de datos se representa con una clase (`Ciclo`, `Curriculo`, `User`...).
+Es el tipo compuesto `object` que anunciamos en 2.3 y 3.3. Y es, además, la base de todo _Laravel_: en el Bloque 6, cada tabla de la base de datos se representa con una clase (`Ciclo`, `Curriculo`, `User`...).
 
 ## Una primera clase
 
@@ -207,7 +207,7 @@ $dam = Ciclo::desdeArray(['codCiclo' => 'DAM', 'nombre' => 'Desarrollo de Aplica
 ?>
 ```
 
-Dentro de un método estático **no existe `$this`**, porque no hay ningún objeto: solo la clase. En el Bloque 4 usarás constantemente métodos estáticos de fábrica de _Laravel_, como `Ciclo::find(1)` o `Ciclo::create([...])`.
+Dentro de un método estático **no existe `$this`**, porque no hay ningún objeto: solo la clase. En el Bloque 6 usarás constantemente métodos estáticos de fábrica de _Laravel_, como `Ciclo::find(1)` o `Ciclo::create([...])`.
 
 > Una **propiedad** `static` es compartida por todos los objetos de la clase. Igual que la variable `static` de una función (2.4), **no sobrevive entre peticiones**: cada petición ejecuta el script desde cero.
 
@@ -290,7 +290,7 @@ class Ciclo extends Modelo
 - **`abstract class`** es una clase que **no se puede instanciar** (`new Modelo(1)` da error): solo sirve de base para otras. Un **método abstracto** declara su firma sin cuerpo y **obliga** a cada hija a implementarlo: todo modelo tiene que saber dar su `descripcion()`, cada uno a su manera.
 - Cualquier objeto de una clase hija es también del tipo de la padre: una función que declare un parámetro `Modelo` acepta un `Ciclo` o un `Curriculo`.
 
-> **Puente al Bloque 4.** En _Laravel_, tus modelos se escribirán `class Ciclo extends Model`: heredarán de una clase padre del framework que ya sabe guardarse en la base de datos, buscarse, convertirse a JSON... La idea es la misma que aquí, pero la clase padre la escribe el framework.
+> **Puente al Bloque 6.** En _Laravel_, tus modelos se escribirán `class Ciclo extends Model`: heredarán de una clase padre del framework que ya sabe guardarse en la base de datos, buscarse, convertirse a JSON... La idea es la misma que aquí, pero la clase padre la escribe el framework.
 
 ## Interfaces
 
@@ -331,7 +331,7 @@ Como las funciones de 3.4, las clases van en `vanilla_php/src/`, en ficheros que
 
 Cada fichero carga con `require_once` lo que necesita para definirse: `Ciclo.php` necesita `Modelo.php`, porque hereda de ella. Así, una página solo tiene que cargar las clases que usa directamente, y cada una arrastra sus dependencias; `require_once` evita que un fichero se cargue dos veces aunque lo pidan varios.
 
-> **Puente al Bloque 4.** En _Laravel_, la clase `Ciclo` vive en `app/Models/Ciclo.php` y se identifica con un **espacio de nombres** (`App\Models\Ciclo`). Gracias a esa correspondencia entre nombre y ruta, el _autoload_ de _Composer_ sabe qué fichero cargar sin ningún `require_once`: la convención "una clase por fichero, con su nombre" que empezamos aquí es la que lo hace posible.
+> **Puente al Bloque 5.** En _Laravel_, la clase `Ciclo` vive en `app/Models/Ciclo.php` y se identifica con un **espacio de nombres** (`App\Models\Ciclo`). Gracias a esa correspondencia entre nombre y ruta, el _autoload_ de _Composer_ sabe qué fichero cargar sin ningún `require_once`: la convención "una clase por fichero, con su nombre" que empezamos aquí es la que lo hace posible.
 
 ## Preparación del entorno de trabajo
 

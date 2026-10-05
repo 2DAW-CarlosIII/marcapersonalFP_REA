@@ -490,7 +490,7 @@ class Ciclo
 $dam = Ciclo::desdeArray(['codCiclo' =&gt; 'DAM', 'nombre' =&gt; '…', 'grado' =&gt; 'Superior']);
 ?&gt;
         </code></pre>
-        <p class="small-text muted">Dentro no existe <code>$this</code>. En el Bloque 4: <code>Ciclo::find(1)</code>, <code>Ciclo::create([...])</code>.</p>
+        <p class="small-text muted">Dentro no existe <code>$this</code>. En el Bloque 6: <code>Ciclo::find(1)</code>, <code>Ciclo::create([...])</code>.</p>
         <aside class="notes">
           Una propiedad static es compartida por todos los objetos de la clase. Igual que la variable static de una función (2.4), no sobrevive
           entre peticiones: cada petición ejecuta el script desde cero.
@@ -584,7 +584,7 @@ class Ciclo extends Modelo
           </div>
         </div>
         <p class="small-text muted fragment" style="margin-top:1em">Un objeto de una clase hija es también del tipo de la padre: un parámetro <code>Modelo</code> acepta un <code>Ciclo</code> o un <code>Curriculo</code>.</p>
-        <p class="small-text fragment"><strong>Puente al Bloque 4.</strong> <code>class Ciclo extends Model</code>: la clase padre la escribe <em>Laravel</em>.</p>
+        <p class="small-text fragment"><strong>Puente al Bloque 6.</strong> <code>class Ciclo extends Model</code>: la clase padre la escribe <em>Laravel</em>.</p>
       </section>
 
       <!-- 17 · Interfaces -->
@@ -613,7 +613,7 @@ class Curriculo extends Modelo implements Publicable
         <h2>Organizar las clases en ficheros</h2>
         <p class="small-text">Como en 3.4, en <code>src/</code>, que <strong>solo define</strong>. Convención: <strong>una clase por fichero</strong>, con su mismo nombre: <code>src/Ciclo.php</code>, <code>src/Curriculo.php</code>…</p>
         <p class="small-text muted">Cada fichero carga con <code>require_once</code> lo que necesita: <code>Ciclo.php</code> necesita <code>Modelo.php</code>, porque hereda de ella.</p>
-        <p class="small-text fragment"><strong>Puente al Bloque 4.</strong> En Laravel, <code>App\Models\Ciclo</code> vive en <code>app/Models/Ciclo.php</code>: esa correspondencia nombre-ruta es la que permite al <em>autoload</em> de Composer cargar sin <code>require_once</code>.</p>
+        <p class="small-text fragment"><strong>Puente al Bloque 5.</strong> En Laravel, <code>App\Models\Ciclo</code> vive en <code>app/Models/Ciclo.php</code>: esa correspondencia nombre-ruta es la que permite al <em>autoload</em> de Composer cargar sin <code>require_once</code>.</p>
       </section>
 
       <!-- 19 · Entorno -->

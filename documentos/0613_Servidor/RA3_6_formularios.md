@@ -99,7 +99,7 @@ Desde PHP 8.1, `htmlspecialchars()` escapa por defecto también las comillas sim
 
 > **Regla:** todo dato que venga del exterior (formularios, URL, y más adelante base de datos) se **escapa al mostrarlo**, con `e()`. Cuesta poco y cierra la puerta al XSS.
 
-> **Puente al Bloque 4.** _Laravel_ tiene precisamente un _helper_ global llamado `e()` que hace lo mismo, y las dobles llaves de _Blade_ (`{{ $ciclo }}`) lo llaman automáticamente: por eso en _Blade_ escapar es lo normal y no escapar exige escribirlo a propósito (`{!! $ciclo !!}`).
+> **Puente al Bloque 5.** _Laravel_ tiene precisamente un _helper_ global llamado `e()` que hace lo mismo, y las dobles llaves de _Blade_ (`{{ $ciclo }}`) lo llaman automáticamente: por eso en _Blade_ escapar es lo normal y no escapar exige escribirlo a propósito (`{!! $ciclo !!}`).
 
 ## Validar en el servidor
 
@@ -181,9 +181,9 @@ Lo verás completo en el ejercicio 4.
 
 ### ¿Y después de validar?
 
-Si los datos son válidos, lo normal sería **guardarlos** (en una base de datos, Bloque 5) y **redirigir** a otra página con una petición GET. Esa redirección, llamada patrón **POST/Redirect/GET**, evita que al recargar la página (F5) el navegador vuelva a enviar el formulario y se dé de alta dos veces lo mismo. Pero para mostrar un mensaje de "dado de alta" en la página a la que redirigimos necesitamos recordar algo **entre dos peticiones**, y ya vimos en 2.4 que cada petición empieza de cero: hace falta una **sesión**, que llega en el Bloque 4. Por ahora, tras validar, nos limitaremos a **mostrar el resultado** en la misma respuesta.
+Si los datos son válidos, lo normal sería **guardarlos** (en una base de datos, Bloque 6) y **redirigir** a otra página con una petición GET. Esa redirección, llamada patrón **POST/Redirect/GET**, evita que al recargar la página (F5) el navegador vuelva a enviar el formulario y se dé de alta dos veces lo mismo. Pero para mostrar un mensaje de "dado de alta" en la página a la que redirigimos necesitamos recordar algo **entre dos peticiones**, y ya vimos en 2.4 que cada petición empieza de cero: hace falta una **sesión**, que llega en el Bloque 4. Por ahora, tras validar, nos limitaremos a **mostrar el resultado** en la misma respuesta.
 
-> **Puente al Bloque 4.** En _Laravel_, leer datos será `$request->input('nombre')`; validar, `$request->validate(['nombre' => 'required', 'horas' => 'integer|between:1000,2000', ...])`; conservar lo escrito, `old('nombre')`; y redirigir con un mensaje, `redirect()->with(...)`. Además, protegerá cada formulario POST frente a otro ataque, el **CSRF**, con un _token_ (`@csrf`) que también depende de las sesiones. Todo lo que aquí hacemos a mano.
+> **Puente al Bloque 5.** En _Laravel_, leer datos será `$request->input('nombre')`; validar, `$request->validate(['nombre' => 'required', 'horas' => 'integer|between:1000,2000', ...])`; conservar lo escrito, `old('nombre')`; y redirigir con un mensaje, `redirect()->with(...)`. Además, protegerá cada formulario POST frente a otro ataque, el **CSRF**, con un _token_ (`@csrf`) que también depende de las sesiones. Todo lo que aquí hacemos a mano.
 
 ## Preparación del entorno de trabajo
 

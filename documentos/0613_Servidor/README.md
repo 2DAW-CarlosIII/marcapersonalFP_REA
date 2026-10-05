@@ -2,7 +2,7 @@
 
 Los contenidos que se presentan a continuación constituyen un desarrollo que, inicialmente, se basó en el libro [Laravel 5](https://ajgallego.gitbooks.io/laravel-5/), escrito por Antonio Javier Gallego Sánchez.
 
-> **Estructura por Resultados de Aprendizaje.** El material está organizado según los **bloques de contenido** del módulo (currículo de la Región de Murcia, ~150 h), de modo que cada bloque se corresponde con un Resultado de Aprendizaje (RA) y con su carga horaria orientativa. El plan de esta reorganización está en [PLAN_integracion_RA.md](./PLAN_integracion_RA.md).
+> **Estructura por Resultados de Aprendizaje.** El material está organizado según los **bloques de contenido** del módulo (currículo de la Región de Murcia, ~150 h), de modo que cada bloque se corresponde con un Resultado de Aprendizaje (RA) y con su carga horaria orientativa. La distribución oficial agrupa RA4 y RA5 en un único bloque; aquí se separan (Bloques 4 y 5) para que el Bloque _n_ corresponda siempre al RA _n_. El plan de esta reorganización está en [PLAN_integracion_RA.md](./PLAN_integracion_RA.md).
 >
 > **Leyenda:** 🆕 = contenido nuevo pendiente de desarrollo · 🔁 = contenido existente pendiente de reubicar/renumerar a su bloque.
 
@@ -11,13 +11,14 @@ Los contenidos que se presentan a continuación constituyen un desarrollo que, i
 | Bloque | Resultado de Aprendizaje | Horas |
 |-------:|--------------------------|------:|
 | 1 | Selección de arquitecturas y herramientas (RA1) — *fuera del REA* | 8 |
-| 2 | Inserción de código en páginas web (RA2) | 12 |
+| 2 | Inserción de código en páginas web (RA2) | 8 |
 | 3 | Programación con código embebido (RA3) | 24 |
-| 4 | Aplicaciones web con código embebido: introducción a Laravel (RA4 + RA5) | 36 |
-| 5 | Acceso a almacenes de datos (RA6) | 28 |
-| 6 | Servicios web reutilizables (RA7) | 28 |
-| 7 | Aplicaciones web dinámicas (RA8) | 6 |
-| 8 | Aplicaciones web híbridas (RA9) | 6 |
+| 4 | Aplicaciones web con código embebido: estado y autenticación (RA4) | 10 |
+| 5 | Generación dinámica de páginas web: introducción a Laravel (RA5) | 26 |
+| 6 | Acceso a almacenes de datos (RA6) | 32 |
+| 7 | Servicios web reutilizables (RA7) | 28 |
+| 8 | Aplicaciones web dinámicas (RA8) | 6 |
+| 9 | Aplicaciones web híbridas (RA9) | 6 |
 
 ---
 
@@ -54,36 +55,40 @@ Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonal
 7. [Comentarios](./RA3_7_comentarios.md)
 8. *Proyecto:* [alta y validación de un currículo](./RA3_8_proyectoAltaCurriculo.md)
 
-## Bloque 4. Desarrollo de aplicaciones web con código embebido: introducción a Laravel (RA4 + RA5)
+## Bloque 4. Desarrollo de aplicaciones web utilizando código embebido (RA4)
 
-### Puente: estado y autenticación en PHP nativo (RA4)
+Cerramos _marcapersonalFP v0_, todavía en PHP plano: mantenimiento del estado, autenticación de usuarios y depuración.
 
-1. 🆕 Sesiones y cookies nativas; *login* básico
-2. 🆕 Depuración con XDebug
+1. 🆕 Mantenimiento del estado: *cookies* y sesiones
+2. 🆕 Autenticación de usuarios: *login* básico
+3. 🆕 Depuración con Xdebug
+4. 🆕 *Proyecto:* área privada de _marcapersonalFP v0_
 
-### Introducción a Laravel (RA5)
+## Bloque 5. Generación dinámica de páginas web: introducción a Laravel (RA5)
 
-1. [Instalación](./021_instalacion.md)
-    1. [Desarrollo colaborativo con GitHub](./0211_desarrolloColaborativoGitHub.md)
-2. [Funcionamiento básico](./022_funcionamientoBasico.md)
-3. [Rutas](./023_rutas.md) · [Ejercicios de rutas](./024_ejercicioRutas.md) · [Rutas avanzadas](./025_rutasAvanzadas.md)
-4. [Artisan](./026_artisan.md)
-5. [Vistas](./027_vistas.md)
-    1. [Plantillas mediante Blade](./0271_vistasBlade.md)
-    2. [Crear un Layout](./0272_crearLayout.md)
-    3. [Ejercicios de vistas](./0273_ejerciciosVistas.md)
-6. [Controladores, filtros y formularios](./03_controladoresFiltrosFormularios.md)
-    1. [Controladores](./031_controladores.md) · [Ejercicios](./0311_ejerciciosControladores.md)
-    2. [Middleware o filtros](./032_middlewares.md)
-    3. [Redirecciones](./033_Redirecciones.md)
-    4. [Formularios](./034_Formularios.md)
-    5. [Datos de entrada](./035_datosEntrada.md)
-7. [Control de usuarios con Breeze](./05_autenticacion.md)
-    1. [Control de usuarios](./051_Autenticacion.md)
-    2. [Ejercicios](./052_ejerciciosUsers.md)
+Reconstruimos _marcapersonalFP_ con _Laravel_, separando la lógica de negocio de la presentación.
+
+1. 🔁 [Instalación](./021_instalacion.md)
+    1. 🔁 [Desarrollo colaborativo con GitHub](./0211_desarrolloColaborativoGitHub.md)
+2. 🔁 [Funcionamiento básico](./022_funcionamientoBasico.md)
+3. 🔁 [Rutas](./023_rutas.md) · [Ejercicios de rutas](./024_ejercicioRutas.md) · [Rutas avanzadas](./025_rutasAvanzadas.md)
+4. 🔁 [Artisan](./026_artisan.md)
+5. 🔁 [Vistas](./027_vistas.md)
+    1. 🔁 [Plantillas mediante Blade](./0271_vistasBlade.md)
+    2. 🔁 [Crear un Layout](./0272_crearLayout.md)
+    3. 🔁 [Ejercicios de vistas](./0273_ejerciciosVistas.md)
+6. 🔁 [Controladores, filtros y formularios](./03_controladoresFiltrosFormularios.md)
+    1. 🔁 [Controladores](./031_controladores.md) · [Ejercicios](./0311_ejerciciosControladores.md)
+    2. 🔁 [Middleware o filtros](./032_middlewares.md)
+    3. 🔁 [Redirecciones](./033_Redirecciones.md)
+    4. 🔁 [Formularios](./034_Formularios.md)
+    5. 🔁 [Datos de entrada](./035_datosEntrada.md)
+7. 🔁 [Control de usuarios con Breeze](./05_autenticacion.md)
+    1. 🔁 [Control de usuarios](./051_Autenticacion.md)
+    2. 🔁 [Ejercicios](./052_ejerciciosUsers.md)
 8. 🆕 Separación de la lógica de negocio: POO y patrones de diseño (MVC, Singleton, repositorio, DAO)
 
-## Bloque 5. Acceso a almacenes de datos (RA6)
+## Bloque 6. Acceso a almacenes de datos (RA6)
 
 1. [Base de datos](./04_basesDatos.md)
     1. [Configuración inicial](./041_configuracionInicial.md)
@@ -101,7 +106,7 @@ Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonal
     5. [Ejercicios](./085_ejerciciosRelaciones.md)
 3. 🆕 Transacciones y **bloqueos** (la sección de transacciones ya existe en [Query Builder](./046_queryBuilder.md); falta bloqueos)
 
-## Bloque 6. Servicios web reutilizables (RA7)
+## Bloque 7. Servicios web reutilizables (RA7)
 
 1. [Creación de una API](./06_crearAPI.md)
     1. [Introducción a API y REST](./061_api_y_rest.md)
@@ -120,14 +125,14 @@ Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonal
 5. [Manejo de ficheros en la API](./11_manejarFicheros.md)
 6. 🆕 Documentación del servicio web (OpenAPI/Swagger)
 
-## Bloque 7. Aplicaciones web dinámicas (RA8)
+## Bloque 8. Aplicaciones web dinámicas (RA8)
 
 1. [React-Admin](./063_React_Admin.md)
 2. [React-Admin sobre Inertia](./064_inertia_reactadmin.md)
 3. [Personalizar las tablas de React-Admin](./066_componentesRA.md)
 4. 🆕 Validación de formularios, internacionalización (i18n) y desarrollo guiado por pruebas (TDD)
 
-## Bloque 8. Aplicaciones web híbridas (RA9)
+## Bloque 9. Aplicaciones web híbridas (RA9)
 
 1. [Consumiendo API externas](./12_apiExterna.md)
     1. [Ejercicios](./121_ejerciciosAPI.md)

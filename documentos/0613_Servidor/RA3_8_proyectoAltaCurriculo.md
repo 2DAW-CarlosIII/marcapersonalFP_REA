@@ -151,7 +151,7 @@ vanilla_php/
 
     const NOMBRE_CENTRO = 'CIFP Carlos III';
 
-    // Catálogo de ciclos del centro. En el Bloque 5 saldrá de la base de datos.
+    // Catálogo de ciclos del centro. En el Bloque 6 saldrá de la base de datos.
     $ciclos = [
         'DAW'  => new Ciclo(1, 'DAW', 'Desarrollo de Aplicaciones Web', Ciclo::GRADO_SUPERIOR),
         'DAM'  => new Ciclo(2, 'DAM', 'Desarrollo de Aplicaciones Multiplataforma', Ciclo::GRADO_SUPERIOR),
@@ -169,7 +169,7 @@ vanilla_php/
         $errores = $validador->validar($datos);
 
         if ($errores === []) {
-            // Sin base de datos no hay quien asigne el id: usamos 1 (Bloque 5).
+            // Sin base de datos no hay quien asigne el id: usamos 1 (Bloque 6).
             $curriculo = $validador->crearCurriculo($datos, 1);
         }
     }
@@ -241,22 +241,22 @@ vanilla_php/
     - Vídeo `http://youtu.be/curriculo1` (sin la _s_) y vídeo `javascript:alert('XSS')`. Para el segundo tendrás que quitar antes `type="url"` con las herramientas de desarrollo (F12), porque el navegador ya lo rechaza; ¿por qué no basta con eso?
     - Con las herramientas de desarrollo, cambia el `value` de una opción del desplegable por `FP` y envía.
     - Datos correctos, con vídeo y sin vídeo.
-4. **Investiga: del PHP plano a _Laravel_.** En _Laravel_, las reglas de validación se escriben como texto. Busca en la documentación de _Laravel_ ("Validation", "Available Validation Rules") qué reglas usarías para expresar cada una de las de `validar()` (pistas: `required`, `max`, `in`, `nullable`, `url`, `starts_with`). Escribe en un comentario el array de reglas que le pasarías a `$request->validate([...])`. En el Bloque 4 lo comprobarás.
+4. **Investiga: del PHP plano a _Laravel_.** En _Laravel_, las reglas de validación se escriben como texto. Busca en la documentación de _Laravel_ ("Validation", "Available Validation Rules") qué reglas usarías para expresar cada una de las de `validar()` (pistas: `required`, `max`, `in`, `nullable`, `url`, `starts_with`). Escribe en un comentario el array de reglas que le pasarías a `$request->validate([...])`. En el Bloque 5 lo comprobarás.
 
 ## De _v0_ a _Laravel_
 
-Con este proyecto, _marcapersonalFP v0_ tiene ya un listado (2.5) y un alta. En el Bloque 4 reconstruiremos ambos con _Laravel_, y cada pieza que aquí hemos hecho a mano tendrá su equivalente automatizado:
+Con este proyecto, _marcapersonalFP v0_ tiene ya un listado (2.5) y un alta. En el Bloque 4 les añadiremos, todavía a mano, lo que les falta para ser una aplicación: **estado** (sesiones y _cookies_) y **autenticación**. En el Bloque 5 reconstruiremos ambos con _Laravel_, y cada pieza que aquí hemos hecho a mano tendrá su equivalente automatizado:
 
 | En _v0_ (a mano) | En _Laravel_ |
 |---|---|
 | Un script en `public/` por página | **Rutas** y **controladores** |
 | HTML con `<?php if (): ?>`, `foreach:` y `<?= e() ?>` | Plantillas **Blade**: `@if`, `@foreach`, `{{ }}` |
 | `require_once` de cada fichero de `src/` | **Autoload** de _Composer_ con espacios de nombres |
-| `class Curriculo extends Modelo` | **Modelos Eloquent**: `class Curriculo extends Model` |
-| El catálogo `$ciclos` escrito en el código | `Ciclo::all()`, desde la **base de datos** (Bloque 5) |
+| `class Curriculo extends Modelo` | **Modelos Eloquent**: `class Curriculo extends Model` (Bloque 6) |
+| El catálogo `$ciclos` escrito en el código | `Ciclo::all()`, desde la **base de datos** (Bloque 6) |
 | `ValidadorCurriculo::validar()` | `$request->validate([...])` o una clase _Form Request_ |
 | `value="<?= e($datos['alumno'] ?? '') ?>"` | `old('alumno')` |
-| El currículo se pierde al terminar la petición | Se **guarda** (Bloque 5) y se **redirige** con un mensaje de **sesión** (Bloque 4) |
+| El currículo se pierde al terminar la petición | Se **guarda** (Bloque 6) y se **redirige** con un mensaje de **sesión** (Bloque 5) |
 
 Esto que hicimos a mano, el framework lo automatiza así.
 
@@ -286,4 +286,4 @@ Y si quieres comprobar que no has roto nada del Bloque 2 por el camino, ejecuta 
 
 ---
 
-**Siguiente:** Bloque 4 — Desarrollo de aplicaciones web con código embebido: introducción a _Laravel_ (RA4 + RA5).
+**Siguiente:** Bloque 4 — Desarrollo de aplicaciones web utilizando código embebido (RA4): estado, sesiones y autenticación.
