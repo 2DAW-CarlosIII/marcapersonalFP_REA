@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>4.3. Depuración con Xdebug · marcapersonalFP v0</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 4 · RA4</p>
+        <h1 class="titulo">4.3. Depuración<br>con Xdebug</h1>
+        <p class="muted">Mirar dentro del código <strong>mientras se ejecuta</strong></p>
+        <p class="small-text muted"><em>marcapersonalFP</em> v0, todavía en PHP plano</p>
+        <aside class="notes">
+          Xdebug ya quedó instalado y configurado en §7 de la preparación del entorno: aquí aprendemos a usarlo.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · Errores sin mensaje -->
+      <section>
+        <h2>Errores que no avisan</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>Hasta ahora</h3>
+            <p class="small-text">El <strong>mensaje de error</strong> de PHP (<code>display_errors</code>, 2.2) y los <strong>tests</strong>.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>Pero…</h3>
+            <p class="small-text">Hay programas que se ejecutan sin quejarse y, simplemente, <strong>calculan mal</strong>.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:1em">Hay que ver qué valor tiene cada variable, por qué rama pasa, cuántas vueltas da: un <strong>depurador</strong>.</p>
+      </section>
+
+      <!-- 3 · Trazas -->
+      <section>
+        <h2>Depurar con trazas</h2>
+        <pre class="medio"><code class="language-php" data-trim>
+&lt;?php
+var_dump($curriculos);   // tipo y valor, con detalle
+print_r($cuenta);        // más legible para arrays
+error_log('cuenta: ' . print_r($cuenta, true));   // al registro
+?&gt;
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment">Hay que <strong>modificar</strong> el código, y acordarse de quitarlas.</li>
+          <li class="fragment">Solo muestran lo que decidiste mirar <strong>antes</strong> de ejecutar.</li>
+          <li class="fragment">En una página que <strong>redirige</strong>, ni se ven.</li>
+        </ul>
+      </section>
+
+      <!-- 4 · Un depurador -->
+      <section>
+        <h2>Un depurador permite…</h2>
+        <ul>
+          <li class="fragment"><strong>Detener</strong> la ejecución en una línea: <strong>punto de ruptura</strong> (<em>breakpoint</em>)</li>
+          <li class="fragment">Avanzar <strong>paso a paso</strong></li>
+          <li class="fragment">Ver <strong>todas</strong> las variables en cada momento, sin tocar el código</li>
+        </ul>
+      </section>
+
+      <!-- 5 · Cómo funciona Xdebug -->
+      <section>
+        <h2>Cómo funciona Xdebug</h2>
+        <ol class="pasos compacta">
+          <li class="fragment">El <strong>editor</strong> (VS Code + <em>PHP Debug</em>) <strong>escucha</strong> en el puerto <strong>9003</strong>.</li>
+          <li class="fragment">Llega una petición con un <strong>disparador</strong> (<em>trigger</em>).</li>
+          <li class="fragment">Xdebug, desde <code>php-fpm</code>, <strong>se conecta al editor</strong>: el servidor llama al editor, no al revés.</li>
+          <li class="fragment">El editor controla la ejecución: dónde parar, cuándo avanzar, qué mostrar.</li>
+        </ol>
+      </section>
+
+      <!-- 6 · Ya configurado -->
+      <section>
+        <h2>Ya configurado (§7 del entorno)</h2>
+        <pre class="medio"><code class="language-ini" data-trim>
+xdebug.mode=debug
+xdebug.start_with_request=trigger
+xdebug.client_host="dockerhost"
+xdebug.client_port=9003
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment"><code>debug</code>: depuración paso a paso.</li>
+          <li class="fragment"><code>trigger</code>: solo se depura la petición que lleva el disparador; las demás, normales.</li>
+          <li class="fragment"><code>dockerhost:9003</code>: dónde está el editor, visto desde el contenedor.</li>
+        </ul>
+      </section>
+
+      <!-- 7 · El disparador -->
+      <section>
+        <h2>El disparador: <code>XDEBUG_TRIGGER</code></h2>
+        <p class="small-text"><strong>En la URL</strong>, para un GET:</p>
+        <pre class="compacto"><code class="language-plaintext" data-trim>
+http://localhost/RA4_resumen.php?XDEBUG_TRIGGER=1
+        </code></pre>
+        <p class="small-text fragment"><strong>Como cookie</strong>, para todas las peticiones (también los POST). Desde la consola de F12:</p>
+        <pre class="compacto fragment"><code class="language-javascript" data-trim>
+document.cookie = 'XDEBUG_TRIGGER=1; path=/';
+        </code></pre>
+        <p class="small-text muted fragment">Las extensiones tipo <em>Xdebug Helper</em> hacen lo mismo con un botón.</p>
+      </section>
+
+      <!-- 8 · launch.json -->
+      <section>
+        <h2>VS Code: <code>.vscode/launch.json</code></h2>
+        <pre class="medio"><code class="language-json" data-trim data-line-numbers="|8-10">
+{
+    "version": "0.2.0",
+    "configurations": [{
+        "name": "Xdebug (vanilla_php)",
+        "type": "php",
+        "request": "launch",
+        "port": 9003,
+        "pathMappings": {
+            "/var/www/vanilla_php": "${workspaceFolder}"
+        }
+    }]
+}
+        </code></pre>
+        <p class="small-text muted">Extensión <strong>PHP Debug</strong> (<code>xdebug.php-debug</code>) y la carpeta <code>vanilla_php</code> abierta.</p>
+      </section>
+
+      <!-- 9 · pathMappings -->
+      <section>
+        <h2>¿Por qué <code>pathMappings</code>?</h2>
+        <div class="cols una">
+          <div class="panel fpm">
+            <h3>Xdebug (contenedor)</h3>
+            <p class="small-text"><code>/var/www/vanilla_php/public/RA4_resumen.php</code></p>
+          </div>
+          <div class="panel client">
+            <h3>VS Code (máquina virtual)</h3>
+            <p class="small-text"><code>~/Documentos/laravel/vanilla_php/public/RA4_resumen.php</code></p>
+          </div>
+        </div>
+        <p class="small-text fragment" style="margin-top:1em">Sin la traducción, la conexión se establece pero el editor <strong>nunca se detiene</strong> en tus puntos de ruptura.</p>
+      </section>
+
+      <!-- 10 · Controles -->
+      <section>
+        <h2>El depurador, en marcha</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th>Continuar</th><td><kbd>F5</kbd></td><td>Hasta el siguiente punto de ruptura</td></tr>
+            <tr class="fragment"><th>Por encima</th><td><kbd>F10</kbd></td><td>La línea entera, aunque llame a funciones</td></tr>
+            <tr class="fragment"><th>Por dentro</th><td><kbd>F11</kbd></td><td>Entra en la función que llama</td></tr>
+            <tr class="fragment"><th>Salir</th><td><kbd>Mayús</kbd>+<kbd>F11</kbd></td><td>Vuelve a quien llamó</td></tr>
+            <tr class="fragment"><th>Detener</th><td><kbd>Mayús</kbd>+<kbd>F5</kbd></td><td>Deja de escuchar</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Se detiene <strong>antes</strong> de ejecutar la línea marcada.</p>
+      </section>
+
+      <!-- 11 · Paneles -->
+      <section>
+        <h2>Lo que puedes ver</h2>
+        <ul class="small-text">
+          <li class="fragment"><strong>Variables</strong>: las locales y las superglobales (<code>$_POST</code>, <code>$_SESSION</code>, <code>$_COOKIE</code>…)</li>
+          <li class="fragment"><strong>Inspección</strong> (<em>Watch</em>): expresiones vigiladas, como <code>$cuenta['DAW']</code></li>
+          <li class="fragment"><strong>Pila de llamadas</strong>: qué función llamó a cuál</li>
+          <li class="fragment"><strong>Consola de depuración</strong>: evalúa cualquier expresión con los valores del momento</li>
+          <li class="fragment">Punto de ruptura <strong>condicional</strong>: solo si <code>$codigo === 'DAW'</code></li>
+        </ul>
+      </section>
+
+      <!-- 12 · Si no se detiene -->
+      <section>
+        <h2>Si no se detiene</h2>
+        <ol class="pasos compacta">
+          <li class="fragment">¿VS Code <strong>escucha</strong>? (barra inferior coloreada)</li>
+          <li class="fragment">¿La petición lleva el <strong>disparador</strong>?</li>
+          <li class="fragment">¿El punto de ruptura está en una línea que <strong>se ejecuta</strong>?</li>
+          <li class="fragment">¿<code>pathMappings</code> coincide con tu carpeta?</li>
+        </ol>
+        <p class="small-text muted fragment" style="margin-top:0.8em"><em>Could not connect to debugging client</em>: nadie escuchaba en el 9003. Diagnóstico completo: una página con <code>&lt;?php xdebug_info();</code></p>
+      </section>
+
+      <!-- 13 · Depurar los tests -->
+      <section>
+        <h2>Depurar también los tests</h2>
+        <p class="small-text">Xdebug también está en <code>workspace</code>. El disparador, como <strong>variable de entorno</strong>:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec -e XDEBUG_TRIGGER=1 --workdir /var/www/vanilla_php \
+  workspace vendor/bin/phpunit tests/RA4_3_XdebugTest.php
+        </code></pre>
+        <p class="small-text muted fragment">Con un punto de ruptura en el test o en <code>src/</code>, se detiene igual que con una página.</p>
+      </section>
+
+      <!-- 14 · Pruebas y depuración -->
+      <section>
+        <h2>Pruebas y depuración</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>Un test</h3>
+            <p class="small-text">Dice <strong>que</strong> algo falla, cada vez que lo ejecutas.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>El depurador</h3>
+            <p class="small-text">Ayuda a encontrar <strong>por qué</strong>.</p>
+          </div>
+        </div>
+        <p class="small-text fragment" style="margin-top:1em">Test detecta → depurador localiza → se corrige → el test confirma, y vigila que no vuelva.</p>
+      </section>
+
+      <!-- 15 · Entorno -->
+      <section>
+        <h2>Seguimos en <code>vanilla_php</code></h2>
+        <p class="small-text">Con VS Code, <em>PHP Debug</em> y el <code>launch.json</code>. Ficheros nuevos:</p>
+        <pre class="ancho"><code class="language-plaintext" data-trim>
+vanilla_php/
+├── .vscode/launch.json      ← configuración de depuración
+├── public/
+│   ├── RA4_xdebug.php       ← ¿está Xdebug activo?
+│   └── RA4_resumen.php      ← resumen de currículos por ciclo
+└── src/
+    └── RA4_depuracion.php   ← dos funciones con errores que encontrar
+        </code></pre>
+      </section>
+
+      <!-- 16 · El resumen que calcula mal -->
+      <section>
+        <h2>Un resumen que calcula mal</h2>
+        <p class="small-text">Cuatro currículos: dos de DAW, uno de DAM, uno de ASIR. Debería mostrar:</p>
+        <pre class="compacto"><code class="language-plaintext" data-trim>
+DAW: 2 (50 %)
+DAM: 1 (25 %)
+ASIR: 1 (25 %)
+        </code></pre>
+        <p class="small-text fragment">No es eso lo que sale. Y <strong>no hay ningún mensaje de error</strong>.</p>
+        <p class="small-text muted fragment">Dos funciones en <code>src/RA4_depuracion.php</code>: <code>contarPorCiclo()</code> y <code>porcentaje()</code>.</p>
+      </section>
+
+      <!-- 17 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/2)</h2>
+        <ol class="pasos compacta">
+          <li><strong>¿Está Xdebug activo?</strong> <code>public/RA4_xdebug.php</code>: "cargado" y modo <code>debug</code>.</li>
+          <li><strong>Prepara VS Code.</strong> <em>PHP Debug</em>, <code>launch.json</code>, un punto de ruptura y <code>?XDEBUG_TRIGGER=1</code>: ¿se detiene?</li>
+          <li><strong>Un resumen que calcula mal.</strong> <code>src/RA4_depuracion.php</code> <strong>con sus errores</strong> y <code>public/RA4_resumen.php</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 18 · Ejercicios 4-6 -->
+      <section>
+        <h2>Ejercicios (2/2)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong>Encuentra los errores con el depurador</strong>, sin <code>var_dump()</code>: <kbd>F10</kbd> vuelta a vuelta vigilando <code>$cuenta</code>; un punto condicional; evalúa <code>intdiv($parte, $total)</code> y <code>$parte / $total</code>. Corrige y explica.</li>
+          <li><strong>Depura un test</strong> con <code>-e XDEBUG_TRIGGER=1</code>: ¿qué muestra la pila de llamadas?</li>
+          <li><strong>Investiga.</strong> ¿Y si <code>$total</code> vale 0? <code>DivisionByZeroError</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 19 · Puente al Bloque 5 -->
+      <section>
+        <h2>Puente al Bloque 5</h2>
+        <ul class="small-text">
+          <li class="fragment">Xdebug no sabe nada del framework: solo ve PHP. En <em>Laravel</em> se depura <strong>igual</strong>.</li>
+          <li class="fragment">Todas las peticiones entran por <code>public/index.php</code>; <code>pathMappings</code> apuntará al proyecto <em>Laravel</em>.</li>
+          <li class="fragment">Para trazas rápidas: <code>dump()</code> y <code>dd()</code> (<em>dump and die</em>).</li>
+        </ul>
+      </section>
+
+      <!-- 20 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA4_3_XdebugTest.php</code> a <code>vanilla_php/tests/</code></li>
+          <li>Desde la carpeta <code>laradock/</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec --workdir /var/www/vanilla_php workspace \
+  vendor/bin/phpunit tests/RA4_3_XdebugTest.php
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1, 3 y 4</strong>. Hasta que corrijas los dos errores, <strong>fallará</strong>: es lo esperado.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">OK (6 tests, 10 assertions)</code></p>
+      </section>
+
+      <!-- 21 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>4.4. <em>Proyecto:</em> área privada de <em>marcapersonalFP v0</em></h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>
