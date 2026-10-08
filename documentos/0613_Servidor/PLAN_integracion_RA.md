@@ -133,5 +133,15 @@ Cada PR es revisable y reversible por separado. Los alumnos usan la rama estable
 ## 6. Flujo de trabajo
 
 - **Ramas** en el repo personal (`PR1`, `PR2`, `PR3`…), creadas desde `master`. Historia lineal, sin *merge commits*: la integración se hace con *fast-forward* desde una máquina con permiso de escritura en los dos repos, empujando los mismos SHAs a `origin/master` y `upstream/master`. Nunca "Rebase and merge" ni "Squash" en GitHub, ni *rebase* de ramas ya publicadas.
-- **Fichero a fichero:** se redacta (`.md` + test + enlace en el README), se revisa, y solo entonces se hace un commit por fichero de contenido y otro por presentación _RevealJS_.
+- **Fichero a fichero:** se redacta cada apartado (`.md` + test + presentación _RevealJS_ + enlace en el README), se revisa, y solo entonces se hace **un commit por apartado** con todo junto.
 - **Tests:** reales y enlazados (nunca embebidos), uno por fichero de contenido, con el comando de ese fichero en cada `.md` y el comando agregado del bloque en el último. Bloques 2–4: `materiales/ejercicios-vanilla/tests/`, con `vendor/bin/phpunit`; desde el Bloque 5: `materiales/ejercicios-laravel/tests/Feature/`, con `php artisan test --filter=…`. La cifra de aserciones documentada se verifica siempre con una ejecución real.
+
+---
+
+## 7. Mejoras futuras
+
+Ideas detectadas durante el desarrollo que no se abordan ahora. Al resolver una, se borra de la lista y se indica en el mensaje del commit.
+
+- **Ejercicios que modifiquen, no solo que reproduzcan.** En los Bloques 2 y 3, los ejercicios piden sobre todo copiar y probar el código expuesto en el apartado. Conviene añadir en cada apartado al menos un ejercicio que obligue a **modificarlo o ampliarlo** (otro campo, otra regla, otro caso), con su comprobación en el test.
+- **Desbordes horizontales en presentaciones del Bloque 3.** Diapositivas más anchas que los 960 px de _RevealJS_: 3.1 (diapositiva 12, 970 px), 3.6 (diapositiva 18, 1023 px) y 3.8 (diapositiva 14, 1128 px). Las tablas con la clase `sin-salto` y la primera columna de cualquier tabla (`tbody th`) no admiten saltos de línea. Desde el Bloque 4, la validación de las presentaciones mide el ancho además del alto.
+- **Contenidos de RA4 en el currículo de Murcia que el REA trata en otros bloques.** El apartado d) del currículo ("Desarrollo de aplicaciones web utilizando código embebido") incluye "Manejo de ficheros. Subida y manipulación" y "Envíos de correos electrónicos con documentos adjuntos". En el REA están en los Bloques 7 ([Manejo de ficheros](./11_manejarFicheros.md)) y 9 ([Correo](./13_email.md)). Una opción, descartada por ahora para 4.4: guardar los currículos en un fichero JSON compartido (con `LOCK_EX`, que anticipa los bloqueos de RA6) y subir el PDF del campo `texto_curriculum`.
