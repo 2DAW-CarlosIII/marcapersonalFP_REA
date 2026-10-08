@@ -62,7 +62,7 @@ Cerramos _marcapersonalFP v0_, todavía en PHP plano: mantenimiento del estado, 
 1. [Mantenimiento del estado: *cookies* y sesiones](./RA4_1_estado.md)
 2. [Autenticación de usuarios: *login* básico](./RA4_2_login.md)
 3. [Depuración con Xdebug](./RA4_3_xdebug.md)
-4. 🆕 *Proyecto:* área privada de _marcapersonalFP v0_
+4. *Proyecto:* [área privada de _marcapersonalFP v0_](./RA4_4_proyectoAreaPrivada.md)
 
 ## Bloque 5. Generación dinámica de páginas web: introducción a Laravel (RA5)
 

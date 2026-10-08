@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>4.4. Proyecto: área privada de marcapersonalFP v0</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 4 · RA4</p>
+        <h1 class="titulo">4.4. Proyecto:<br>área privada</h1>
+        <p class="muted">Cierre del Bloque 4 · <em>login</em> + sesión + autorización</p>
+        <p class="small-text muted">La última pieza de <em>marcapersonalFP</em> v0</p>
+        <aside class="notes">
+          Proyecto de integración: la única pieza nueva es la autorización (exigirRol y el 403).
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · Qué aporta cada apartado -->
+      <section>
+        <h2>Qué aporta cada apartado</h2>
+        <table class="sin-salto">
+          <tbody>
+            <tr class="fragment"><th>3.8 Alta</th><td><code>ValidadorCurriculo</code>: validar y construir</td></tr>
+            <tr class="fragment"><th>4.1 Sesiones</th><td><code>$_SESSION</code>, POST/Redirect/GET, <em>flash</em></td></tr>
+            <tr class="fragment"><th>4.2 <em>Login</em></th><td><code>exigirLogin()</code> y el rol del usuario</td></tr>
+            <tr class="fragment"><th>4.3 Xdebug</th><td>Depurar si algo no cuadra</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:1em">Lo nuevo: la <strong>autorización</strong>, qué puede hacer un usuario que ya sabemos quién es.</p>
+      </section>
+
+      <!-- 3 · El diseño -->
+      <section>
+        <h2>El diseño: "Mi currículo"</h2>
+        <ul class="small-text">
+          <li class="fragment"><strong>Solo para alumnos.</strong> Un docente recibe un <strong>403</strong>.</li>
+          <li class="fragment"><strong>Un currículo por alumno</strong>, como <code>User</code> y <code>Curriculo</code> (1:1, con <em>Eloquent</em> en el Bloque 6), en <code>$_SESSION['curriculo']</code>.</li>
+          <li class="fragment"><strong>La misma página da de alta y edita</strong>: formulario si no hay currículo; si lo hay, se muestra con un enlace "Editar".</li>
+          <li class="fragment">Al guardar: POST/Redirect/GET y mensaje <em>flash</em>, como en 4.1.</li>
+        </ul>
+      </section>
+
+      <!-- 4 · 403 frente a redirigir -->
+      <section>
+        <h2>403 frente a redirigir</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>No sabemos quién es</h3>
+            <p class="small-text">Redirigir al <em>login</em> (en las API, <strong>401</strong>).</p>
+            <p class="small-text muted"><code>exigirLogin()</code>, de 4.2</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>Sabemos quién es, pero no puede</h3>
+            <p class="small-text"><strong>403</strong> <em>Forbidden</em>: identificarse otra vez no cambiaría nada.</p>
+            <p class="small-text muted"><code>exigirRol()</code>, nueva</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 · exigirRol -->
+      <section>
+        <h2><code>exigirRol()</code></h2>
+        <pre class="medio"><code class="language-php" data-trim data-line-numbers="|3|4-7">
+function exigirRol(string $rol): array
+{
+    $usuario = exigirLogin();
+    if ($usuario['rol'] !== $rol) {
+        http_response_code(403);
+        exit('No tienes permiso para ver esta página.');
+    }
+    return $usuario;
+}
+        </code></pre>
+        <p class="small-text muted">Primero, que haya usuario; después, su rol. <code>exit()</code> admite un texto, que se envía antes de terminar.</p>
+      </section>
+
+      <!-- 6 · No te fíes del formulario -->
+      <section>
+        <h2>El alumno sale de la <strong>sesión</strong></h2>
+        <p class="small-text">Con F12, cualquiera añadiría al formulario un campo <code>alumno</code> con otro nombre:</p>
+        <pre class="ancho"><code class="language-php" data-trim>
+$datos = [
+    'alumno' =&gt; $usuario['firstName'] . ' ' . $usuario['lastName'],   // de la sesión
+    'ciclo'  =&gt; $_POST['ciclo'] ?? '',                                 // del formulario
+    'video'  =&gt; $_POST['video'] ?? '',                                 // del formulario
+];
+        </code></pre>
+        <p class="small-text fragment">Lo que identifica al usuario, o decide qué datos son "suyos", <strong>nunca</strong> sale del cliente.</p>
+      </section>
+
+      <!-- 7 · Ocultar no es proteger -->
+      <section>
+        <h2>Ocultar no es proteger</h2>
+        <p class="small-text">En el perfil, el enlace "Mi currículo" solo lo ven los alumnos:</p>
+        <pre class="medio"><code class="language-php" data-trim>
+&lt;?php if ($usuario['rol'] === 'alumno'): ?&gt;
+  &lt;p&gt;&lt;a href="RA4_miCurriculo.php"&gt;Mi currículo&lt;/a&gt;&lt;/p&gt;
+&lt;?php endif; ?&gt;
+        </code></pre>
+        <p class="small-text fragment">Es <strong>comodidad</strong>, no seguridad: quien escriba la dirección a mano llega igual. Lo que protege la página es <code>exigirRol()</code>.</p>
+      </section>
+
+      <!-- 8 · Y si cierro la sesión -->
+      <section>
+        <h2>¿Y si cierro la sesión?</h2>
+        <p class="statement" style="font-size:1.2em">El currículo <strong>desaparece</strong></p>
+        <p class="small-text fragment" style="margin-top:1em">El <em>logout</em> destruye la sesión; al volver a entrar, <code>session_regenerate_id()</code> da un identificador nuevo y vacío.</p>
+        <p class="small-text fragment">Y Elena, la docente, nunca podría ver los currículos de sus alumnos: cada sesión es de un navegador.</p>
+      </section>
+
+      <!-- 9 · La sesión no es un almacén -->
+      <section>
+        <h2>La conclusión del bloque</h2>
+        <p class="small-text">La sesión sirve para <strong>recordar a un usuario mientras navega</strong>…</p>
+        <p class="statement fragment" style="font-size:1.1em">…pero <strong>no es un almacén de datos</strong></p>
+        <p class="small-text fragment" style="margin-top:1em">Para que sobreviva al cierre de sesión y otros usuarios puedan consultarlo: un sitio compartido y permanente, la <strong>base de datos</strong> (Bloque 6).</p>
+      </section>
+
+      <!-- 10 · Entorno -->
+      <section>
+        <h2>Seguimos en <code>vanilla_php</code></h2>
+        <p class="small-text">Con todo lo de 4.1 y 4.2. Ficheros nuevos o modificados:</p>
+        <pre class="ancho"><code class="language-plaintext" data-trim>
+vanilla_php/
+├── public/
+│   ├── RA4_miCurriculo.php   ← el área privada del alumno (nuevo)
+│   └── RA4_perfil.php        ← + enlace a "Mi currículo"
+└── src/
+    └── RA4_comun.php         ← + exigirRol()
+        </code></pre>
+      </section>
+
+      <!-- 11 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/2)</h2>
+        <ol class="pasos compacta">
+          <li><strong><code>exigirRol()</code>.</strong> Al final de <code>src/RA4_comun.php</code>.</li>
+          <li><strong>"Mi currículo".</strong> <code>public/RA4_miCurriculo.php</code>: solo alumnos; alta y edición en la misma página; el nombre, de la sesión.</li>
+          <li><strong>Un enlace desde el perfil</strong>, solo para alumnos.</li>
+        </ol>
+      </section>
+
+      <!-- 12 · Ejercicios 4-5 -->
+      <section>
+        <h2>Ejercicios (2/2)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong>Pruébalo.</strong> Como Ana: alta, F5 y edición; añade con F12 un campo <code>alumno</code> con otro nombre; cierra sesión y vuelve. Como Elena: la dirección a mano, ¿qué código ves en <strong>Red</strong>?</li>
+          <li><strong>Investiga.</strong> ¿401 o 403? ¿Dónde tendrían que guardarse los currículos para que Elena los viera, y qué dato haría falta junto a cada uno? (Pista: <code>user_id</code>.)</li>
+        </ol>
+      </section>
+
+      <!-- 13 · v0 terminada -->
+      <section>
+        <h2><em>marcapersonalFP v0</em>, terminada</h2>
+        <ul class="small-text">
+          <li class="fragment">Un <strong>listado</strong> (2.5)</li>
+          <li class="fragment">Un <strong>alta</strong> validada (3.8)</li>
+          <li class="fragment"><strong>Estado</strong> entre peticiones (4.1)</li>
+          <li class="fragment"><strong>Usuarios</strong>, con <em>login</em> y roles (4.2)</li>
+          <li class="fragment">Un <strong>área privada</strong> (4.4)</li>
+        </ul>
+        <p class="small-text muted fragment" style="margin-top:1em">En el Bloque 5, la reconstruimos con <em>Laravel</em>.</p>
+      </section>
+
+      <!-- 14 · De v0 a Laravel -->
+      <section>
+        <h2>De <em>v0</em> a <em>Laravel</em>: el Bloque 4 (1)</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>session_start()</code></th><td>Lo hace el framework (<code>config/session.php</code>)</td></tr>
+            <tr class="fragment"><th><em>Flash</em> + <code>unset()</code></th><td><code>redirect()-&gt;with('mensaje', …)</code></td></tr>
+            <tr class="fragment"><th><code>password_hash()</code></th><td><code>Hash::make()</code></td></tr>
+            <tr class="fragment"><th><code>Autenticador</code></th><td><code>Auth::attempt([...])</code> (Bloque 5, <em>Breeze</em>)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 14b · De v0 a Laravel (2) -->
+      <section>
+        <h2>De <em>v0</em> a <em>Laravel</em>: el Bloque 4 (2)</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>exigirLogin()</code></th><td><em>Middleware</em> <code>auth</code></td></tr>
+            <tr class="fragment"><th><code>exigirRol()</code> + 403</th><td><em>Gates</em>, <em>Policies</em>, <code>abort(403)</code> (Bloque 7)</td></tr>
+            <tr class="fragment"><th><code>$_SESSION['curriculo']</code></th><td>Tabla <code>curriculos</code>, con <code>user_id</code> (Bloque 6)</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+      </section>
+
+      <!-- 15 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA4_4_ProyectoAreaPrivadaTest.php</code> a <code>vanilla_php/tests/</code></li>
+          <li>Desde la carpeta <code>laradock/</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec --workdir /var/www/vanilla_php workspace \
+  vendor/bin/phpunit tests/RA4_4_ProyectoAreaPrivadaTest.php
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 y 2</strong>, entrando como Ana y como Elena (usuarios de 4.2).</p>
+        <p class="small-text">Si todo está bien: <code class="nw">OK (8 tests, 18 assertions)</code></p>
+      </section>
+
+      <!-- 16 · Todos los tests del bloque -->
+      <section>
+        <h2>Todos los tests del Bloque 4</h2>
+        <p class="small-text">Con los cuatro tests copiados, para lanzar <strong>solo</strong> los del Bloque 4:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec --workdir /var/www/vanilla_php workspace \
+  vendor/bin/phpunit --filter RA4_
+        </code></pre>
+        <p class="small-text">Si todo el Bloque 4 está resuelto: <code class="nw">OK (30 tests, 68 assertions)</code></p>
+        <p class="small-text muted fragment"><code>phpunit</code> sin opciones lanza los de los Bloques 2, 3 y 4 juntos.</p>
+      </section>
+
+      <!-- 17 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>Bloque 5 · Generación dinámica de páginas web: introducción a <em>Laravel</em> (RA5)</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>
