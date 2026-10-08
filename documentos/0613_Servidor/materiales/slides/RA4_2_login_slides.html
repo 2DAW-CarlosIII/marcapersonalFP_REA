@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>4.2. Autenticación de usuarios: login básico · marcapersonalFP v0</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 4 · RA4</p>
+        <h1 class="titulo">4.2. Autenticación de usuarios:<br><em>login</em> básico</h1>
+        <p class="muted">La aplicación aprende <strong>quién</strong> la usa</p>
+        <p class="small-text muted"><em>marcapersonalFP</em> v0, todavía en PHP plano</p>
+        <aside class="notes">
+          Seguimos con vanilla_php y el código común de 4.1 (src/RA4_comun.php).
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · De recordar a saber quién -->
+      <section>
+        <h2>De recordar a saber <strong>quién</strong></h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>4.1</h3>
+            <p class="small-text">La aplicación <strong>recuerda</strong> a un navegador entre peticiones.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>4.2</h3>
+            <p class="small-text">Sabe <strong>quién</strong> está detrás: un formulario de <em>login</em> y una sesión que lo recuerda.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:1em">Sin <em>login</em>, cualquiera da de alta un currículo a nombre de cualquiera.</p>
+      </section>
+
+      <!-- 3 · Identificar, autenticar, autorizar -->
+      <section>
+        <h2>Tres ideas distintas</h2>
+        <ul class="small-text">
+          <li class="fragment"><strong>Identificación</strong>: el usuario dice <strong>quién es</strong> (escribe su email).</li>
+          <li class="fragment"><strong>Autenticación</strong>: <strong>lo demuestra</strong>, con algo que solo él debería tener (su contraseña).</li>
+          <li class="fragment"><strong>Autorización</strong>: la aplicación decide <strong>qué puede hacer</strong> (un docente ve todos los currículos; un alumno, el suyo).</li>
+        </ul>
+        <p class="small-text muted fragment" style="margin-top:1em">Aquí, las dos primeras. La autorización, con los <strong>roles</strong>: en 4.4 y en el Bloque 7.</p>
+      </section>
+
+      <!-- 4 · Mecanismos -->
+      <section>
+        <h2>Mecanismos de autenticación</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th>Formulario + sesión</th><td>Aquí, a mano; con <em>Breeze</em> en el Bloque 5</td></tr>
+            <tr class="fragment"><th>HTTP <em>Basic</em></th><td>Credenciales en <strong>cada</strong> petición; sin <em>logout</em> ni página propia</td></tr>
+            <tr class="fragment"><th><em>Tokens</em></th><td>Lo habitual en las API: Bloque 7 (<em>Sanctum</em>)</td></tr>
+            <tr class="fragment"><th>Proveedor externo</th><td>"Iniciar sesión con Google" (<em>OAuth 2</em>, <em>OpenID Connect</em>)</td></tr>
+            <tr class="fragment"><th>Segundo factor</th><td>Código del móvil (2FA); <em>passkeys</em></td></tr>
+          </tbody>
+        </table>
+        <aside class="notes">
+          Todos acaban igual: en cada petición, la aplicación tiene que saber qué usuario la hace. Con formulario + sesión, ese dato vive en $_SESSION.
+        </aside>
+      </section>
+
+      <!-- 5 · Nunca la contraseña -->
+      <section>
+        <h2>Las contraseñas no se guardan</h2>
+        <p class="statement" style="font-size:1.2em">Se guarda su <strong><em>hash</em></strong></p>
+        <p class="small-text fragment" style="margin-top:1em">Una función que <strong>no se puede invertir</strong>. Para comprobar, se rehace el cálculo con la contraseña recibida y se compara.</p>
+        <p class="small-text muted fragment">Si alguien roba los usuarios, no tiene las contraseñas, que mucha gente repite en otras cuentas.</p>
+      </section>
+
+      <!-- 6 · password_hash / password_verify -->
+      <section>
+        <h2><code>password_hash()</code> y <code>password_verify()</code></h2>
+        <pre class="medio"><code class="language-php" data-trim>
+&lt;?php
+$hash = password_hash('ana-secreta', PASSWORD_DEFAULT);
+// $2y$12$Wq3... (60 caracteres, distinto cada vez)
+
+password_verify('ana-secreta', $hash);   // true
+password_verify('otra-cosa', $hash);     // false
+?&gt;
+        </code></pre>
+      </section>
+
+      <!-- 7 · Sal y lentitud -->
+      <section>
+        <h2>Sal y lentitud, a propósito</h2>
+        <ul class="small-text">
+          <li class="fragment">Algoritmo pensado para contraseñas (<em>bcrypt</em>), <strong>lento a propósito</strong>: probar millones cuesta.</li>
+          <li class="fragment">Una <strong>sal</strong> aleatoria, guardada dentro del propio <em>hash</em>: dos ejecuciones, dos <em>hashes</em> distintos.</li>
+          <li class="fragment"><code>password_verify()</code> extrae la sal, rehace el cálculo y compara.</li>
+        </ul>
+        <p class="small-text fragment" style="margin-top:1em"><code>md5()</code> o <code>sha1()</code> <strong>no sirven</strong>: rapidísimas y sin sal.</p>
+      </section>
+
+      <!-- 8 · Comillas -->
+      <section>
+        <h2>Cuidado con las comillas</h2>
+        <p class="small-text">Un <em>hash</em> empieza por <code>$2y$</code>. Entre comillas <strong>dobles</strong>, PHP lo toma por variables:</p>
+        <pre class="medio"><code class="language-php" data-trim>
+'password' =&gt; "$2y$12$Wq3...",   // ✗ PHP intenta sustituir $2y...
+'password' =&gt; '$2y$12$Wq3...',   // ✓ comillas simples
+        </code></pre>
+        <p class="small-text muted fragment">Los <em>hashes</em>, siempre entre comillas <strong>simples</strong>.</p>
+      </section>
+
+      <!-- 9 · Usuarios de v0 -->
+      <section>
+        <h2>Los usuarios de <em>v0</em></h2>
+        <p class="small-text">Un array en <code>src/RA4_comun.php</code>, indexado por email, con los campos de <code>User</code>, un <strong>rol</strong> y el <em>hash</em>:</p>
+        <ul class="small-text">
+          <li><strong>Ana López</strong>, <code>alumno</code>: <code>ana.lopez@marcapersonalfp.test</code> / <code>ana-secreta</code></li>
+          <li><strong>Elena Ruiz</strong>, <code>docente</code>: <code>elena.ruiz@marcapersonalfp.test</code> / <code>docente-secreta</code></li>
+        </ul>
+        <p class="small-text muted fragment" style="margin-top:0.8em">En el código, solo el <em>hash</em>. Contraseñas de prueba: en una aplicación real, largas y difíciles de adivinar.</p>
+      </section>
+
+      <!-- 10 · Autenticador -->
+      <section>
+        <h2>La clase <code>Autenticador</code></h2>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="|3-5|9-11|13-14">
+class Autenticador
+{
+    public function __construct(
+        private readonly array $usuarios,
+    ) {
+    }
+
+    public function autenticar(string $email, string $password): ?array
+    {
+        $usuario = $this-&gt;usuarios[$email] ?? null;
+        if ($usuario === null || !password_verify($password, $usuario['password'])) {
+            return null;
+        }
+        return [ /* email, firstName, lastName, rol: sin el hash */ ];
+    }
+}
+        </code></pre>
+        <p class="small-text muted">El mismo patrón que <code>ValidadorCurriculo</code> (3.8).</p>
+      </section>
+
+      <!-- 11 · El login paso a paso -->
+      <section>
+        <h2>El <em>login</em>, paso a paso</h2>
+        <ol class="pasos">
+          <li class="fragment"><strong>Regenera</strong> el identificador: <code>session_regenerate_id(true)</code></li>
+          <li class="fragment">Guarda el usuario en <code>$_SESSION['usuario']</code></li>
+          <li class="fragment">Mensaje <em>flash</em> y <strong>303</strong> al área del usuario, como en 4.1</li>
+        </ol>
+      </section>
+
+      <!-- 12 · Fijación de sesión -->
+      <section>
+        <h2>¿Por qué regenerar? Fijación de sesión</h2>
+        <p class="small-text">Un atacante consigue que tu navegador use un <code>PHPSESSID</code> que <strong>él conoce</strong> (un enlace preparado; PHP acepta por defecto identificadores del cliente).</p>
+        <p class="small-text fragment">Si al hacer <em>login</em> no cambia, el atacante <strong>ya está dentro</strong> de tu sesión autenticada.</p>
+        <p class="small-text fragment">Con <code>session_regenerate_id(true)</code>: identificador nuevo, y el antiguo se <strong>borra</strong> (el <code>true</code>).</p>
+      </section>
+
+      <!-- 13 · Mismo mensaje -->
+      <section>
+        <h2>Si las credenciales fallan</h2>
+        <ul class="small-text">
+          <li class="fragment">El <strong>mismo mensaje</strong> si falla el email o la contraseña: <em>Email o contraseña incorrectos.</em> Así no se revela qué emails tienen cuenta.</li>
+          <li class="fragment">El formulario conserva el <strong>email</strong>, nunca la contraseña.</li>
+        </ul>
+      </section>
+
+      <!-- 14 · Páginas privadas -->
+      <section>
+        <h2>Páginas privadas: <code>exigirLogin()</code></h2>
+        <pre class="medio"><code class="language-php" data-trim>
+function exigirLogin(): array
+{
+    $usuario = usuarioActual();   // $_SESSION['usuario'] ?? null
+    if ($usuario === null) {
+        header('Location: RA4_login.php');   // 302
+        exit;
+    }
+    return $usuario;
+}
+        </code></pre>
+        <p class="small-text muted">Y <code>iniciarSesion()</code>: el <code>session_start([...])</code> de 4.1, en una función.</p>
+      </section>
+
+      <!-- 15 · Logout -->
+      <section>
+        <h2>Cerrar la sesión</h2>
+        <ol class="pasos compacta">
+          <li class="fragment">Vaciar <code>$_SESSION</code></li>
+          <li class="fragment">Borrar la cookie <code>PHPSESSID</code>: <code>setcookie()</code> con fecha ya pasada y la misma ruta</li>
+          <li class="fragment">Destruir la sesión en el servidor: <code>session_destroy()</code></li>
+        </ol>
+        <p class="small-text fragment" style="margin-top:0.8em">Con un formulario <strong>POST</strong>, no con un enlace: un GET lo dispararía cualquier página ajena (una imagen basta), y <code>SameSite=Lax</code> no protege los GET.</p>
+      </section>
+
+      <!-- 16 · Entorno -->
+      <section>
+        <h2>Seguimos en <code>vanilla_php</code></h2>
+        <p class="small-text">Con el código común de 4.1. Ficheros nuevos o modificados:</p>
+        <pre class="ancho"><code class="language-plaintext" data-trim>
+vanilla_php/
+├── public/
+│   ├── RA4_login.php      ← formulario de login (nuevo)
+│   ├── RA4_perfil.php     ← área del usuario, privada (nuevo)
+│   └── RA4_logout.php     ← cierre de sesión (nuevo)
+└── src/
+    ├── Autenticador.php   ← comprueba las credenciales (nuevo)
+    └── RA4_comun.php      ← + usuarios, iniciarSesion(), exigirLogin()
+        </code></pre>
+      </section>
+
+      <!-- 17 · Ejercicios 1-2 -->
+      <section>
+        <h2>Ejercicios (1/3)</h2>
+        <ol class="pasos compacta">
+          <li><strong>La clase <code>Autenticador</code>.</strong> <code>src/Autenticador.php</code>, con <code>autenticar()</code>.</li>
+          <li><strong>Usuarios y funciones comunes.</strong> Genera los <em>hashes</em> (ejecútalo dos veces y compara):</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec workspace \
+  php -r "echo password_hash('ana-secreta', PASSWORD_DEFAULT), PHP_EOL;"
+        </code></pre>
+        <p class="small-text">y añade a <code>src/RA4_comun.php</code> <code>usuarios()</code>, <code>iniciarSesion()</code>, <code>usuarioActual()</code> y <code>exigirLogin()</code>.</p>
+      </section>
+
+      <!-- 18 · Ejercicios 3-5 -->
+      <section>
+        <h2>Ejercicios (2/3)</h2>
+        <ol class="pasos compacta" start="3">
+          <li><strong>El <em>login</em>.</strong> <code>public/RA4_login.php</code>: <code>Autenticador</code>, <code>session_regenerate_id(true)</code> y 303 al perfil.</li>
+          <li><strong>El área del usuario.</strong> <code>public/RA4_perfil.php</code>, privada: nombre, email, rol y botón de cierre.</li>
+          <li><strong>El <em>logout</em>.</strong> <code>public/RA4_logout.php</code>: solo con POST; vaciar, borrar la cookie, destruir y 303 al <em>login</em>.</li>
+        </ol>
+      </section>
+
+      <!-- 19 · Ejercicios 6-7 -->
+      <section>
+        <h2>Ejercicios (3/3)</h2>
+        <ol class="pasos compacta" start="6">
+          <li><strong>Pruébalo con F12.</strong> El perfil sin sesión; contraseña mala y email inexistente; <code>PHPSESSID</code> antes y después de entrar; volver al <em>login</em> ya dentro; <strong>Atrás</strong> tras cerrar sesión, y F5; entrar como Elena Ruiz.</li>
+          <li><strong>Investiga.</strong> "Recordarme": ¿por qué no guardar email y contraseña en una cookie? ¿Cómo se hace de forma segura?</li>
+        </ol>
+      </section>
+
+      <!-- 20 · Puente al Bloque 5 -->
+      <section>
+        <h2>Puente al Bloque 5</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>password_hash()</code><br><code>password_verify()</code></th><td><code>Hash::make()</code><br><code>Hash::check()</code></td></tr>
+            <tr class="fragment"><th><code>Autenticador</code> +<br><code>session_regenerate_id()</code></th><td><code>Auth::attempt([...])</code></td></tr>
+            <tr class="fragment"><th><code>usuarioActual()</code></th><td><code>Auth::user()</code></td></tr>
+            <tr class="fragment"><th><code>exigirLogin()</code></th><td><em>Middleware</em> <code>auth</code></td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:1em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+        <aside class="notes">
+          Y Breeze añade las páginas: login, registro, recuperación de contraseña y "Recordarme".
+        </aside>
+      </section>
+
+      <!-- 21 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA4_2_LoginTest.php</code> a <code>vanilla_php/tests/</code></li>
+          <li>Desde la carpeta <code>laradock/</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec --workdir /var/www/vanilla_php workspace \
+  vendor/bin/phpunit tests/RA4_2_LoginTest.php
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 a 5</strong>. Entra como Ana López (<code>ana-secreta</code>): tus <em>hashes</em> deben corresponder a la tabla.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">OK (9 tests, 22 assertions)</code></p>
+      </section>
+
+      <!-- 22 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>4.3. Depuración con Xdebug</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>
