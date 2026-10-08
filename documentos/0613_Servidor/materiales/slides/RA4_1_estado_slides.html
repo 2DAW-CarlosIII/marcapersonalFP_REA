@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>4.1. Mantenimiento del estado: cookies y sesiones · marcapersonalFP v0</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 4 · RA4</p>
+        <h1 class="titulo">4.1. Mantenimiento del estado:<br><em>cookies</em> y sesiones</h1>
+        <p class="muted">La aplicación aprende a <strong>recordar</strong></p>
+        <p class="small-text muted"><em>marcapersonalFP</em> v0, todavía en PHP plano</p>
+        <aside class="notes">
+          Primer apartado del Bloque 4. Retomamos el alta de 3.8 y el listado de 2.5 y les damos memoria entre peticiones.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · El Bloque 4 -->
+      <section>
+        <h2>Bloque 4: cerramos la <em>v0</em></h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>Al terminar el Bloque 3</h3>
+            <p class="small-text">Un listado y un alta que <strong>lo olvidan todo</strong> al acabar cada petición.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En el Bloque 4</h3>
+            <p class="small-text">La aplicación aprende a <strong>recordar</strong> (<em>cookies</em> y sesiones) y a saber <strong>quién la usa</strong>; y nosotros, a <strong>depurarla</strong> con Xdebug.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:1em">En el Bloque 5 lo reconstruiremos con <em>Laravel</em>: el framework automatiza lo que aquí hacemos a mano.</p>
+        <aside class="notes">
+          Recuadro de contexto del bloque. Hilo conductor: marcapersonalFP v0 en PHP plano (Bloques 2-4) y reconstrucción con Laravel (Bloque 5+).
+          El bloque termina con un área privada de v0.
+        </aside>
+      </section>
+
+      <!-- 3 · Por qué lo olvida todo -->
+      <section>
+        <h2>¿Por qué lo olvida todo?</h2>
+        <p class="small-text">Cada petición ejecuta el script <strong>desde cero</strong> (2.4): variables, arrays y objetos desaparecen al enviar la respuesta.</p>
+        <p class="statement fragment" style="font-size:1.2em">HTTP <strong>no tiene estado</strong></p>
+        <p class="small-text muted fragment">Cada petición llega sin relación con las anteriores: nada indica qué peticiones vienen del mismo navegador.</p>
+        <aside class="notes">
+          Por eso el alta de 3.8 no podía guardar nada. Con dos alumnos usando la aplicación a la vez, sus peticiones se mezclan en el servidor.
+        </aside>
+      </section>
+
+      <!-- 4 · Dos mecanismos -->
+      <section>
+        <h2>Dos mecanismos para recordar</h2>
+        <div class="cols">
+          <div class="panel client">
+            <h3><em>Cookies</em></h3>
+            <p class="small-text">La información se guarda <strong>en el navegador</strong>, que la devuelve en cada petición.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>Sesiones</h3>
+            <p class="small-text">La información se guarda <strong>en el servidor</strong>; el navegador solo guarda un identificador.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:1em">En la práctica se usan <strong>juntos</strong>: la sesión se apoya en una cookie.</p>
+      </section>
+
+      <!-- 5 · El intercambio de cookies -->
+      <section>
+        <h2>Una <em>cookie</em>, en las cabeceras</h2>
+        <ol class="pasos">
+          <li class="fragment">En una <strong>respuesta</strong>, el servidor envía <code>Set-Cookie: ultimo_ciclo=DAW</code></li>
+          <li class="fragment">En cada <strong>petición</strong> siguiente a ese sitio, el navegador envía <code>Cookie: ultimo_ciclo=DAW</code></li>
+        </ol>
+        <p class="small-text muted fragment" style="margin-top:1em">Un par nombre-valor que el servidor pide al navegador que guarde.</p>
+      </section>
+
+      <!-- 6 · setcookie y $_COOKIE -->
+      <section>
+        <h2><code>setcookie()</code> y <code>$_COOKIE</code></h2>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="|2-7|9-10">
+&lt;?php
+// Guardar: el navegador la conservará 30 días.
+setcookie('ultimo_ciclo', 'DAW', [
+    'expires'  =&gt; time() + 60 * 60 * 24 * 30,
+    'httponly' =&gt; true,
+    'samesite' =&gt; 'Lax',
+]);
+
+// Leer: llega en las peticiones SIGUIENTES.
+$ciclo = $_COOKIE['ultimo_ciclo'] ?? '';
+?&gt;
+        </code></pre>
+      </section>
+
+      <!-- 7 · Tres detalles -->
+      <section>
+        <h2>Tres detalles</h2>
+        <ul class="small-text">
+          <li class="fragment"><code>$_COOKIE</code> refleja la <strong>petición</strong>: lo que acabas de crear con <code>setcookie()</code> no está ahí hasta la siguiente.</li>
+          <li class="fragment">Con <code>expires</code>, cookie <strong>persistente</strong>; sin él, <strong>de sesión</strong>: se borra al cerrar el navegador.</li>
+          <li class="fragment">El valor <strong>viene del cliente</strong>: se ve y se cambia con F12. Es un dato de entrada más, como <code>$_POST</code>.</li>
+        </ul>
+      </section>
+
+      <!-- 8 · Cabeceras antes que el cuerpo -->
+      <section>
+        <h2>Las cabeceras, antes que el cuerpo</h2>
+        <p class="small-text"><code>setcookie()</code>, <code>header()</code> y <code>session_start()</code> añaden <strong>cabeceras</strong>, que viajan <strong>antes</strong> que el HTML.</p>
+        <p class="small-text fragment">Con la primera salida (un <code>echo</code>, HTML, una línea en blanco antes de <code>&lt;?php</code>) se envían las cabeceras, y ya no se pueden añadir más:</p>
+        <pre class="compacto fragment"><code class="language-plaintext" data-trim>
+Cannot modify header information - headers already sent
+        </code></pre>
+        <p class="small-text muted fragment">Por eso: primero la lógica en PHP, después la página (como en 3.6 y 3.8).</p>
+      </section>
+
+      <!-- 9 · Sesiones -->
+      <section>
+        <h2>Sesiones: el servidor recuerda</h2>
+        <pre class="medio"><code class="language-php" data-trim>
+&lt;?php
+session_start();
+
+$_SESSION['visitas'] = ($_SESSION['visitas'] ?? 0) + 1;
+?&gt;
+&lt;p&gt;Has visitado esta página &lt;?= $_SESSION['visitas'] ?&gt; veces.&lt;/p&gt;
+        </code></pre>
+        <p class="small-text muted">Para lo que no debe ver ni cambiar el usuario, o no cabe en una cookie.</p>
+      </section>
+
+      <!-- 10 · Qué hace session_start -->
+      <section>
+        <h2>¿Qué hace <code>session_start()</code>?</h2>
+        <ol class="pasos compacta">
+          <li class="fragment">Busca la cookie <code>PHPSESSID</code>. Si no llega, sesión <strong>nueva</strong>: identificador aleatorio y <code>Set-Cookie: PHPSESSID=…</code>. Si llega, <strong>carga</strong> sus datos.</li>
+          <li class="fragment">Durante el script, <code>$_SESSION</code> es un <strong>array normal</strong>.</li>
+          <li class="fragment">Al terminar, PHP <strong>guarda</strong> <code>$_SESSION</code> en el servidor hasta la siguiente petición con ese identificador.</li>
+        </ol>
+        <p class="small-text muted fragment">Cada navegador, su sesión: una ventana privada empieza vacía.</p>
+      </section>
+
+      <!-- 11 · Datos, no objetos -->
+      <section>
+        <h2>En la sesión: datos, no objetos</h2>
+        <p class="small-text">Para guardar <code>$_SESSION</code>, PHP la <strong>serializa</strong> (la convierte en texto).</p>
+        <p class="small-text fragment">Un objeto también se puede guardar, pero su clase tiene que estar cargada <strong>antes</strong> de <code>session_start()</code> para reconstruirlo.</p>
+        <p class="small-text fragment">Guardaremos los <strong>datos</strong> de cada currículo; el listado volverá a construir los objetos.</p>
+        <p class="small-text muted fragment">La misma idea que con la base de datos: se guardan filas, la aplicación las convierte en objetos.</p>
+      </section>
+
+      <!-- 12 · Cookie o sesión -->
+      <section>
+        <h2>¿<em>Cookie</em> o sesión?</h2>
+        <table>
+          <thead>
+            <tr><th></th><th><em>Cookie</em></th><th>Sesión</th></tr>
+          </thead>
+          <tbody>
+            <tr class="fragment"><th>Dónde</th><td>Navegador</td><td>Servidor (+ <code>PHPSESSID</code>)</td></tr>
+            <tr class="fragment"><th>¿La cambia el usuario?</th><td>Sí</td><td>No</td></tr>
+            <tr class="fragment"><th>Tamaño</th><td>~4 KB por cookie</td><td>Lo que necesites</td></tr>
+            <tr class="fragment"><th>Duración</th><td><code>expires</code> o cierre</td><td>Inactividad o destrucción</td></tr>
+            <tr class="fragment"><th>Ejemplos</th><td>Idioma, último ciclo</td><td>Altas, usuario, mensajes</td></tr>
+          </tbody>
+        </table>
+        <aside class="notes">
+          Además, las cookies viajan en cada petición, también en la de cada imagen y hoja de estilos: cuantas más y más grandes, más tráfico.
+        </aside>
+      </section>
+
+      <!-- 13 · Proteger la cookie de sesión -->
+      <section>
+        <h2>Proteger la cookie de sesión</h2>
+        <p class="small-text">Quien conozca tu <code>PHPSESSID</code> puede <strong>suplantar tu sesión</strong>.</p>
+        <ul class="small-text">
+          <li class="fragment"><strong><code>HttpOnly</code></strong>: el JavaScript no la lee; un XSS (3.6) no podría robarla.</li>
+          <li class="fragment"><strong><code>SameSite=Lax</code></strong>: no viaja en POST desde <strong>otro sitio</strong>; dificulta el <strong>CSRF</strong>.</li>
+        </ul>
+        <pre class="compacto fragment"><code class="language-php" data-trim>
+session_start([
+    'cookie_httponly' =&gt; true,
+    'cookie_samesite' =&gt; 'Lax',
+]);
+        </code></pre>
+        <p class="small-text muted fragment"><code>Secure</code> (solo HTTPS): siempre en producción; aquí trabajamos con HTTP.</p>
+      </section>
+
+      <!-- 14 · POST/Redirect/GET -->
+      <section>
+        <h2>Por fin: POST/Redirect/GET</h2>
+        <p class="small-text">En 3.6 nos faltaba recordar un mensaje entre dos peticiones. Con la sesión:</p>
+        <pre class="medio"><code class="language-php" data-trim>
+$_SESSION['mensaje'] = 'Currículo dado de alta: Ana López (DAW)';
+header('Location: RA4_curriculos.php', true, 303);
+exit;
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment"><strong>303 <em>See Other</em></strong>: el navegador pide la otra página <strong>con GET</strong>.</li>
+          <li class="fragment"><code>exit</code>: tras redirigir, no tiene sentido generar HTML.</li>
+        </ul>
+      </section>
+
+      <!-- 15 · Mensaje flash -->
+      <section>
+        <h2>Mensaje <em>flash</em></h2>
+        <p class="small-text">En la página de destino, el mensaje se lee y <strong>se borra</strong>:</p>
+        <pre class="medio"><code class="language-php" data-trim>
+$mensaje = $_SESSION['mensaje'] ?? null;
+unset($_SESSION['mensaje']);
+        </code></pre>
+        <p class="small-text muted fragment">Se muestra una sola vez: al pulsar F5 en el listado, ni reaparece el mensaje ni se reenvía el formulario.</p>
+      </section>
+
+      <!-- 16 · El alta de v0, con memoria -->
+      <section>
+        <h2>El alta de <em>v0</em>, ahora con memoria</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3><code>RA4_altaCurriculo.php</code></h3>
+            <p class="small-text">El formulario de 3.8. Si es válido: a <code>$_SESSION['curriculos']</code>, mensaje <em>flash</em>, cookie <code>ultimo_ciclo</code> y 303 al listado.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3><code>RA4_curriculos.php</code></h3>
+            <p class="small-text">El listado de 2.5, con los currículos <strong>de esta sesión</strong> y el mensaje <em>flash</em>.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:1em">Catálogo común en <code>src/RA4_comun.php</code>. El id de cada currículo: su posición en la lista + 1.</p>
+      </section>
+
+      <!-- 17 · Entorno -->
+      <section>
+        <h2>Seguimos en <code>vanilla_php</code></h2>
+        <p class="small-text">Mismo proyecto, con las clases de 3.5 y 3.8. Al terminar:</p>
+        <pre class="ancho"><code class="language-plaintext" data-trim>
+vanilla_php/
+├── public/
+│   ├── RA4_altaCurriculo.php   ← el alta, con sesión y cookie (nuevo)
+│   └── RA4_curriculos.php      ← el listado de la sesión (nuevo)
+└── src/
+    ├── Modelo.php, Publicable.php, Ciclo.php, Curriculo.php   (3.5)
+    ├── RA3_formularios.php, ValidadorCurriculo.php           (3.6, 3.8)
+    └── RA4_comun.php           ← catálogo y código común (nuevo)
+        </code></pre>
+      </section>
+
+      <!-- 18 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/2)</h2>
+        <ol class="pasos compacta">
+          <li><strong>El código común.</strong> <code>src/RA4_comun.php</code>: <code>NOMBRE_CENTRO</code>, <code>require_once</code> y <code>catalogoCiclos()</code>.</li>
+          <li><strong>El alta.</strong> <code>public/RA4_altaCurriculo.php</code>: sesión, cookie <code>ultimo_ciclo</code> y redirección 303.</li>
+          <li><strong>El listado.</strong> <code>public/RA4_curriculos.php</code>: currículos de la sesión y mensaje <em>flash</em>.</li>
+        </ol>
+      </section>
+
+      <!-- 19 · Ejercicios 4-5 -->
+      <section>
+        <h2>Ejercicios (2/2)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong>Pruébalo con F12.</strong> La respuesta 303 y sus cabeceras; F5 en el listado; las dos cookies (¿cuál caduca?); una ventana privada; borrar <code>PHPSESSID</code>; cambiar <code>ultimo_ciclo</code> por <code>FP</code>. Anota lo que observas.</li>
+          <li><strong>Investiga.</strong> <em>Web Storage</em> (<code>localStorage</code>, <code>sessionStorage</code>): ¿lo recibe el servidor? ¿Serviría para guardar el identificador de sesión, sabiendo lo que hace <code>HttpOnly</code>?</li>
+        </ol>
+      </section>
+
+      <!-- 20 · Puente al Bloque 5 -->
+      <section>
+        <h2>Puente al Bloque 5</h2>
+        <table class="sin-salto">
+          <tbody>
+            <tr class="fragment"><th><code>session_start()</code></th><td>Lo hace el framework</td></tr>
+            <tr class="fragment"><th><code>$_SESSION['clave']</code></th><td><code>session('clave')</code></td></tr>
+            <tr class="fragment"><th>Mensaje <em>flash</em> + <code>unset()</code></th><td><code>redirect()-&gt;with('mensaje', …)</code></td></tr>
+            <tr class="fragment"><th>Conservar lo escrito</th><td><code>old('alumno')</code>, vía sesión</td></tr>
+            <tr class="fragment"><th>Cookies editables con F12</th><td>Cookies <strong>cifradas</strong></td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:1em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+      </section>
+
+      <!-- 21 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA4_1_EstadoTest.php</code> a <code>vanilla_php/tests/</code></li>
+          <li>Desde la carpeta <code>laradock/</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose exec --workdir /var/www/vanilla_php workspace \
+  vendor/bin/phpunit tests/RA4_1_EstadoTest.php
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 a 3</strong>, como un navegador: POST, redirección y cookies devueltas. Necesita <code>nginx</code> y <code>php-fpm</code>.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">OK (7 tests, 18 assertions)</code></p>
+      </section>
+
+      <!-- 22 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>4.2. Autenticación de usuarios: <em>login</em> básico</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>

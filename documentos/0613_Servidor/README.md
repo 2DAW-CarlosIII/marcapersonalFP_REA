@@ -59,7 +59,7 @@ Fundamentos de PHP embebido, construyendo una primera versión de *marcapersonal
 
 Cerramos _marcapersonalFP v0_, todavía en PHP plano: mantenimiento del estado, autenticación de usuarios y depuración.
 
-1. 🆕 Mantenimiento del estado: *cookies* y sesiones
+1. [Mantenimiento del estado: *cookies* y sesiones](./RA4_1_estado.md)
 2. 🆕 Autenticación de usuarios: *login* básico
 3. 🆕 Depuración con Xdebug
 4. 🆕 *Proyecto:* área privada de _marcapersonalFP v0_
