@@ -97,7 +97,7 @@ cd laradock && cp .env.example .env && cd ..
 
 Edita el `.env` de la carpeta `laradock`:
 
-- **Versión de PHP:** `PHP_VERSION=8.4` — es la que usa el proyecto Laravel del módulo (Laravel 12 requiere PHP ≥ 8.2; usamos 8.4 para que coincida con el entorno real de desarrollo del código).
+- **Versión de PHP:** `PHP_VERSION=8.4` — es la que usa el proyecto Laravel del módulo (Laravel 13 requiere PHP ≥ 8.3; usamos 8.4 para que coincida con el entorno real de desarrollo del código).
 - **Motor de base de datos de phpMyAdmin:** `PMA_DB_ENGINE=mariadb`
 
 ## 6. Node.js y npm en el contenedor `workspace`

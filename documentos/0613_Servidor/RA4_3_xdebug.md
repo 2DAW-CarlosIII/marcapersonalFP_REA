@@ -56,7 +56,9 @@ Una petición "pide" ser depurada si lleva una variable llamada **`XDEBUG_TRIGGE
     document.cookie = 'XDEBUG_TRIGGER=1; path=/';
     ```
 
-    Y borrarla cuando termines, desde **Aplicación** (Chrome) o **Almacenamiento** (Firefox) → **Cookies**. Las extensiones del navegador del tipo _Xdebug Helper_ hacen esto mismo con un botón.
+    Y borrarla cuando termines, desde **Aplicación** (Chrome) o **Almacenamiento** (Firefox) → **Cookies**.
+
+- **Con una extensión del navegador**, como _Xdebug Helper_ (de _JetBrains_) en Chrome: crea y borra la cookie con un botón. En sus opciones, el **Desencadenador de depuración** admite cualquier valor (por ejemplo, `vsc`); los de rastreo y perfilado no se usan, porque nuestro `xdebug.mode` solo incluye `debug`. Esta extensión no crea `XDEBUG_TRIGGER`, sino **`XDEBUG_SESSION`**, el nombre que usaban las versiones anteriores de Xdebug y que la actual sigue aceptando para la depuración.
 
 ## VS Code: la extensión y `launch.json`
 
@@ -166,7 +168,7 @@ vanilla_php/
     <p>Inicio de la depuración: <?= ini_get('xdebug.start_with_request') ?: '(no definido)' ?></p>
     ```
 
-2. **Prepara VS Code.** Instala _PHP Debug_, abre la carpeta `vanilla_php` y crea `.vscode/launch.json` como en este apartado. Pon un punto de ruptura en la primera línea de `<p>` de `RA4_xdebug.php`, empieza a escuchar (<kbd>F5</kbd>) y pide `http://localhost/RA4_xdebug.php?XDEBUG_TRIGGER=1`. Si VS Code se detiene, todo está listo. Si no, sigue la lista de "Si no se detiene".
+2. **Prepara VS Code.** Comprueba que la extensión _PHP Debug_ está instalada, abre la carpeta `vanilla_php` y crea `.vscode/launch.json` como en este apartado. Pon un punto de ruptura en la primera línea de `<p>` de `RA4_xdebug.php`, empieza a escuchar (<kbd>F5</kbd>) y pide `http://localhost/RA4_xdebug.php?XDEBUG_TRIGGER=1`. Si VS Code se detiene, todo está listo. Si no, sigue la lista de "Si no se detiene".
 
 3. **Un resumen que calcula mal.** Crea `src/RA4_depuracion.php` **exactamente así**, con sus errores:
 
