@@ -296,7 +296,7 @@ Este fichero está montado como volumen (no forma parte de la imagen), así que 
 
 Cada ejercicio de los Bloques 2 a 4 tiene su test correspondiente en [`materiales/ejercicios-vanilla/tests/`](./materiales/ejercicios-vanilla/tests/) — el propio bloque indica, en cada caso, qué fichero copiar a `vanilla_php/tests/` y con qué comando ejecutarlo.
 
-> **¿Y el proyecto _Laravel_?** `vanilla_php/composer.json` y `phpunit.xml` son específicos de la etapa PHP vanilla. En el Bloque 5, el proyecto _Laravel_ de _marcapersonalFP_ se crea en su propia subcarpeta (`marcapersonalfp`) y recibe **su propio sitio** de _nginx_ (`http://marcapersonalfp.test`), así que este `default.conf` sigue sirviendo `vanilla_php` y los dos proyectos conviven. Allí los tests se lanzan con `php artisan test` en lugar de `vendor/bin/phpunit`.
+> **¿Y el proyecto _Laravel_?** `vanilla_php/composer.json` y `phpunit.xml` son específicos de la etapa PHP vanilla. En el Bloque 5, el proyecto _Laravel_ de _marcapersonalFP_ se crea en su propia subcarpeta (`marcapersonalfp`) y recibe **su propio sitio** de _nginx_ (`http://marcapersonalfp.test`, configurado en [5.1](./RA5_1_instalacion.md#paso-5-el-sitio-de-nginx)), así que este `default.conf` sigue sirviendo `vanilla_php` y los dos proyectos conviven. Allí los tests se lanzan con `php artisan test` en lugar de `vendor/bin/phpunit`.
 
 ## 12. Limpiar la MV si se va a exportar
 

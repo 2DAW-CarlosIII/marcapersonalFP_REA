@@ -1,249 +1,242 @@
-# 2.1 Instalación
+# 5.1. Instalación de _Laravel_ y desarrollo colaborativo
 
-Existen diferentes maneras de generar un proyecto Laravel. En las siguientes secciones veremos 2 de esas formas:
-- [Utilizando Composer](#utilizando-composer)
-- [Utilizando Laradock](#utilizando-laradock)
+> **Bloque 5 · Generación dinámica de páginas web: introducción a _Laravel_ (RA5).** _marcapersonalFP v0_ funciona, pero cada página es un script que mezcla HTML, lógica y datos, y todo lo hemos programado a mano: la sesión, el _login_, la validación, el escape de la salida. En este bloque la reconstruimos con _Laravel_, un _framework_ que **separa la lógica de negocio de la presentación** y automatiza buena parte de ese trabajo. Los datos de la aplicación seguirán en arrays hasta el Bloque 6, donde llegarán _MariaDB_ y _Eloquent_. Mientras tanto, _Laravel_ guarda sus propias tablas (sesiones, caché, usuarios) en un fichero _SQLite_.
 
-A lo largo del curso utilizaremos mayoritariamente la que hace uso de Laradock.
+**Presentación de apoyo** (_RevealJS_): [RA5_1_instalacion_slides.html](./materiales/slides/RA5_1_instalacion_slides.html)
 
-En cualquier caso, para almacenar los proyectos de Laravel que vayamos generando, crearemos un directorio `laravel` en el directorio `Documentos`.
+## ¿Qué es un _framework_?
+
+En [§11 de la preparación del entorno](./00_instalacionEntorno.md#11-proyecto-vanilla_php-y-phpunit-bloques-2-a-4) definimos un _framework_ como una capa de librerías y convenciones que automatiza buena parte del trabajo a cambio de que sigas sus reglas. Después de construir _v0_, ya sabemos qué trabajo es ese.
+
+Con _Laravel_:
+
+- **Una sola puerta de entrada.** Todas las peticiones llegan a `public/index.php`, y un fichero de **rutas** decide qué código las atiende. Se acabó un script por página.
+- **Cada cosa en su sitio.** La lógica va en **controladores** y clases de `app/`, y el HTML en **vistas** _Blade_. Es el patrón **MVC** (Modelo-Vista-Controlador), que estudiaremos en 5.8.
+- **Lo repetitivo ya está hecho.** Sesiones, protección contra CSRF, validación, autenticación, escape de la salida.
+
+## El plan de trabajo del bloque
+
+Al cerrar 3.8 y 4.4 anotamos qué automatiza el framework de cada pieza de _v0_. Esas dos tablas son el plan de este bloque:
+
+| En _v0_ (a mano) | En _Laravel_ | Apartado |
+|---|---|---|
+| Un script en `public/` por página | **Rutas** y **controladores** | 5.3, 5.5 |
+| `require_once` de cada fichero de `src/` | **Autoload** de _Composer_ con espacios de nombres | 5.2 |
+| `session_start()` con sus opciones | Lo hace el framework (`config/session.php`) | 5.2 |
+| HTML con `<?php if (): ?>` y `<?= e() ?>` | Plantillas **Blade**: `@if`, `{{ }}` | 5.4 |
+| `ValidadorCurriculo::validar()` | `$request->validate([...])` o un _Form Request_ | 5.6 |
+| `value="<?= e($datos['alumno'] ?? '') ?>"` | `old('alumno')` | 5.6 |
+| `$_SESSION['mensaje']` + `unset()` | `redirect()->with('mensaje', '…')` | 5.6 |
+| `password_hash()` y `Autenticador` | `Hash::make()` y `Auth::attempt()`, con _Breeze_ | 5.7 |
+| `exigirLogin()` | _Middleware_ `auth` | 5.7 |
+| Las clases de `src/` | Clases en `app/` y un **repositorio** | 5.8 |
+
+El resto de filas (los modelos _Eloquent_, `Ciclo::all()`, la tabla `curriculos` y `exigirRol()`) corresponden a los Bloques 6 y 7.
+
+Usamos **_Laravel_ 13**, publicado en marzo de 2026, que requiere PHP 8.3 o superior. Nuestro entorno tiene PHP 8.4 ([§5 de la preparación del entorno](./00_instalacionEntorno.md#5-seleccionar-la-versión-de-php-y-el-motor-de-base-de-datos)).
+
+## Un repositorio por curso
+
+El proyecto _Laravel_ de _marcapersonalFP_ se desarrolla en grupo, sobre un repositorio de _GitHub_ por curso. Intervienen tres copias del código:
+
+| Copia | Dónde | Remoto en tu clon |
+|---|---|---|
+| **Repositorio base** | `github.com/2DAW-CarlosIII/marcapersonalfp2627` | `upstream` |
+| **Tu _fork_** | `github.com/<tu-usuario>/marcapersonalfp2627` | `origin` |
+| **Tu clon local** | `~/Documentos/laravel/marcapersonalfp` | — |
+
+Tú trabajas en el clon local, subes tus ramas a tu _fork_ y, desde allí, propones los cambios al repositorio base con un _pull request_.
+
+![Esquema del flujo: fork, clone, rama, push, pull request y pull](./images/esquemaSolucionEjerciciosGit.svg)
+
+> **Cómo se creó el repositorio base (profesorado).** Una vez por curso, el profesorado genera el esqueleto con _Composer_ y lo sube a la organización. En la máquina virtual no hay PHP instalado, así que _Composer_ se ejecuta en un contenedor de usar y tirar de la imagen `thecodingmachine/php`, que crea los ficheros a nombre del dueño de la carpeta (no de _root_):
+>
+> ```bash
+> cd ~/Documentos/laravel
+> docker run -it --rm -v "$PWD:/usr/src/app" thecodingmachine/php:8.4-v4-slim-cli \
+>     composer create-project laravel/laravel:^13.0 marcapersonalfp
+> ```
+>
+> `create-project` descarga el esqueleto, instala sus dependencias y ejecuta los _scripts_ de `post-create-project-cmd` de `composer.json`: entre ellos, crear el fichero `database/database.sqlite` y ejecutar las migraciones. Con esta imagen, las migraciones fallan con `could not find driver`, porque la variante `slim` no trae el controlador de _SQLite_ de PHP, y el fichero se queda vacío. No importa: la base no se sube al repositorio.
+>
+> La carpeta local se llama `marcapersonalfp`, aunque el repositorio de _GitHub_ lleve el curso en el nombre. Después, con un repositorio vacío ya creado en la organización (público, sin `README` ni licencia):
+>
+> ```bash
+> cd marcapersonalfp
+> git init -b main
+> git add .
+> git commit -m "Esqueleto de Laravel 13"
+> git remote add origin git@github.com:2DAW-CarlosIII/marcapersonalfp2627.git
+> git push -u origin main
+> ```
+>
+> El `.gitignore` del esqueleto deja fuera `vendor/`, `.env` y el fichero de la base _SQLite_. Por eso el alumnado tiene que regenerarlos en el paso 4.
+
+## Paso 1: el _fork_
+
+Entra en el repositorio base y pulsa el botón ![Botón Fork](./images/botonFork.png), arriba a la derecha. _GitHub_ crea una copia en tu cuenta: tu _fork_.
+
+## Paso 2: el clon local
+
+Los comandos `git` se ejecutan **en la máquina virtual**, donde están tus claves SSH. Copia la dirección SSH de tu _fork_ con el botón ![Botón Code](./images/botonCode.png) y clónalo en `~/Documentos/laravel` con el nombre `marcapersonalfp`, el mismo todos los cursos:
 
 ```bash
-cd ~/Documentos
-mkdir laravel
-cd laravel/
+cd ~/Documentos/laravel
+git clone git@github.com:<tu-usuario>/marcapersonalfp2627.git marcapersonalfp
+cd marcapersonalfp
+git remote add upstream git@github.com:2DAW-CarlosIII/marcapersonalfp2627.git
+git remote -v
 ```
 
-Y nos aseguraremos de tener actualizado Composer:
+`git remote -v` debe mostrar `origin` (tu _fork_) y `upstream` (el repositorio base). Si aún no tienes una clave SSH en _GitHub_, sigue [su guía](https://docs.github.com/es/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
+
+## Paso 3: un terminal dentro de `workspace`
+
+_Composer_ y _Artisan_, la herramienta de línea de comandos de _Laravel_, necesitan PHP, que está en el contenedor `workspace`. En este bloque vas a lanzar muchos comandos seguidos, así que en lugar de anteponer `docker compose exec` a cada uno, **abre un terminal dentro del contenedor**. Desde la carpeta `laradock`:
 
 ```bash
-sudo composer self-update --2
+cd ~/Documentos/laravel/laradock
+docker compose up -d nginx php-fpm workspace
+docker compose exec --user=laradock --workdir /var/www/marcapersonalfp workspace bash
 ```
 
-## Utilizando Composer
+El indicador del terminal cambia a `laradock@…:/var/www/marcapersonalfp$`: ya estás dentro, en la carpeta del proyecto. Para salir, `exit`.
 
-Antes de poder utilizar Laravel, debemos asegurarnos de cumplir sus requisitos:
+**¿Por qué `--user=laradock`?** Por defecto, `docker compose exec` entra como _root_, y los ficheros que crea pertenecen a _root_.
 
-- PHP
-- [Composer](https://getcomposer.org/)
-- [Node y NPM](https://nodejs.org/)
+- En `vanilla_php` no importaba: `php-fpm` solo **leía** los ficheros.
+- En _Laravel_, `php-fpm`, que atiende las peticiones como el usuario `www-data`, también **escribe**: en el fichero de la base _SQLite_, en los registros de `storage/logs/` y en las vistas compiladas de `storage/framework/`. Si los ha creado _root_, no puede modificarlos y la web responde con un error 500.
+- `laradock` es tu usuario de la máquina virtual (el mismo número de usuario), y dentro de `php-fpm` ese usuario es `www-data`. Con `--user=laradock`, todo lo que crees será tuyo y `php-fpm` podrá escribirlo.
 
-A continuación, instalaremos Laravel installer utilizando composer, el cual ya tenemos instalado en la máquina virtual.
+A partir de aquí, y en todo el bloque, los comandos `composer` y `php artisan` se escriben en este terminal. Los de `git` y `docker compose`, en otro terminal de la máquina virtual.
+
+## Paso 4: dependencias y configuración
+
+En el terminal de `workspace`:
 
 ```bash
-composer global require "laravel/installer"
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
 ```
 
-Nos debemos asegurar de que el ejecutable de `laravel` sea accesible desde terminal de comandos. Para ello, editaremos el archivo `~/.bashrc` e incluiremos, al final del mismo, la siguiente línea:
+1. **`composer install`** descarga en `vendor/` las librerías que fija `composer.lock`, las mismas versiones exactas para todo el grupo.
+2. **`.env`** guarda la configuración propia de cada instalación: nombre de la aplicación, modo de depuración, base de datos… Contiene secretos, así que nunca se sube al repositorio. Se sube su plantilla, `.env.example`.
+3. **`key:generate`** escribe en `.env` una clave aleatoria, `APP_KEY`, con la que _Laravel_ cifra las _cookies_ y la sesión.
+4. **`migrate`** crea las tablas que el framework necesita. El `.env` indica `DB_CONNECTION=sqlite` y el fichero `database/database.sqlite` aún no existe, así que _Artisan_ pregunta si quieres crearlo: responde que sí.
+
+Comprueba versiones y configuración con:
 
 ```bash
-alias laravel='~/.config/composer/vendor/bin/laravel'
+php artisan about
 ```
 
-Como ya hemos hecho en anteriores ocasiones, podemos cerrar el terminal y volver a abrirlo, para que tenga efecto la línea anterior o, simplemente, ejecutar el siguiente comando:
+Debe mostrar _Laravel_ 13 y PHP 8.4.
 
-```bash
-source ~/.bashrc
-```
+## Paso 5: el sitio de _nginx_
 
-En este momento, ya podremos utilizar laravel para crear nuestra primera aplicación web:
+El sitio por defecto de _nginx_ (`http://localhost`) sigue sirviendo `vanilla_php`: los tests de los Bloques 2 a 4 lo necesitan ([§11 de la preparación del entorno](./00_instalacionEntorno.md#11-proyecto-vanilla_php-y-phpunit-bloques-2-a-4)). _Laravel_ tendrá **su propio sitio**, `http://marcapersonalfp.test`. En un terminal de la máquina virtual:
 
-```bash
-laravel new prueba
-```
-
-La aplicación web creada con Laravel se encontrará en el directorio `prueba`.
-
-```bash
-cd prueba
-```
-
-En el entorno de desarrollo, podemos usar el servidor web que nos proporciona el propio Laravel a través de su _CLI_ `artisan`.
-
-```bash
-php artisan serve
-```
-
-El resultado lo podremos comprobar si accedemos a la dirección https://localhost:8000, a través de un navegador.
-
-## Utilizando Laradock
-
-### Estructura de carpetas
-
-Una vez completados todos los pasos, la estructura quedará así:
-
-```.
-└── laravel
-    ├── marcapersonalfp
-    └── laradock
-```
-
-
-### Descargar Laradock
-_Si estás utilizando la máquina virtual que se ofrece en esta documentación, puedes saltar a la sección [Nuevo proyecto de Laravel](#nuevo-proyecto-de-laravel) porque laradock ya está incluido._
-
-1. Clonar el repositorio:
+1. Copia la plantilla de sitio _Laravel_ que trae _Laradock_:
 
     ```bash
-    git clone https://github.com/Laradock/laradock.git
+    cd ~/Documentos/laravel/laradock/nginx/sites
+    cp laravel.conf.example marcapersonalfp.conf
     ```
-    > Para que funcione, tiene que estar instalado el [cliente de línea de comandos de Git](https://git-scm.com/downloads).
 
-2. Copiar el fichero `.env.example` a `.env`:
+2. En `marcapersonalfp.conf`, cambia estas dos líneas:
+
+    ```nginx
+    server_name marcapersonalfp.test;
+    root /var/www/marcapersonalfp/public;
+    ```
+
+    `root` apunta a `public/`, la única carpeta que _nginx_ debe servir. El resto del proyecto (`.env`, `vendor/`, `app/`…) queda fuera de su alcance.
+
+3. Haz que el nombre `marcapersonalfp.test` apunte a tu propia máquina:
 
     ```bash
-    cd laradock && cp .env.example .env && cd ..
+    echo "127.0.0.1  marcapersonalfp.test" | sudo tee -a /etc/hosts
     ```
 
-3. Editar el fichero `.env` de la carpeta laradock:
-
-    - Seleccionar la versión de PHP: `PHP_VERSION=8.2`
-    - Modificar el driver de base de datos de phpMyAdmin: `PMA_DB_ENGINE=mariadb`
-
-4. Habilitar la depuración de código:
-
-    - Añadir _XDEBUG_ a WORKSPACE y PHP-FPM para poder depurar: `WORKSPACE_INSTALL_XDEBUG=true` y `PHP_FPM_INSTALL_XDEBUG=true`
-    - Modificar también los puertos asociados a _XDEBUG_: `WORKSPACE_XDEBUG_PORT=9003` y `PHP_FPM_XDEBUG_PORT=9003`
-    - Modificar los archivos `php-fpm/xdebug.ini` y `workspace/xdebug.ini` con el siguiente contenido:
-        ```bash
-        ; NOTE: The actual debug.so extention is NOT SET HERE but rather (/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini)
-
-        xdebug.client_host="host.docker.internal"
-        xdebug.discover_client_host=1
-        xdebug.client_port=9003
-        xdebug.idekey=vsc
-        xdebug.mode=debug
-        xdebug.start_with_request=trigger
-
-        xdebug.cli_color=0
-        xdebug.output_dir="~/xdebug/phpstorm/tmp/profiling"
-
-        xdebug.var_display_max_children=-1
-        xdebug.var_display_max_data=-1
-        xdebug.var_display_max_depth=-1
-
-        ```
-
-5. Editar el fichero `mariadb/my.cnf` para asignarle únicamente _256M_ a la variable `innodb_log_file_size`, en lugar de las _4048M_ con las que está configurada inicialmente.
-
-6. Editar el fichero `mariadb/Dockerfile` sustituyendo la línea `CMD ["mysqld"]` por `CMD ["mariadbd"]`.
-
-### Generar el proyecto
-
-- Accedemos a la carpeta en la que vayamos a almacenar nuestros proyectos Laravel. En nuestro caso:
+4. Reinicia _nginx_ desde la carpeta `laradock`:
 
     ```bash
-    cd ~/Documentos/laravel/
-    ```
-
-- Generamos el proyecto _marcapersonalfp_ con el siguiente comando:
-
-    ```bash
-    docker run -it --rm --name php-cli \
-        -v "$PWD:/usr/src/app" thecodingmachine/php:8.2-v4-slim-cli \
-        composer create-project --prefer-dist laravel/laravel marcapersonalfp
-    ```
-
-    > **atención** _Si quisiéramos generar más aplicaciones Laravel, únicamente deberíamos cambiar el nombre del proyecto, que se encuentra al final de la orden, después de `laravel/laravel`._
-
-### Arrancar los contenedores necesarios:
-
-Desde el directorio de _Laradock_ ejecutaremos el siguiente comando para arrancar los contenedores:
-
-```bash
-docker compose up -d nginx mariadb php-fpm phpmyadmin workspace
-```
-
-La primera vez que se ejecute este comando tardará bastante puesto que tiene que descargar muchas imágenes desde internet.
-
-> **Límites en la descarga** _Si todo un grupo/clase lanza el comando anterior, es posible que Docker limite la descarga, imposibilitando que el comando se complete.
-> Una solución es que se generen las imágenes en un único equipo y que se compartan las imágenes con [`docker save`](https://docs.docker.com/reference/cli/docker/image/save/) y [`docker load`](https://docs.docker.com/reference/cli/docker/image/save/)._
-
-### Crear la base de datos
-
-1. Acceder a [phpMyAdmin](http://localhost:8081/)
-
-    - Servidor _mariadb_ y usuario _root_/_root_.
-        - ![Acceso a phpMyAdmin](./images/logInPhpMyAdmin.png)
-    - Acceder a la pestaña _Cuentas de usuario_ y, una vez en esa pestaña, seleccionar la opción _Agregar cuenta de usuario_.
-        - ![Seleccionar la opción de menú Cuentas de Usuario](./images/seleccionarCuentasUsuario.png)
-    - Las credenciales del nuevo usuario serán _marcapersonalfp_ tanto para el nombre de usuario como para la contraseña.
-        - ![Seleccionar Agregar cuenta de usuario](./images/agregarCuentaUsuario.png)
-    - Antes de hacer click en el botón _Continuar_ seleccionar la casilla _Crear base de datos con el mismo nombre y otorgar todos los privilegios_.
-        - ![Crear usuario y base de datos marcapersonalfp y otorgar todos los privilegios](./images/credencialesUsuarioBD.png)
-    - El resultado exitoso se muestra en la siguiente imagen
-        - ![Usuario creado correctamente](./images/usuarioCreado.png)
-
-    Alternativamente, podemos acceder a la pestaña de SQL de phpMyAdmin o al contenedor de MariaDB y ejecutar las siguientes sentencias:
-
-    ```sql
-    CREATE USER 'marcapersonalfp'@'%' IDENTIFIED VIA mysql_native_password USING PASSWORD('marcapersonalfp');
-    GRANT USAGE ON *.* TO 'marcapersonalfp'@'%' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
-    CREATE DATABASE IF NOT EXISTS `marcapersonalfp`;
-    GRANT ALL PRIVILEGES ON `marcapersonalfp`.* TO 'marcapersonalfp'@'%';
-    ```
-
-    Para acceder al contenedor de MariaDB podemos ejecutar el comando `docker exec -ti laradock-mariadb-1 /bin/bash`. Una vez en el interior del contenedor (`root@________:/# `), podremos iniciar una sesión de MariaDB ejecutando `mariadb -p` respondiendo con _root_ como contraseña y ejecutar las sentencias anteriores.
-
-2. Editar el `.env` de la aplicación
-
-    ```php
-    DB_CONNECTION=mysql
-    DB_HOST=mariadb
-    DB_PORT=3306
-    DB_DATABASE=marcapersonalfp
-    DB_USERNAME=marcapersonalfp
-    DB_PASSWORD=marcapersonalfp
-    ```
-
-3. Debido a que las sesiones, en la versión 11 de _Laravel_, se guardan en la base de datos, es necesario ejecutar las migraciones para que se cree la tabla `sessions` en la base de datos. Para ello, ejecutaremos el siguiente comando:
-
-    ```bash
-    php artisan migrate
-    ```
-
-> Más adelante, en el apartado [Migraciones](./042_migraciones.md), veremos cómo gestionamos las tablas de la Base de Datos a través de las migraciones.
-
-### Definir un servidor virtual en nginx
-
-Para cada aplicación, generaremos un servidor virtual. En este caso, nuestro servidor responderá a la url http://marcapersonalfp.test. Para ello:
-
-1. Accedemos al directorio `laradock/nginx/sites` y duplicaremos `laravel.conf.example` con el nombre de `marcapersonalfp.conf`.
-
-2. Modificaremos, en el fichero `marcapersonalfp.conf`, estas dos líneas:
-
-    - `server_name marcapersonalfp.test;`
-    - `root /var/www/marcapersonalfp/public;`
-
-3. Añadiremos el archivo `/etc/hosts` (con `sudo`) una línea para que traduzca convenientemente la url `marcapersonalfp.test`.
-
-    ```bash
-    127.0.0.1  marcapersonalfp.test
-    ```
-
-4. Reiniciaremos el contenedor de NGINX, **desde el directorio `laradock`**
-
-    ```bash
+    cd ~/Documentos/laravel/laradock
     docker compose restart nginx
     ```
 
-### (Re)arrancar los contenedores
+Abre [http://marcapersonalfp.test](http://marcapersonalfp.test): debe aparecer la página de bienvenida de _Laravel_. Y [http://localhost](http://localhost) sigue mostrando `vanilla_php`.
 
-Los comandos de `docker compose` se lanzan desde la carpeta `laradock`.
+## Paso 6: trabajar en ramas
 
-La primera vez que arrancamos los contenedores tarda mucho tiempo, ya que _Docker_ debe descargar las imágenes que le son necesarias.
+En `main` solo entra lo que ya se ha revisado en el repositorio base. Cada apartado se resuelve en su propia rama:
 
-Y para reiniciar un contenedor concreto:
+1. Crea la rama antes de empezar, en el terminal de la máquina virtual:
+
+    ```bash
+    git switch -c RA5_1
+    ```
+
+2. Al terminar, guarda los cambios en un _commit_ y sube la rama a **tu _fork_**:
+
+    ```bash
+    git add .
+    git commit -m "Soluciona los ejercicios de 5.1"
+    git push -u origin RA5_1
+    ```
+
+3. En _GitHub_, abre un **_pull request_** de tu rama hacia el `main` del repositorio base. Al principio los revisa y acepta el profesorado. Más adelante, también podrán hacerlo compañeros con permisos en el repositorio base.
+4. Cuando se acepte (_merge_), actualiza tu `main` local y el de tu _fork_:
+
+    ```bash
+    git switch main
+    git pull upstream main
+    git push origin main
+    ```
+
+## Preparación del entorno de trabajo
+
+Necesitas el entorno de [0. Instalación y preparación del entorno](./00_instalacionEntorno.md), con los contenedores `nginx`, `php-fpm` y `workspace` levantados. _MariaDB_ no hace falta hasta el Bloque 6.
+
+## Ejercicios
+
+1. **Fork y clon.** Haz el _fork_ del repositorio base y clónalo en `~/Documentos/laravel/marcapersonalfp`, con el remoto `upstream` (pasos 1 y 2). Crea la rama `RA5_1`.
+2. **Instalación.** Abre el terminal de `workspace` como `laradock`, instala las dependencias, crea el `.env`, genera la clave y ejecuta las migraciones (pasos 3 y 4). Anota en un comentario de tu _pull request_ qué versiones muestra `php artisan about`.
+3. **Sitio de _nginx_.** Configura `http://marcapersonalfp.test` (paso 5) y comprueba en el navegador que `http://localhost` sigue sirviendo `vanilla_php`.
+4. **Configuración.** En el `.env`, cambia estas dos variables:
+
+    ```ini
+    APP_NAME=marcapersonalFP
+    APP_URL=http://marcapersonalfp.test
+    ```
+
+    _Laravel_ lee el `.env` en cada petición, así que el cambio se aplica sin reiniciar nada. Las veremos de nuevo en 5.2, al estudiar la carpeta `config/`.
+
+5. **Tu primer _pull request_.** Copia el test de este apartado (ver más abajo) a `tests/Feature/`, comprueba que pasa y súbelo en un _commit_ a tu rama. Abre el _pull request_ hacia el repositorio base (paso 6).
+6. **Investiga.** Abre `composer.json` y busca la sección `scripts` → `post-create-project-cmd`. ¿Qué comandos contiene? ¿Cuáles del paso 4 se ahorró el profesorado al crear el repositorio base? ¿Por qué tú sí tuviste que ejecutarlos? Responde en el _pull request_.
+
+> **Puente.** Para `vanilla_php` lo hicimos todo a mano: la carpeta `public/`, un `composer.json` con PHPUnit, el `phpunit.xml` y el sitio de _nginx_. _Laravel_ trae de serie su `public/index.php`, su `composer.json`, su `phpunit.xml` y una carpeta `tests/`. Solo el sitio de _nginx_ sigue siendo cosa nuestra.
+
+## Comprueba tu solución automáticamente (opcional)
+
+Para los ejercicios 1 a 4, copia el archivo [RA5_1_InstalacionTest.php](./materiales/ejercicios-laravel/tests/Feature/RA5_1_InstalacionTest.php) a la carpeta `tests/Feature/` de tu proyecto y ejecuta, en el terminal de `workspace`, ese test en concreto:
 
 ```bash
-docker compose restart nginx
+php artisan test --filter=RA5_1_InstalacionTest
 ```
 
-#### Acceder al sitio web
+El test comprueba:
+- los remotos `origin` y `upstream` de tu clon;
+- la clave de la aplicación y la base _SQLite_ con sus tablas;
+- las dos variables del ejercicio 4;
+- que `http://marcapersonalfp.test` sirve _Laravel_: hace una petición real a `nginx`, como el navegador.
 
-Página principal: [http://marcapersonalfp.test](http://marcapersonalfp.test)
+Necesita `nginx` y `php-fpm` levantados.
 
-![Captura de pantalla MarcaPersonalFP recién instalado](./images/marcaPersonalFP_LaravelInstalacion.png)
+Si todo está bien: `Tests: 6 passed (13 assertions)`.
 
-> Los pasos anteriores se pueden repetir para cualquier otra aplicación, cambiando cada aparición de _marcapersonalfp_ por el nombre que le queramos asignar a la nueva aplicación.
+---
 
+**Siguiente:** [5.2. Estructura de un proyecto, configuración y _Artisan_](./RA5_2_estructura.md)

@@ -7,7 +7,7 @@
 ## Datos confirmados
 
 - **Repo REA (docs):** personal `github.com/albsierra/marcapersonalFP_REA` (`origin`) y global `github.com/2DAW-CarlosIII/marcapersonalFP_REA` (`upstream`, el que usa el alumnado). Mismos SHAs en ambos (ver §6).
-- **Repo de código Laravel:** uno por curso, creado por el profesor en la organización y *forkeado* por el alumnado (flujo descrito en [2.1.1 Desarrollo colaborativo con GitHub](./0211_desarrolloColaborativoGitHub.md)). Curso 2026/27: `github.com/2DAW-CarlosIII/marcapersonalfp2627` — Laravel **13**, PHP **8.4** (composer `^8.3`), Breeze **2.4** (pila _Blade_), Sanctum **4.3**. Referencia del curso anterior: `marcapersonalfp2526` (Laravel 12, Breeze 2.3, Sanctum 4).
+- **Repo de código Laravel:** uno por curso, creado por el profesor en la organización y *forkeado* por el alumnado (flujo descrito en [5.1. Instalación de _Laravel_ y desarrollo colaborativo](./RA5_1_instalacion.md)). Curso 2026/27: `github.com/2DAW-CarlosIII/marcapersonalfp2627` — Laravel **13**, PHP **8.4** (composer `^8.3`), Breeze **2.4** (pila _Blade_), Sanctum **4.3**. Referencia del curso anterior: `marcapersonalfp2526` (Laravel 12, Breeze 2.3, Sanctum 4).
 - **Modelos:** los definidos en `materiales/swagger/marcapersonalFP_api.yaml` (`Ciclo`, `Curriculo`, `FamiliaProfesional`, `Proyecto`, `User`, `Reconocimiento`, `Actividad`, `Competencia`, `Empresa`, `Idioma`…), según los vaya necesitando cada bloque.
 - **Decisión aceptada:** RA4 en **PHP nativo** (sesiones/cookies/login), en su propio bloque, + **refuerzo en Laravel** (Bloque 5).
 - **Carga lectiva Murcia:** ~**150 h**; ver la distribución adaptada de §1.
@@ -133,7 +133,7 @@ Cada PR es revisable y reversible por separado. Los alumnos usan la rama estable
 ## 6. Flujo de trabajo
 
 - **Ramas** en el repo personal (`PR1`, `PR2`, `PR3`…), creadas desde `master`. Historia lineal, sin *merge commits*: la integración se hace con *fast-forward* desde una máquina con permiso de escritura en los dos repos, empujando los mismos SHAs a `origin/master` y `upstream/master`. Nunca "Rebase and merge" ni "Squash" en GitHub, ni *rebase* de ramas ya publicadas.
-- **Fichero a fichero:** se redacta cada apartado (`.md` + test + presentación _RevealJS_ + enlace en el README), se revisa, y solo entonces se hace **un commit por apartado** con todo junto.
+- **Fichero a fichero:** se redacta cada apartado (`.md` + test + presentación _RevealJS_ + enlace en el README), se revisa, y solo entonces se hace **un commit por apartado** con todo junto. Si el apartado reescribe un capítulo antiguo, lo precede un commit que **solo renombra** ese capítulo con `git mv` (y retira con `git rm` los que se fusionan en él), sin cambiar su contenido: tras una reescritura completa, _git_ ya no reconoce el renombrado, y así `git log --follow` conserva su historial.
 - **Tests:** reales y enlazados (nunca embebidos), uno por fichero de contenido, con el comando de ese fichero en cada `.md` y el comando agregado del bloque en el último. Bloques 2–4: `materiales/ejercicios-vanilla/tests/`, con `vendor/bin/phpunit`; desde el Bloque 5: `materiales/ejercicios-laravel/tests/Feature/`, con `php artisan test --filter=…`. La cifra de aserciones documentada se verifica siempre con una ejecución real.
 
 ---

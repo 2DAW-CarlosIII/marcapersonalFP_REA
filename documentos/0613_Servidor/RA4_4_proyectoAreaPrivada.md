@@ -291,4 +291,4 @@ Y `phpunit` sin opciones lanza los de los Bloques 2, 3 y 4 juntos.
 
 ---
 
-**Siguiente:** Bloque 5 — Generación dinámica de páginas web: introducción a _Laravel_ (RA5).
+**Siguiente:** Bloque 5 — [5.1. Instalación de _Laravel_ y desarrollo colaborativo](./RA5_1_instalacion.md)

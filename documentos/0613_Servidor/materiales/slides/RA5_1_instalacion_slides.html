@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>5.1. Instalación de Laravel y desarrollo colaborativo · marcapersonalFP</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 5 · RA5</p>
+        <h1 class="titulo">5.1. Instalación de <em>Laravel</em></h1>
+        <p class="muted">y desarrollo colaborativo con <em>GitHub</em></p>
+        <p class="small-text muted">Empezamos a reconstruir <em>marcapersonalFP</em> con un <em>framework</em></p>
+        <aside class="notes">
+          Apertura del Bloque 5. Venimos de sufrir v0, que lo mezcla todo y lo hace todo a mano.
+          Este apartado solo deja el proyecto instalado y servido; el código empieza en 5.2.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · Qué es un framework -->
+      <section>
+        <h2>¿Qué es un <em>framework</em>?</h2>
+        <p class="small-text">Librerías y convenciones que automatizan el trabajo, a cambio de seguir sus reglas.</p>
+        <ul class="small-text">
+          <li class="fragment"><strong>Una sola puerta de entrada</strong>: <code>public/index.php</code>, y las <strong>rutas</strong> deciden quién atiende cada petición.</li>
+          <li class="fragment"><strong>Cada cosa en su sitio</strong>: lógica en <strong>controladores</strong> y <code>app/</code>; HTML en <strong>vistas</strong> <em>Blade</em> (MVC, en 5.8).</li>
+          <li class="fragment"><strong>Lo repetitivo, hecho</strong>: sesiones, CSRF, validación, autenticación, escape.</li>
+        </ul>
+        <aside class="notes">
+          Retomar la definición de framework de la nota de 00 §11. Ahora ya sabemos qué trabajo automatiza.
+        </aside>
+      </section>
+
+      <!-- 3 · Plan de trabajo (1) -->
+      <section>
+        <h2>El plan del bloque (1/2)</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th>Un script<br>por página</th><td>Rutas y controladores</td><td>5.3, 5.5</td></tr>
+            <tr class="fragment"><th><code>require_once</code></th><td><em>Autoload</em> de <em>Composer</em></td><td>5.2</td></tr>
+            <tr class="fragment"><th><code>session_start()</code></th><td>Lo hace el framework</td><td>5.2</td></tr>
+            <tr class="fragment"><th><code>&lt;?php if ?&gt;</code>, <code>e()</code></th><td><em>Blade</em>: <code>@if</code>, <code>{{ }}</code></td><td>5.4</td></tr>
+            <tr class="fragment"><th><code>ValidadorCurriculo</code></th><td><code>$request-&gt;validate()</code>, <em>Form Request</em></td><td>5.6</td></tr>
+          </tbody>
+        </table>
+        <aside class="notes">
+          Son las filas de las tablas "De v0 a Laravel" de 3.8 y 4.4, con el apartado donde se resuelve cada una.
+        </aside>
+      </section>
+
+      <!-- 4 · Plan de trabajo (2) -->
+      <section>
+        <h2>El plan del bloque (2/2)</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>value="&lt;?= e(…) ?&gt;"</code></th><td><code>old('alumno')</code></td><td>5.6</td></tr>
+            <tr class="fragment"><th><em>Flash</em> + <code>unset()</code></th><td><code>redirect()-&gt;with()</code></td><td>5.6</td></tr>
+            <tr class="fragment"><th><code>Autenticador</code></th><td><code>Auth::attempt()</code>, con <em>Breeze</em></td><td>5.7</td></tr>
+            <tr class="fragment"><th><code>exigirLogin()</code></th><td><em>Middleware</em> <code>auth</code></td><td>5.7</td></tr>
+            <tr class="fragment"><th>Las clases de <code>src/</code></th><td>Clases en <code>app/</code> y un repositorio</td><td>5.8</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:0.8em"><em>Eloquent</em>, la tabla <code>curriculos</code> y los roles: Bloques 6 y 7.</p>
+      </section>
+
+      <!-- 5 · Un repositorio por curso -->
+      <section>
+        <h2>Un repositorio por curso</h2>
+        <ul class="small-text">
+          <li class="fragment"><strong>Repositorio base</strong>, en la organización: <code>2DAW-CarlosIII/marcapersonalfp2627</code>. En tu clon, el remoto <code>upstream</code>.</li>
+          <li class="fragment"><strong>Tu <em>fork</em></strong>, en tu cuenta: <code>&lt;tu-usuario&gt;/marcapersonalfp2627</code>. El remoto <code>origin</code>.</li>
+          <li class="fragment"><strong>Tu clon local</strong>: <code>~/Documentos/laravel/marcapersonalfp</code>, donde trabajas.</li>
+        </ul>
+        <p class="small-text fragment">Subes tus ramas a tu <em>fork</em> y propones los cambios al base con un <strong><em>pull request</em></strong>.</p>
+      </section>
+
+      <!-- 6 · El flujo -->
+      <section>
+        <h2>El flujo de trabajo</h2>
+        <img class="flow" style="max-height:520px; width:auto; background:#fff; padding:10px; border-radius:8px" src="../../images/esquemaSolucionEjerciciosGit.svg" alt="Fork, clone, rama, push, pull request y pull">
+        <aside class="notes">
+          1 fork, 2 clone, 3 rama del ejercicio, 4 push a tu fork, 5 pull request al base, 6 pull desde upstream, 7 siguiente rama.
+        </aside>
+      </section>
+
+      <!-- 7 · Cómo se creó el repositorio base -->
+      <section>
+        <h2>Cómo nació el repositorio base</h2>
+        <p class="small-text">Una vez por curso, el profesorado. Sin PHP en la VM, <em>Composer</em> va en un contenedor de usar y tirar:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+cd ~/Documentos/laravel
+docker run -it --rm -v "$PWD:/usr/src/app" thecodingmachine/php:8.4-v4-slim-cli \
+    composer create-project laravel/laravel:^13.0 marcapersonalfp
+        </code></pre>
+        <p class="small-text fragment">Después, <code>git init</code> y <em>push</em> a <code>2DAW-CarlosIII/marcapersonalfp2627</code>.</p>
+        <p class="small-text fragment">El <code>.gitignore</code> deja fuera <code>vendor/</code>, <code>.env</code> y la base <em>SQLite</em>: tú los regeneras en el paso 4.</p>
+        <aside class="notes">
+          La imagen de thecodingmachine crea los ficheros a nombre del dueño de la carpeta, no de root.
+          create-project ejecuta además los scripts post-create-project-cmd (ejercicio Investiga).
+          Las migraciones fallan con "could not find driver": la imagen slim no trae pdo_sqlite. No importa, la base no se sube.
+        </aside>
+      </section>
+
+      <!-- 8 · Pasos 1 y 2 -->
+      <section>
+        <h2>Pasos 1 y 2: <em>fork</em> y clon</h2>
+        <p class="small-text">Botón <strong>Fork</strong> en el repositorio base. Después, <strong>en la VM</strong> (allí están tus claves SSH):</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+cd ~/Documentos/laravel
+git clone git@github.com:&lt;tu-usuario&gt;/marcapersonalfp2627.git marcapersonalfp
+cd marcapersonalfp
+git remote add upstream git@github.com:2DAW-CarlosIII/marcapersonalfp2627.git
+git remote -v
+        </code></pre>
+        <p class="small-text muted">La carpeta se llama <code>marcapersonalfp</code> todos los cursos.</p>
+      </section>
+
+      <!-- 9 · Paso 3 -->
+      <section>
+        <h2>Paso 3: un terminal dentro de <code>workspace</code></h2>
+        <p class="small-text"><em>Composer</em> y <em>Artisan</em> necesitan PHP. Desde <code>laradock</code>:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+docker compose up -d nginx php-fpm workspace
+docker compose exec --user=laradock --workdir /var/www/marcapersonalfp workspace bash
+        </code></pre>
+        <p class="small-text fragment">Indicador: <code>laradock@…:/var/www/marcapersonalfp$</code>. Para salir, <code>exit</code>.</p>
+        <p class="small-text fragment"><code>composer</code> y <code>php artisan</code>, aquí. <code>git</code> y <code>docker compose</code>, en otro terminal de la VM.</p>
+      </section>
+
+      <!-- 10 · Por qué --user=laradock -->
+      <section>
+        <h2>¿Por qué <code>--user=laradock</code>?</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>Sin la opción: <em>root</em></h3>
+            <p class="small-text">Los ficheros que crea son de <em>root</em>.</p>
+            <p class="small-text muted">En <code>vanilla_php</code> no importaba: <code>php-fpm</code> solo leía.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3><em>Laravel</em> escribe</h3>
+            <p class="small-text"><code>php-fpm</code> (<code>www-data</code>) escribe en la base <em>SQLite</em>, en <code>storage/logs/</code> y en <code>storage/framework/</code>.</p>
+            <p class="small-text muted">Si son de <em>root</em>: error 500.</p>
+          </div>
+        </div>
+        <p class="small-text fragment" style="margin-top:0.8em"><code>laradock</code> es tu usuario de la VM, y en <code>php-fpm</code> ese usuario es <code>www-data</code>.</p>
+      </section>
+
+      <!-- 11 · Paso 4 -->
+      <section>
+        <h2>Paso 4: dependencias y configuración</h2>
+        <pre class="medio"><code class="language-bash" data-trim data-line-numbers="|1|2|3|4">
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+        </code></pre>
+        <ol class="pasos compacta small-text">
+          <li><code>vendor/</code>, con las versiones de <code>composer.lock</code>.</li>
+          <li><code>.env</code>: la configuración de esta instalación. No se sube.</li>
+          <li><code>APP_KEY</code>: cifra las <em>cookies</em> y la sesión.</li>
+          <li>Crea <code>database.sqlite</code> (responde que sí) y sus tablas.</li>
+        </ol>
+        <aside class="notes">
+          Después, php artisan about debe mostrar Laravel 13 y PHP 8.4.
+          El .env lleva secretos (APP_KEY); se sube su plantilla, .env.example.
+        </aside>
+      </section>
+
+      <!-- 12 · Paso 5 -->
+      <section>
+        <h2>Paso 5: el sitio de <em>nginx</em></h2>
+        <pre class="compacto"><code class="language-bash" data-trim>
+cd ~/Documentos/laravel/laradock/nginx/sites
+cp laravel.conf.example marcapersonalfp.conf
+        </code></pre>
+        <p class="label">En <code>marcapersonalfp.conf</code>:</p>
+        <pre class="compacto"><code class="language-nginx" data-trim>
+server_name marcapersonalfp.test;
+root /var/www/marcapersonalfp/public;
+        </code></pre>
+        <pre class="compacto fragment"><code class="language-bash" data-trim>
+echo "127.0.0.1  marcapersonalfp.test" | sudo tee -a /etc/hosts
+docker compose restart nginx        # desde laradock
+        </code></pre>
+        <aside class="notes">
+          root apunta a public/: .env, vendor/ y app/ quedan fuera del alcance de nginx.
+        </aside>
+      </section>
+
+      <!-- 13 · Dos sitios -->
+      <section>
+        <h2>Dos sitios conviven</h2>
+        <div class="cols">
+          <div class="panel nginx">
+            <h3><code>http://localhost</code></h3>
+            <p class="small-text"><code>default.conf</code> → <code>vanilla_php</code></p>
+            <p class="small-text muted">Los tests de los Bloques 2 a 4 lo necesitan.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3><code>http://marcapersonalfp.test</code></h3>
+            <p class="small-text"><code>marcapersonalfp.conf</code> → <em>Laravel</em></p>
+            <p class="small-text muted">Página de bienvenida de <em>Laravel</em>.</p>
+          </div>
+        </div>
+        <p class="small-text fragment" style="margin-top:0.8em"><em>nginx</em> elige el sitio por el nombre que pide el navegador: <code>server_name</code>.</p>
+      </section>
+
+      <!-- 14 · Paso 6 -->
+      <section>
+        <h2>Paso 6: una rama por apartado</h2>
+        <pre class="compacto"><code class="language-bash" data-trim data-line-numbers="1|2-4|5-7">
+git switch -c RA5_1
+git add .
+git commit -m "Soluciona los ejercicios de 5.1"
+git push -u origin RA5_1
+git switch main                  # tras aceptarse el pull request
+git pull upstream main
+git push origin main
+        </code></pre>
+        <p class="small-text fragment">En <em>GitHub</em>: <em>pull request</em> de tu rama hacia el <code>main</code> del repositorio base.</p>
+        <p class="small-text muted fragment">Los acepta el profesorado; más adelante, también compañeros con permisos.</p>
+      </section>
+
+      <!-- 15 · Entorno -->
+      <section>
+        <h2>El entorno</h2>
+        <pre class="compacto"><code class="language-plaintext" data-trim>
+~/Documentos/laravel/
+├── laradock/
+│   └── nginx/sites/
+│       ├── default.conf          ← vanilla_php (Bloques 2-4)
+│       └── marcapersonalfp.conf  ← Laravel (nuevo)
+├── vanilla_php/
+└── marcapersonalfp/              ← tu clon (nuevo)
+        </code></pre>
+        <p class="small-text">Contenedores: <code>nginx</code>, <code>php-fpm</code> y <code>workspace</code>. <em>MariaDB</em>, en el Bloque 6.</p>
+      </section>
+
+      <!-- 16 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/2)</h2>
+        <ol class="pasos compacta">
+          <li><strong><em>Fork</em> y clon</strong>, con el remoto <code>upstream</code>. Crea la rama <code>RA5_1</code>.</li>
+          <li><strong>Instalación</strong> como <code>laradock</code>: dependencias, <code>.env</code>, clave y migraciones. Anota lo que muestra <code>php artisan about</code>.</li>
+          <li><strong>Sitio de <em>nginx</em></strong>: <code>marcapersonalfp.test</code>, y <code>localhost</code> sigue en <code>vanilla_php</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 17 · Ejercicios 4-6 -->
+      <section>
+        <h2>Ejercicios (2/2)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong>Configuración.</strong> En el <code>.env</code>: <code>APP_NAME=marcapersonalFP</code> y <code>APP_URL=http://marcapersonalfp.test</code>.</li>
+          <li><strong>Tu primer <em>pull request</em></strong>, con el test de este apartado en <code>tests/Feature/</code>.</li>
+          <li><strong>Investiga.</strong> En <code>composer.json</code>, <code>post-create-project-cmd</code>: ¿qué pasos del paso 4 se ahorró el profesorado? ¿Por qué tú no?</li>
+        </ol>
+      </section>
+
+      <!-- 18 · Puente -->
+      <section>
+        <h2>Puente</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3><code>vanilla_php</code>, a mano</h3>
+            <p class="small-text"><code>public/</code>, <code>composer.json</code> con PHPUnit, <code>phpunit.xml</code> y el sitio de <em>nginx</em>.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3><em>Laravel</em>, de serie</h3>
+            <p class="small-text"><code>public/index.php</code>, <code>composer.json</code>, <code>phpunit.xml</code> y <code>tests/</code>.</p>
+            <p class="small-text muted">Solo el sitio de <em>nginx</em> sigue siendo cosa nuestra.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 19 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA5_1_InstalacionTest.php</code> a <code>tests/Feature/</code></li>
+          <li>En el terminal de <code>workspace</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan test --filter=RA5_1_InstalacionTest
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 a 4</strong>, con una petición real a <code>marcapersonalfp.test</code>.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">Tests: 6 passed (13 assertions)</code></p>
+      </section>
+
+      <!-- 20 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>5.2. Estructura de un proyecto, configuración y <em>Artisan</em></h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>
