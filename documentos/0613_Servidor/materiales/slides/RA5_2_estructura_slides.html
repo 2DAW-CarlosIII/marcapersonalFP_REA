@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>5.2. Estructura de un proyecto, configuración y Artisan · marcapersonalFP</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 5 · RA5</p>
+        <h1 class="titulo">5.2. Estructura de un proyecto</h1>
+        <p class="muted">configuración y <em>Artisan</em></p>
+        <p class="small-text muted">Dónde va cada cosa, antes de escribir código</p>
+        <aside class="notes">
+          Laravel funciona por convenciones: si un fichero está en su sitio y se llama como debe, el framework lo encuentra solo.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · De vanilla_php a Laravel -->
+      <section>
+        <h2>De <code>vanilla_php</code> a <em>Laravel</em></h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th>Un script<br>por página</th><td>Un único <code>public/index.php</code></td></tr>
+            <tr class="fragment"><th><code>src/</code></th><td>Clases en <code>app/</code>, con espacio de nombres</td></tr>
+            <tr class="fragment"><th>HTML + PHP</th><td>Vistas en <code>resources/views/</code></td></tr>
+            <tr class="fragment"><th>Constantes</th><td><code>.env</code> y <code>config/</code></td></tr>
+            <tr class="fragment"><th><code>tests/</code></th><td><code>tests/</code> y <code>phpunit.xml</code>, ya preparados</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 3 · Estructura (1) -->
+      <section>
+        <h2>Las carpetas (1/2)</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>app/</code></th><td>Controladores, modelos, clases propias</td></tr>
+            <tr class="fragment"><th><code>bootstrap/</code></th><td>El arranque del framework</td></tr>
+            <tr class="fragment"><th><code>config/</code></th><td>Un fichero por tema: <code>app.php</code>, <code>session.php</code>…</td></tr>
+            <tr class="fragment"><th><code>database/</code></th><td>Migraciones, <em>seeders</em>, la base <em>SQLite</em> (Bloque 6)</td></tr>
+            <tr class="fragment"><th><code>public/</code></th><td><code>index.php</code> y los ficheros públicos</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 4 · Estructura (2) -->
+      <section>
+        <h2>Las carpetas (2/2)</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>resources/</code></th><td>Vistas, y fuentes de CSS y JavaScript</td></tr>
+            <tr class="fragment"><th><code>routes/</code></th><td><code>web.php</code> (páginas), <code>console.php</code> (comandos)</td></tr>
+            <tr class="fragment"><th><code>storage/</code></th><td>Lo que genera el framework: registros, vistas compiladas</td></tr>
+            <tr class="fragment"><th><code>tests/</code></th><td><code>Feature/</code> y <code>Unit/</code></td></tr>
+            <tr class="fragment"><th><code>vendor/</code></th><td>Las librerías de <em>Composer</em>. <strong>Nunca</strong> se toca</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 5 · Raíz y app/ -->
+      <section>
+        <h2>La raíz y <code>app/</code></h2>
+        <div class="cols una">
+          <div class="panel">
+            <h3>En la raíz</h3>
+            <p class="small-text"><code>artisan</code>, <code>composer.json</code> y <code>.lock</code>, <code>.env</code> y <code>.env.example</code>, <code>package.json</code>, <code>vite.config.js</code>, <code>phpunit.xml</code></p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En <code>app/</code>, de serie</h3>
+            <p class="small-text"><code>Http/Controllers/Controller.php</code> (5.5) · <code>Models/User.php</code> (5.7) · <code>Providers/AppServiceProvider.php</code> (5.8)</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Las demás subcarpetas aparecen al generar piezas con <em>Artisan</em>.</p>
+      </section>
+
+      <!-- 6 · public/index.php -->
+      <section>
+        <h2>Una sola puerta: <code>public/index.php</code></h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="1|3|5">
+require __DIR__.'/../vendor/autoload.php';              // el autoload de Composer
+
+$app = require_once __DIR__.'/../bootstrap/app.php';     // crea la aplicación
+
+$app-&gt;handleRequest(Request::capture());                 // atiende la petición
+        </code></pre>
+        <p class="small-text fragment">Por eso el <code>root</code> del sitio de <em>nginx</em> apunta a <code>public/</code> (5.1).</p>
+      </section>
+
+      <!-- 7 · Ciclo de vida -->
+      <section>
+        <h2>El viaje de una petición</h2>
+        <ol class="pasos compacta small-text">
+          <li class="fragment"><code>Request::capture()</code>: lo que en <em>v0</em> leíamos de <code>$_GET</code>, <code>$_POST</code>, <code>$_COOKIE</code>…</li>
+          <li class="fragment">El <strong><em>middleware</em></strong> (5.7): abre la sesión, comprueba el <em>token</em> CSRF…</li>
+          <li class="fragment">El <strong>enrutador</strong> busca la ruta en <code>routes/web.php</code> (5.3).</li>
+          <li class="fragment">La ruta llama a su <strong>acción</strong>: un <strong>controlador</strong> (5.5), que pide datos a los <strong>modelos</strong>.</li>
+          <li class="fragment">El controlador devuelve una <strong>vista</strong> (5.4).</li>
+          <li class="fragment">De vuelta por el <em>middleware</em> (guarda la sesión), al navegador.</li>
+        </ol>
+      </section>
+
+      <!-- 8 · Esquema MVC -->
+      <section>
+        <h2>El patrón MVC</h2>
+        <img class="flow" style="max-height:400px; width:auto" src="../../images/esquema_funcionamiento.png" alt="public/index.php, rutas, controlador, modelos y vista">
+        <p class="small-text muted">Cada pieza, una responsabilidad. Lo formalizamos en 5.8. (<code>routes.php</code> es hoy <code>routes/web.php</code>.)</p>
+      </section>
+
+      <!-- 9 · Adiós a require_once -->
+      <section>
+        <h2>Adiós a <code>require_once</code></h2>
+        <p class="label">En <em>v0</em>, cada página cargaba lo que necesitaba:</p>
+        <pre class="compacto"><code class="language-php" data-trim>
+require_once __DIR__ . '/../src/RA3_formularios.php';
+require_once __DIR__ . '/../src/ValidadorCurriculo.php';   // que carga Curriculo.php
+        </code></pre>
+        <p class="label fragment">En <em>Laravel</em>, cada clase declara su <strong>espacio de nombres</strong> y las demás la importan con <code>use</code>:</p>
+        <pre class="compacto fragment"><code class="language-php" data-trim>
+namespace App\Http\Controllers;     // App\Http\Controllers\ProyectosController
+
+use App\Models\User;                // "User" significa App\Models\User
+        </code></pre>
+      </section>
+
+      <!-- 10 · PSR-4 -->
+      <section>
+        <h2>El <em>autoload</em> de <em>Composer</em> (PSR-4)</h2>
+        <pre class="compacto"><code class="language-json" data-trim>
+"autoload": {
+    "psr-4": {
+        "App\\": "app/",
+        "Database\\Factories\\": "database/factories/",
+        "Database\\Seeders\\": "database/seeders/"
+    }
+}
+        </code></pre>
+        <p class="small-text fragment"><code>App\Models\User</code> → <code>app/Models/User.php</code>: la ruta del fichero coincide con el espacio de nombres.</p>
+        <p class="small-text muted fragment">La convención "una clase por fichero, con su nombre" de 3.5. Si cambias <code>autoload</code>: <code>composer dump-autoload</code>.</p>
+      </section>
+
+      <!-- 11 · Configuración: tres niveles -->
+      <section>
+        <h2>La configuración</h2>
+        <ol class="pasos">
+          <li class="fragment"><strong><code>.env</code></strong>: los valores de <strong>esta</strong> instalación. Pueden ser secretos. No se sube.</li>
+          <li class="fragment"><strong><code>config/*.php</code></strong>: un array por tema; cada opción lee el <code>.env</code> con <code>env()</code> y tiene un valor por defecto. Sí se sube.</li>
+          <li class="fragment"><strong><code>config('fichero.clave')</code></strong>: así se lee desde el código.</li>
+        </ol>
+        <aside class="notes">
+          En v0, NOMBRE_CENTRO o las opciones de session_start() estaban escritas en el código: para cambiarlas había que editar el programa.
+        </aside>
+      </section>
+
+      <!-- 12 · config/app.php -->
+      <section>
+        <h2>Por ejemplo, <code>config/app.php</code></h2>
+        <pre class="compacto"><code class="language-php" data-trim>
+'name' =&gt; env('APP_NAME', 'Laravel'),
+
+'debug' =&gt; (bool) env('APP_DEBUG', false),
+
+'locale' =&gt; env('APP_LOCALE', 'en'),
+        </code></pre>
+        <p class="label fragment">Y en cualquier parte de la aplicación:</p>
+        <pre class="compacto fragment"><code class="language-php" data-trim>
+config('app.name')      // 'marcapersonalFP', el APP_NAME de tu .env (5.1)
+        </code></pre>
+      </section>
+
+      <!-- 13 · env() solo en config, APP_ENV, APP_DEBUG -->
+      <section>
+        <h2>Tres reglas</h2>
+        <ul class="small-text">
+          <li class="fragment"><strong><code>env()</code>, solo dentro de <code>config/</code>.</strong> Tras <code>config:cache</code> (producción), devuelve <code>null</code> fuera. En tu máquina, si lo ejecutas: <code>config:clear</code>.</li>
+          <li class="fragment"><strong><code>APP_ENV</code></strong>: <code>local</code>, <code>production</code> o <code>testing</code> (lo fija <code>phpunit.xml</code>).</li>
+          <li class="fragment"><strong><code>APP_DEBUG</code></strong>: con <code>true</code>, página de error detallada, como <code>display_errors</code>. Con <code>false</code>, "500 Server Error" y el detalle en <code>storage/logs/laravel.log</code>. En producción, <strong>siempre <code>false</code></strong>.</li>
+        </ul>
+      </section>
+
+      <!-- 14 · Fichero propio -->
+      <section>
+        <h2>Configuración propia</h2>
+        <p class="small-text"><code>define('NOMBRE_CENTRO', …)</code> de <em>v0</em> pasa a <code>config/marcapersonalfp.php</code>:</p>
+        <pre class="compacto"><code class="language-php" data-trim>
+&lt;?php
+
+return [
+
+    // Nombre del centro que se muestra en la aplicación.
+    'centro' =&gt; env('NOMBRE_CENTRO', 'CIFP Carlos III'),
+
+];
+        </code></pre>
+        <p class="small-text fragment"><code>config('marcapersonalfp.centro')</code>. Variable nueva en <code>.env</code> → también en <code>.env.example</code>.</p>
+      </section>
+
+      <!-- 15 · Sesión -->
+      <section>
+        <h2>La sesión, ya configurada</h2>
+        <p class="small-text">Adiós a <code>iniciarSesion()</code> (4.2). En <code>config/session.php</code>:</p>
+        <pre class="compacto"><code class="language-php" data-trim>
+'driver' =&gt; env('SESSION_DRIVER', 'database'),       // la tabla sessions (5.1)
+
+'lifetime' =&gt; (int) env('SESSION_LIFETIME', 120),   // minutos de inactividad
+
+'http_only' =&gt; env('SESSION_HTTP_ONLY', true),      // como en 4.1
+
+'same_site' =&gt; env('SESSION_SAME_SITE', 'lax'),     // como en 4.1
+        </code></pre>
+        <p class="small-text fragment">Un <em>middleware</em> la abre en cada petición. La usaremos en 5.6 (<em>flash</em>) y 5.7 (<em>login</em>).</p>
+      </section>
+
+      <!-- 16 · Artisan (1) -->
+      <section>
+        <h2><em>Artisan</em></h2>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan list
+php artisan help make:controller
+        </code></pre>
+        <table class="fragment">
+          <tbody>
+            <tr><th><code>about</code></th><td>Versiones y configuración principal</td><td>5.1</td></tr>
+            <tr><th><code>config:show app</code></th><td>Las opciones de un fichero de <code>config/</code></td><td>5.2</td></tr>
+            <tr><th><code>tinker</code></th><td>Probar código dentro de la aplicación</td><td>5.2</td></tr>
+            <tr><th><code>route:list</code></th><td>Todas las rutas</td><td>5.3</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 17 · Artisan (2) -->
+      <section>
+        <h2>Generadores: <code>make:</code></h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>make:controller</code></th><td>Un controlador</td><td>5.5</td></tr>
+            <tr class="fragment"><th><code>make:request</code></th><td>Un <em>Form Request</em></td><td>5.6</td></tr>
+            <tr class="fragment"><th><code>test</code></th><td>Ejecuta los tests</td><td>todo el bloque</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text fragment" style="margin-top:0.8em">Los generadores crean el fichero en su carpeta, con su espacio de nombres y el esqueleto de la clase: no hay que memorizar convenciones.</p>
+      </section>
+
+      <!-- 18 · Tinker -->
+      <section>
+        <h2><em>Tinker</em></h2>
+        <p class="small-text"><code>php artisan tinker</code>: cada línea se ejecuta con la aplicación cargada.</p>
+        <pre class="compacto"><code class="language-plaintext" data-trim>
+&gt; config('app.name')
+= "marcapersonalFP"
+
+&gt; app()-&gt;environment()
+= "local"
+        </code></pre>
+        <p class="small-text muted">Para salir, <code>exit</code>.</p>
+      </section>
+
+      <!-- 19 · Comandos propios -->
+      <section>
+        <h2>Comandos propios: <code>routes/console.php</code></h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="1|2|3">
+Artisan::command('inspire', function () {
+    $this-&gt;comment(Inspiring::quote());
+})-&gt;purpose('Display an inspiring quote');
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment">El <strong>nombre</strong>: <code>php artisan inspire</code>.</li>
+          <li class="fragment"><code>$this</code> es el comando: <code>info()</code> (verde), <code>comment()</code> (amarillo), <code>error()</code> (rojo).</li>
+          <li class="fragment"><code>purpose()</code>: la descripción de <code>php artisan list</code>.</li>
+        </ul>
+      </section>
+
+      <!-- 20 · Entorno -->
+      <section>
+        <h2>El entorno</h2>
+        <p class="small-text">El proyecto de 5.1 y el terminal de <code>workspace</code> como <code>laradock</code>. Rama nueva, en la VM:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+git switch main
+git pull upstream main
+git switch -c RA5_2
+        </code></pre>
+      </section>
+
+      <!-- 21 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/2)</h2>
+        <ol class="pasos compacta">
+          <li><strong>Recorre la estructura.</strong> ¿Dónde están la vista y la ruta de la bienvenida? ¿Por qué está vacía <code>storage/framework/sessions/</code>?</li>
+          <li><strong>Sigue una petición con Xdebug.</strong> <code>pathMappings</code> a <code>/var/www/marcapersonalfp</code>, punto de ruptura en <code>public/index.php</code> y <kbd>F11</kbd> en <code>handleRequest()</code>.</li>
+          <li><strong>Configuración regional.</strong> <code>APP_LOCALE=es</code> y <code>APP_FAKER_LOCALE=es_ES</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 22 · Ejercicios 4-6 -->
+      <section>
+        <h2>Ejercicios (2/2)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong>Un fichero de configuración propio.</strong> <code>config/marcapersonalfp.php</code> y <code>NOMBRE_CENTRO</code> en <code>.env</code> y <code>.env.example</code>.</li>
+          <li><strong>Un comando propio.</strong> <code>marcapersonalfp:centro</code>, en verde y con descripción.</li>
+          <li><strong>Investiga.</strong> <code>vendor/composer/autoload_psr4.php</code>. Y un error a propósito (<code>SESSION_DRIVER=inexistente</code>) con <code>APP_DEBUG</code> a <code>true</code> y a <code>false</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 23 · Puente -->
+      <section>
+        <h2>Puente</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>En <em>v0</em></h3>
+            <p class="small-text"><code>NOMBRE_CENTRO</code>, escrita en cada página; las opciones de la sesión, repetidas hasta <code>iniciarSesion()</code>.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En <em>Laravel</em></h3>
+            <p class="small-text">Lo que cambia por instalación, en <code>.env</code>; el resto, en <code>config/</code>, con un valor por defecto.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+      </section>
+
+      <!-- 24 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA5_2_EstructuraTest.php</code> a <code>tests/Feature/</code></li>
+          <li>En el terminal de <code>workspace</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan test --filter=RA5_2_EstructuraTest
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>3 a 5</strong>.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">Tests: 4 passed (10 assertions)</code></p>
+      </section>
+
+      <!-- 25 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>5.3. Rutas</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>

@@ -69,7 +69,7 @@ Cerramos _marcapersonalFP v0_, todavía en PHP plano: mantenimiento del estado, 
 Reconstruimos _marcapersonalFP_ con _Laravel_, separando la lógica de negocio de la presentación.
 
 1. [Instalación de _Laravel_ y desarrollo colaborativo](./RA5_1_instalacion.md)
-2. 🔁 Estructura de un proyecto, configuración y _Artisan_ (a partir de [Funcionamiento básico](./022_funcionamientoBasico.md) y [Artisan](./026_artisan.md))
+2. [Estructura de un proyecto, configuración y _Artisan_](./RA5_2_estructura.md)
 3. 🔁 Rutas (a partir de [Rutas](./023_rutas.md), [Ejercicios de rutas](./024_ejercicioRutas.md) y [Rutas avanzadas](./025_rutasAvanzadas.md))
 4. 🔁 Vistas, _Blade_ y _layouts_ (a partir de [Vistas](./027_vistas.md), [Plantillas mediante Blade](./0271_vistasBlade.md), [Crear un Layout](./0272_crearLayout.md) y [Ejercicios de vistas](./0273_ejerciciosVistas.md))
 5. 🔁 Controladores (a partir de [Controladores](./031_controladores.md) y sus [Ejercicios](./0311_ejerciciosControladores.md))
