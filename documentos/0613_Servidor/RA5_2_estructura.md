@@ -72,11 +72,13 @@ A partir de ahí, la petición recorre estos pasos:
 5. El controlador devuelve una **vista** (5.4) con esos datos.
 6. La respuesta vuelve a atravesar el _middleware_, que, por ejemplo, guarda la sesión, y llega al navegador.
 
-![Esquema de funcionamiento: public/index.php, rutas, controlador, modelos y vista](./images/esquema_funcionamiento.png)
+![El viaje de una petición: public/index.php, middleware, router, controlador y modelo, vista, y vuelta por el middleware al navegador](./images/RA5_2_viajePeticion.svg)
 
-En el esquema, `routes.php` es el nombre antiguo de `routes/web.php`.
+Los números del esquema son los pasos de la lista. Fíjate en el _middleware_: la petición lo atraviesa a la ida y la respuesta, a la vuelta.
 
-Esta división es el patrón **MVC** (Modelo-Vista-Controlador), que formalizaremos en 5.8. Cada pieza tiene una sola responsabilidad: los datos, en el modelo; la presentación, en la vista; y el controlador las coordina.
+Esta división es el patrón **MVC** (Modelo-Vista-Controlador), que formalizaremos en 5.8. Cada pieza tiene una sola responsabilidad: los datos, en el modelo; la presentación, en la vista; y el controlador las coordina. En _v0_, un mismo script hacía las tres cosas; con MVC, cada línea pasa a la pieza que le corresponde:
+
+![Modelo-Vista-Controlador: las líneas de un script de v0 repartidas entre modelo, controlador y vista, y el recorrido de una petición](./images/RA5_2_mvc.svg)
 
 ## Adiós a `require_once`: el _autoload_ de _Composer_
 

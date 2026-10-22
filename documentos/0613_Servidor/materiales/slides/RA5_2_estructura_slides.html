@@ -347,24 +347,191 @@ $app-&gt;handleRequest(Request::capture());                 // atiende la petici
         <p class="small-text fragment">Por eso el <code>root</code> del sitio de <em>nginx</em> apunta a <code>public/</code> (5.1).</p>
       </section>
 
-      <!-- 7 · Ciclo de vida -->
+      <!-- 7 · Ciclo de vida (SVG animado: un paso por fragmento) -->
       <section>
+        <style>
+          .reveal svg.anim { display: block; margin: 0 auto; width: 100%; height: auto; }
+          .reveal svg.anim text { font-family: var(--r-main-font); }
+          .reveal svg.anim .mono { font-family: var(--r-code-font); }
+          .reveal svg .fragment.custom.mover { transition: transform 1.2s ease-in-out; }
+          .reveal svg .fragment.custom.mover.visible { transform: translate(var(--dx), var(--dy)); }
+          .reveal ol.leyenda { columns: 2; column-gap: 40px; font-size: 0.5em; max-width: 920px; margin: 8px auto 0; padding-left: 1.4em; text-align: left; }
+          .reveal ol.leyenda li { margin: 2px 0; break-inside: avoid; }
+          @media (prefers-reduced-motion: reduce) {
+            .reveal svg .punto { display: none; }
+            .reveal svg .fragment.custom.mover { transition: none; }
+          }
+        </style>
         <h2>El viaje de una petición</h2>
-        <ol class="pasos compacta small-text">
-          <li class="fragment"><code>Request::capture()</code>: lo que en <em>v0</em> leíamos de <code>$_GET</code>, <code>$_POST</code>, <code>$_COOKIE</code>…</li>
-          <li class="fragment">El <strong><em>middleware</em></strong> (5.7): abre la sesión, comprueba el <em>token</em> CSRF…</li>
-          <li class="fragment">El <strong>enrutador</strong> busca la ruta en <code>routes/web.php</code> (5.3).</li>
-          <li class="fragment">La ruta llama a su <strong>acción</strong>: un <strong>controlador</strong> (5.5), que pide datos a los <strong>modelos</strong>.</li>
-          <li class="fragment">El controlador devuelve una <strong>vista</strong> (5.4).</li>
-          <li class="fragment">De vuelta por el <em>middleware</em> (guarda la sesión), al navegador.</li>
+        <svg class="anim" viewBox="0 0 960 400" role="img" aria-label="Una petición entra por public/index.php, atraviesa el middleware, el router la lleva al controlador, que pide datos al modelo y los pasa a la vista; la respuesta vuelve por el middleware al navegador">
+          <defs>
+            <marker id="v-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+            <marker id="v-fl-rosa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#DB2777"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="400" rx="14" fill="#F8FAFC"/>
+
+          <!-- Middleware: una banda que la petición cruza a la ida y a la vuelta -->
+          <rect x="355" y="15" width="95" height="370" rx="12" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+          <text x="402" y="200" transform="rotate(-90 402 200)" text-anchor="middle" font-size="22" font-weight="700" fill="#B45309">Middleware</text>
+          <text x="402" y="36" text-anchor="middle" font-size="12" fill="#B45309">sesión · CSRF</text>
+
+          <!-- Nodos -->
+          <rect x="15" y="150" width="120" height="100" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+          <rect x="15" y="150" width="120" height="18" rx="9" fill="#3B82F6"/>
+          <text x="75" y="215" text-anchor="middle" font-size="18" font-weight="700" fill="#1E3A8A">Navegador</text>
+
+          <rect x="175" y="40" width="150" height="70" rx="10" fill="#F3F4F6" stroke="#4B5563" stroke-width="2"/>
+          <text x="250" y="82" text-anchor="middle" font-size="15" class="mono" fill="#111827">public/index.php</text>
+
+          <rect x="480" y="40" width="130" height="70" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+          <text x="545" y="70" text-anchor="middle" font-size="18" font-weight="700" fill="#1E40AF">Router</text>
+          <text x="545" y="94" text-anchor="middle" font-size="12" class="mono" fill="#1E40AF">routes/web.php</text>
+
+          <rect x="650" y="40" width="140" height="70" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+          <text x="720" y="81" text-anchor="middle" font-size="18" font-weight="700" fill="#5B21B6">Controlador</text>
+
+          <rect x="830" y="40" width="115" height="70" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+          <text x="887" y="81" text-anchor="middle" font-size="18" font-weight="700" fill="#065F46">Modelo</text>
+
+          <rect x="650" y="290" width="140" height="70" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="2"/>
+          <text x="720" y="321" text-anchor="middle" font-size="18" font-weight="700" fill="#9D174D">Vista</text>
+          <text x="720" y="344" text-anchor="middle" font-size="12" class="mono" fill="#9D174D">.blade.php</text>
+
+          <!-- Paso 1: la petición entra por public/index.php -->
+          <g class="fragment" data-fragment-index="1">
+            <text x="22" y="138" font-size="14" class="mono" fill="#1D4ED8">GET /proyectos</text>
+            <path d="M135 180 C 160 180, 150 75, 173 75" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+            <circle cx="176" cy="128" r="13" fill="#4B5563"/><text x="176" y="133" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">1</text>
+          </g>
+          <!-- Paso 2: el middleware -->
+          <g class="fragment" data-fragment-index="2">
+            <path d="M325 75 L 400 75" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+            <circle cx="402" cy="112" r="13" fill="#D97706"/><text x="402" y="117" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">2</text>
+          </g>
+          <!-- Paso 3: el router busca la ruta -->
+          <g class="fragment" data-fragment-index="3">
+            <path d="M404 75 L 478 75" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+            <circle cx="545" cy="135" r="13" fill="#2563EB"/><text x="545" y="140" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">3</text>
+          </g>
+          <!-- Paso 4: el controlador pide los datos al modelo -->
+          <g class="fragment" data-fragment-index="4">
+            <path d="M610 75 L 648 75" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+            <path d="M790 64 L 828 64" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+            <path d="M830 88 L 792 88" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+            <circle cx="810" cy="135" r="13" fill="#7C3AED"/><text x="810" y="140" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">4</text>
+          </g>
+          <!-- Paso 5: el controlador pasa los datos a la vista -->
+          <g class="fragment" data-fragment-index="5">
+            <path d="M720 110 L 720 286" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+            <text x="732" y="205" font-size="13" fill="#4B5563">datos</text>
+            <circle cx="700" cy="200" r="13" fill="#DB2777"/><text x="700" y="205" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">5</text>
+          </g>
+          <!-- Paso 6: la respuesta vuelve por el middleware -->
+          <g class="fragment" data-fragment-index="6">
+            <path d="M650 325 L 75 325 L 75 254" fill="none" stroke="#DB2777" stroke-width="3" marker-end="url(#v-fl-rosa)"/>
+            <text x="520" y="315" font-size="14" font-weight="700" fill="#9D174D">HTML</text>
+            <circle cx="402" cy="355" r="13" fill="#D97706"/><text x="402" y="360" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">6</text>
+          </g>
+
+          <!-- Un punto recorre el tramo activo (solo el del paso actual) -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.2s" repeatCount="indefinite" path="M135 180 C 160 180, 150 75, 173 75"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.2s" repeatCount="indefinite" path="M325 75 L 400 75"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.2s" repeatCount="indefinite" path="M404 75 L 478 75"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="4"><circle r="7" fill="#1D4ED8"><animateMotion dur="2s" repeatCount="indefinite" path="M610 75 L 648 75 L 790 64 L 828 64 L 830 88 L 792 88"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="5"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.4s" repeatCount="indefinite" path="M720 110 L 720 286"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="6"><circle r="7" fill="#DB2777"><animateMotion dur="2.4s" repeatCount="indefinite" path="M650 325 L 75 325 L 75 254"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1"><code>Request::capture()</code>: todo entra por <code>public/index.php</code></li>
+          <li class="fragment" data-fragment-index="2"><strong><em>Middleware</em></strong> (5.7): abre la sesión, comprueba el CSRF</li>
+          <li class="fragment" data-fragment-index="3"><strong>Router</strong>: busca la ruta en <code>routes/web.php</code> (5.3)</li>
+          <li class="fragment" data-fragment-index="4"><strong>Controlador</strong> (5.5): pide los datos al <strong>modelo</strong></li>
+          <li class="fragment" data-fragment-index="5"><strong>Vista</strong> (5.4): genera el HTML con esos datos</li>
+          <li class="fragment" data-fragment-index="6">De vuelta por el <em>middleware</em> (guarda la sesión), al navegador</li>
         </ol>
+        <aside class="notes">
+          Un paso por pulsación; el punto recorre el tramo del paso actual.
+          Insistir en el middleware: la petición lo cruza a la ida y la respuesta a la vuelta.
+          En v0, cada script hacía todo esto él solo, empezando por session_start().
+        </aside>
       </section>
 
-      <!-- 8 · Esquema MVC -->
+      <!-- 8 · Esquema MVC (SVG animado: de v0 a MVC, y el ciclo de una petición) -->
       <section>
         <h2>El patrón MVC</h2>
-        <img class="flow" style="max-height:400px; width:auto" src="../../images/esquema_funcionamiento.png" alt="public/index.php, rutas, controlador, modelos y vista">
-        <p class="small-text muted">Cada pieza, una responsabilidad. Lo formalizamos en 5.8. (<code>routes.php</code> es hoy <code>routes/web.php</code>.)</p>
+        <svg class="anim" viewBox="0 0 900 465" style="max-height:440px" role="img" aria-label="Las líneas de un script de v0, que mezclan datos, lógica y HTML, se separan en Modelo, Controlador y Vista; después, una petición recorre controlador, modelo, controlador y vista">
+          <defs>
+            <marker id="m-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+            <marker id="m-fl-rosa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#DB2777"/></marker>
+          </defs>
+          <rect x="0" y="0" width="900" height="465" rx="14" fill="#F8FAFC"/>
+
+          <!-- v0: un único script (desaparece al separar) -->
+          <g class="fragment fade-out" data-fragment-index="1">
+            <rect x="30" y="80" width="330" height="300" rx="10" fill="#FFFFFF" stroke="#6B7280" stroke-width="2" stroke-dasharray="6 4"/>
+            <text x="45" y="108" font-size="15" font-weight="700" class="mono" fill="#374151">RA2_proyectoListado.php</text>
+            <text x="345" y="108" text-anchor="end" font-size="13" fill="#6B7280">v0</text>
+          </g>
+
+          <!-- MVC: tres piezas (aparecen al separar) -->
+          <g class="fragment" data-fragment-index="1">
+            <rect x="570" y="15" width="310" height="100" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+            <text x="585" y="42" font-size="19" font-weight="700" fill="#065F46">Modelo <tspan font-weight="400" font-size="15">· los datos</tspan></text>
+            <rect x="570" y="155" width="310" height="100" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+            <text x="585" y="182" font-size="19" font-weight="700" fill="#5B21B6">Controlador <tspan font-weight="400" font-size="15">· coordina</tspan></text>
+            <rect x="570" y="295" width="310" height="160" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="2"/>
+            <text x="585" y="322" font-size="19" font-weight="700" fill="#9D174D">Vista <tspan font-weight="400" font-size="15">· la presentación</tspan></text>
+          </g>
+
+          <!-- Las líneas del script: viajan a la pieza que les corresponde -->
+          <g class="fragment custom mover" data-fragment-index="1" style="--dx:530px; --dy:210px">
+            <rect x="50" y="130" width="290" height="44" rx="6" fill="#FCE7F3" stroke="#DB2777"/>
+            <text x="62" y="157" font-size="13" class="mono" fill="#831843">&lt;h1&gt;&lt;?= NOMBRE_CENTRO ?&gt;&lt;/h1&gt;</text>
+          </g>
+          <g class="fragment custom mover" data-fragment-index="1" style="--dx:530px; --dy:-125px">
+            <rect x="50" y="185" width="290" height="44" rx="6" fill="#D1FAE5" stroke="#059669"/>
+            <text x="62" y="212" font-size="13" class="mono" fill="#064E3B">$curriculos = [ … ];</text>
+          </g>
+          <g class="fragment custom mover" data-fragment-index="1" style="--dx:530px; --dy:-45px">
+            <rect x="50" y="240" width="290" height="44" rx="6" fill="#EDE9FE" stroke="#7C3AED"/>
+            <text x="62" y="267" font-size="13" class="mono" fill="#4C1D95">$ciclo = $_GET['ciclo'] ?? '';</text>
+          </g>
+          <g class="fragment custom mover" data-fragment-index="1" style="--dx:530px; --dy:95px">
+            <rect x="50" y="295" width="290" height="44" rx="6" fill="#FCE7F3" stroke="#DB2777"/>
+            <text x="62" y="322" font-size="13" class="mono" fill="#831843">foreach (…) echo '&lt;li&gt;…&lt;/li&gt;';</text>
+          </g>
+
+          <!-- El ciclo de una petición -->
+          <g class="fragment" data-fragment-index="2">
+            <circle cx="150" cy="205" r="22" fill="#3B82F6"/>
+            <path d="M112 270 C 112 236, 188 236, 188 270 Z" fill="#3B82F6"/>
+            <text x="150" y="298" text-anchor="middle" font-size="16" font-weight="700" fill="#1E3A8A">Navegador</text>
+            <path d="M200 215 L 566 215" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#m-fl-gris)"/>
+            <text x="383" y="205" text-anchor="middle" font-size="14" fill="#374151">petición</text>
+            <path d="M690 155 L 690 119" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#m-fl-gris)"/>
+            <text x="682" y="142" text-anchor="end" font-size="13" fill="#374151">pide</text>
+            <path d="M760 115 L 760 151" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#m-fl-gris)"/>
+            <text x="768" y="142" font-size="13" fill="#374151">datos</text>
+            <path d="M725 255 L 725 291" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#m-fl-gris)"/>
+            <text x="733" y="280" font-size="13" fill="#374151">datos</text>
+            <path d="M570 430 C 380 430, 230 400, 165 312" fill="none" stroke="#DB2777" stroke-width="3" marker-end="url(#m-fl-rosa)"/>
+            <text x="350" y="440" font-size="14" font-weight="700" fill="#9D174D">HTML</text>
+          </g>
+          <g class="fragment punto" data-fragment-index="2">
+            <circle r="8" fill="#1D4ED8">
+              <animateMotion dur="7s" repeatCount="indefinite"
+                path="M200 215 L 566 215 L 690 215 L 690 119 L 760 119 L 760 215 L 725 215 L 725 291 L 725 430 L 570 430 C 380 430, 230 400, 165 312"/>
+            </circle>
+          </g>
+        </svg>
+        <p class="small-text" style="margin:6px 0 0">En <em>v0</em>, un mismo script mezcla datos, lógica y HTML.</p>
+        <p class="small-text fragment" data-fragment-index="1" style="margin:2px 0 0">Con MVC, cada pieza tiene <strong>una sola responsabilidad</strong> (5.8).</p>
+        <p class="small-text fragment" data-fragment-index="2" style="margin:2px 0 0">Una petición las recorre: controlador → modelo → controlador → vista.</p>
+        <aside class="notes">
+          Paso 1: cada línea del script de v0 viaja a la pieza que le corresponde; las dos de HTML acaban juntas en la vista.
+          Paso 2: el punto recorre el ciclo completo de una petición.
+          El foreach que genera el HTML es presentación: en Blade será @foreach (5.4).
+        </aside>
       </section>
 
       <!-- 9 · Adiós a require_once -->

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 430" width="960" height="430" role="img" aria-label="Flujo de trabajo: fork del repositorio base, clone a la máquina virtual, rama con commits, push a tu fork, pull request al repositorio base, pull desde upstream y push de main a tu fork" font-family="'Source Sans Pro', Helvetica, Arial, sans-serif">
+  <title>Flujo de trabajo: fork del repositorio base, clone a la máquina virtual, rama con commits, push a tu fork, pull request al repositorio base, pull desde upstream y push de main a tu fork</title>
+  <defs>
+    <marker id="g-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+    <marker id="g-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+    <marker id="g-fl-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+  </defs>
+  <rect x="0" y="0" width="960" height="430" rx="14" fill="#F8FAFC"/>
+
+  <!-- Zonas -->
+  <rect x="15" y="12" width="930" height="180" rx="12" fill="#F1F5F9" stroke="#CBD5E1"/>
+  <text x="30" y="34" font-size="14" font-weight="700" fill="#64748B">GitHub</text>
+  <rect x="15" y="235" width="930" height="185" rx="12" fill="#F1F5F9" stroke="#CBD5E1"/>
+  <text x="30" y="257" font-size="14" font-weight="700" fill="#64748B">Tu máquina virtual</text>
+
+  <!-- Repositorio base -->
+  <rect x="50" y="45" width="310" height="115" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+  <text x="65" y="72" font-size="18" font-weight="700" fill="#1E40AF">Repositorio base</text>
+  <text x="65" y="95" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#1E40AF">2DAW-CarlosIII/marcapersonalfp2627</text>
+  <rect x="65" y="112" width="88" height="26" rx="13" fill="#2563EB"/>
+  <text x="109" y="130" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#fff">upstream</text>
+
+  <!-- Tu fork -->
+  <rect x="600" y="45" width="310" height="115" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+  <text x="615" y="72" font-size="18" font-weight="700" fill="#5B21B6">Tu fork</text>
+  <text x="615" y="95" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#5B21B6">&lt;tu-usuario&gt;/marcapersonalfp2627</text>
+  <rect x="615" y="112" width="70" height="26" rx="13" fill="#7C3AED"/>
+  <text x="650" y="130" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#fff">origin</text>
+
+  <!-- Tu clon local, con la rama main -->
+  <rect x="270" y="280" width="420" height="132" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+  <text x="285" y="305" font-size="18" font-weight="700" fill="#065F46">Tu clon local</text>
+  <text x="285" y="325" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#065F46">~/Documentos/laravel/marcapersonalfp</text>
+  <line x1="290" y1="390" x2="670" y2="390" stroke="#065F46" stroke-width="3"/>
+  <circle cx="315" cy="390" r="7" fill="#065F46"/><circle cx="360" cy="390" r="7" fill="#065F46"/>
+  <text x="292" y="408" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#065F46">main</text>
+
+  <!-- 1 · fork -->
+  <g>
+    <path d="M360 82 L 597 82" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#g-fl-gris)"/>
+    <circle cx="452" cy="66" r="12" fill="#4B5563"/><text x="452" y="71" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+    <text x="470" y="71" font-size="15" font-family="'Source Code Pro', Consolas, monospace" fill="#374151">fork</text>
+  </g>
+  <!-- 2 · clone -->
+  <g>
+    <path d="M640 160 C 640 220, 560 225, 560 277" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#g-fl-gris)"/>
+    <circle cx="580" cy="215" r="12" fill="#4B5563"/><text x="580" y="220" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+    <text x="512" y="220" font-size="15" font-family="'Source Code Pro', Consolas, monospace" fill="#374151">clone</text>
+  </g>
+  <!-- 3 · rama y commits -->
+  <g>
+    <path d="M360 390 C 385 390, 380 358, 405 358 L 555 358" fill="none" stroke="#D97706" stroke-width="3"/>
+    <circle cx="430" cy="358" r="7" fill="#D97706"/><circle cx="480" cy="358" r="7" fill="#D97706"/><circle cx="530" cy="358" r="7" fill="#D97706"/>
+    <text x="560" y="363" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#B45309">RA5_1</text>
+    <circle cx="420" cy="336" r="12" fill="#D97706"/><text x="420" y="341" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+  </g>
+  <!-- 4 · push de la rama a tu fork -->
+  <g>
+    <path d="M655 277 C 655 225, 760 220, 760 163" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#g-fl-gris)"/>
+    <circle cx="728" cy="215" r="12" fill="#4B5563"/><text x="728" y="220" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+    <text x="746" y="220" font-size="15" font-family="'Source Code Pro', Consolas, monospace" fill="#374151">push</text>
+  </g>
+  <!-- 5 · pull request al repositorio base -->
+  <g>
+    <path d="M598 135 L 363 135" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#g-fl-ambar)"/>
+    <circle cx="400" cy="119" r="12" fill="#D97706"/><text x="400" y="124" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+    <text x="418" y="124" font-size="15" fill="#92400E">pull request</text>
+    <text x="480" y="155" text-anchor="middle" font-size="12" fill="#92400E">lo acepta el profesorado</text>
+  </g>
+  <!-- 6 · pull desde upstream -->
+  <g>
+    <path d="M200 160 C 200 250, 225 335, 266 345" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#g-fl-verde)"/>
+    <circle cx="610" cy="390" r="7" fill="#059669"/>
+    <circle cx="190" cy="250" r="12" fill="#059669"/><text x="190" y="255" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">6</text>
+    <text x="85" y="282" font-size="15" font-family="'Source Code Pro', Consolas, monospace" fill="#065F46">pull upstream</text>
+  </g>
+  <!-- 7 · push de main a tu fork -->
+  <g>
+    <path d="M690 345 C 830 345, 865 260, 862 163" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#g-fl-gris)"/>
+    <circle cx="845" cy="300" r="12" fill="#4B5563"/><text x="845" y="305" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">7</text>
+    <text x="742" y="370" font-size="15" font-family="'Source Code Pro', Consolas, monospace" fill="#374151">push main</text>
+  </g>
+
+</svg>

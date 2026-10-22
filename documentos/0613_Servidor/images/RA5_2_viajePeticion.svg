@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-label="Una petición entra por public/index.php, atraviesa el middleware, el router la lleva al controlador, que pide datos al modelo y los pasa a la vista; la respuesta vuelve por el middleware al navegador" font-family="'Source Sans Pro', Helvetica, Arial, sans-serif">
+  <title>Una petición entra por public/index.php, atraviesa el middleware, el router la lleva al controlador, que pide datos al modelo y los pasa a la vista; la respuesta vuelve por el middleware al navegador</title>
+  <defs>
+    <marker id="v-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+    <marker id="v-fl-rosa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#DB2777"/></marker>
+  </defs>
+  <rect x="0" y="0" width="960" height="400" rx="14" fill="#F8FAFC"/>
+
+  <!-- Middleware: una banda que la petición cruza a la ida y a la vuelta -->
+  <rect x="355" y="15" width="95" height="370" rx="12" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+  <text x="402" y="200" transform="rotate(-90 402 200)" text-anchor="middle" font-size="22" font-weight="700" fill="#B45309">Middleware</text>
+  <text x="402" y="36" text-anchor="middle" font-size="12" fill="#B45309">sesión · CSRF</text>
+
+  <!-- Nodos -->
+  <rect x="15" y="150" width="120" height="100" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+  <rect x="15" y="150" width="120" height="18" rx="9" fill="#3B82F6"/>
+  <text x="75" y="215" text-anchor="middle" font-size="18" font-weight="700" fill="#1E3A8A">Navegador</text>
+
+  <rect x="175" y="40" width="150" height="70" rx="10" fill="#F3F4F6" stroke="#4B5563" stroke-width="2"/>
+  <text x="250" y="82" text-anchor="middle" font-size="15" font-family="'Source Code Pro', Consolas, monospace" fill="#111827">public/index.php</text>
+
+  <rect x="480" y="40" width="130" height="70" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+  <text x="545" y="70" text-anchor="middle" font-size="18" font-weight="700" fill="#1E40AF">Router</text>
+  <text x="545" y="94" text-anchor="middle" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#1E40AF">routes/web.php</text>
+
+  <rect x="650" y="40" width="140" height="70" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+  <text x="720" y="81" text-anchor="middle" font-size="18" font-weight="700" fill="#5B21B6">Controlador</text>
+
+  <rect x="830" y="40" width="115" height="70" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+  <text x="887" y="81" text-anchor="middle" font-size="18" font-weight="700" fill="#065F46">Modelo</text>
+
+  <rect x="650" y="290" width="140" height="70" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="2"/>
+  <text x="720" y="321" text-anchor="middle" font-size="18" font-weight="700" fill="#9D174D">Vista</text>
+  <text x="720" y="344" text-anchor="middle" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#9D174D">.blade.php</text>
+
+  <!-- Paso 1: la petición entra por public/index.php -->
+  <g>
+    <text x="22" y="138" font-size="14" font-family="'Source Code Pro', Consolas, monospace" fill="#1D4ED8">GET /proyectos</text>
+    <path d="M135 180 C 160 180, 150 75, 173 75" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+    <circle cx="176" cy="128" r="13" fill="#4B5563"/><text x="176" y="133" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">1</text>
+  </g>
+  <!-- Paso 2: el middleware -->
+  <g>
+    <path d="M325 75 L 400 75" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+    <circle cx="402" cy="112" r="13" fill="#D97706"/><text x="402" y="117" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">2</text>
+  </g>
+  <!-- Paso 3: el router busca la ruta -->
+  <g>
+    <path d="M404 75 L 478 75" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+    <circle cx="545" cy="135" r="13" fill="#2563EB"/><text x="545" y="140" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">3</text>
+  </g>
+  <!-- Paso 4: el controlador pide los datos al modelo -->
+  <g>
+    <path d="M610 75 L 648 75" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+    <path d="M790 64 L 828 64" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+    <path d="M830 88 L 792 88" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+    <circle cx="810" cy="135" r="13" fill="#7C3AED"/><text x="810" y="140" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">4</text>
+  </g>
+  <!-- Paso 5: el controlador pasa los datos a la vista -->
+  <g>
+    <path d="M720 110 L 720 286" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#v-fl-gris)"/>
+    <text x="732" y="205" font-size="13" fill="#4B5563">datos</text>
+    <circle cx="700" cy="200" r="13" fill="#DB2777"/><text x="700" y="205" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">5</text>
+  </g>
+  <!-- Paso 6: la respuesta vuelve por el middleware -->
+  <g>
+    <path d="M650 325 L 75 325 L 75 254" fill="none" stroke="#DB2777" stroke-width="3" marker-end="url(#v-fl-rosa)"/>
+    <text x="520" y="315" font-size="14" font-weight="700" fill="#9D174D">HTML</text>
+    <circle cx="402" cy="355" r="13" fill="#D97706"/><text x="402" y="360" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">6</text>
+  </g>
+
+</svg>

@@ -47,7 +47,9 @@ El proyecto _Laravel_ de _marcapersonalFP_ se desarrolla en grupo, sobre un repo
 
 Tú trabajas en el clon local, subes tus ramas a tu _fork_ y, desde allí, propones los cambios al repositorio base con un _pull request_.
 
-![Esquema del flujo: fork, clone, rama, push, pull request y pull](./images/esquemaSolucionEjerciciosGit.svg)
+![Flujo de trabajo: fork, clone, rama con commits, push a tu fork, pull request al repositorio base, pull desde upstream y push de main](./images/RA5_1_flujoTrabajo.svg)
+
+Los números del esquema marcan el orden. El _fork_ y el _clone_ (1 y 2) se hacen una sola vez, en los pasos 1 y 2 de este apartado. Del 3 al 7 se repiten en cada apartado del bloque, como se explica en el paso 6.
 
 > **Cómo se creó el repositorio base (profesorado).** Una vez por curso, el profesorado genera el esqueleto con _Composer_ y lo sube a la organización. En la máquina virtual no hay PHP instalado, así que _Composer_ se ejecuta en un contenedor de usar y tirar de la imagen `thecodingmachine/php`, que crea los ficheros a nombre del dueño de la carpeta (no de _root_):
 >
