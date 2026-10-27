@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Tests\TestCase;
 
 class RA5_4_VistasTest extends TestCase
@@ -11,6 +12,8 @@ class RA5_4_VistasTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Desde 5.7, el alta y la edición exigen sesión: estos tests entran como Ana López (4.2).
+        $this->actingAs(new User(['name' => 'Ana López', 'email' => 'ana.lopez@marcapersonalfp.test']));
         // Las vistas se prueban sin los estilos; su compilación se comprueba en test_estructura_de_las_vistas.
         $this->withoutVite();
     }

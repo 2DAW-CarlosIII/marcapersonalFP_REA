@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
@@ -13,6 +14,8 @@ class RA5_5_ControladoresTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Desde 5.7, el alta y la edición exigen sesión: estos tests entran como Ana López (4.2).
+        $this->actingAs(new User(['name' => 'Ana López', 'email' => 'ana.lopez@marcapersonalfp.test']));
         $this->withoutVite();
     }
 

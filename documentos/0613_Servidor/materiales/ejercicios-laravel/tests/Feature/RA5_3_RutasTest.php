@@ -2,11 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Tests\TestCase;
 
 class RA5_3_RutasTest extends TestCase
 {
     private const ID = 7;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Desde 5.7, el alta y la edición exigen sesión: estos tests entran como Ana López (4.2).
+        $this->actingAs(new User(['name' => 'Ana López', 'email' => 'ana.lopez@marcapersonalfp.test']));
+    }
 
     public function test_saludo_con_y_sin_nombre(): void
     {
