@@ -71,7 +71,7 @@ Reconstruimos _marcapersonalFP_ con _Laravel_, separando la lógica de negocio d
 1. [Instalación de _Laravel_ y desarrollo colaborativo](./RA5_1_instalacion.md)
 2. [Estructura de un proyecto, configuración y _Artisan_](./RA5_2_estructura.md)
 3. [Rutas](./RA5_3_rutas.md)
-4. 🔁 Vistas, _Blade_ y _layouts_ (a partir de [Vistas](./027_vistas.md), [Plantillas mediante Blade](./0271_vistasBlade.md), [Crear un Layout](./0272_crearLayout.md) y [Ejercicios de vistas](./0273_ejerciciosVistas.md))
+4. [Vistas, _Blade_ y _layouts_](./RA5_4_vistas.md)
 5. 🔁 Controladores (a partir de [Controladores](./031_controladores.md) y sus [Ejercicios](./0311_ejerciciosControladores.md))
     - Ejercicios colaborativos opcionales: 🔁 [Reconocimientos](./0363_reconocimientoController.md) · 🔁 [Actividades](./0364_actividadController.md)
 6. 🔁 Formularios, datos de entrada, validación y redirecciones (a partir de [Formularios](./034_Formularios.md), [Datos de entrada](./035_datosEntrada.md) y [Redirecciones](./033_Redirecciones.md))

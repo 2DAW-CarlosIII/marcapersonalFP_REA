@@ -2,111 +2,90 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ViewsExerciseTest extends TestCase
+class RA5_4_VistasTest extends TestCase
 {
-    public function test_vistas(): void
+    private const ID = 7;
+
+    protected function setUp(): void
     {
-        /**
-         * main page test.
-         */
-            $value = 'Pantalla principal';
-            $response = $this->get('/');
+        parent::setUp();
+        // Las vistas se prueban sin los estilos; su compilación se comprueba en test_estructura_de_las_vistas.
+        $this->withoutVite();
+    }
 
-            $response
-                ->assertStatus(200)
-                ->assertViewIs('home')
-                ->assertSeeText($value, $escaped = true);
+    public function test_pantalla_principal(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertViewIs('home')
+            ->assertViewHas('centro', 'CIFP Carlos III')
+            ->assertSeeText('Pantalla principal');
+    }
 
-        /**
-         * login test.
-         */
-            $value = 'Login usuario';
-            $response = $this->get('/login');
-
-            $response
-            ->assertStatus(200)
-            ->assertViewIs('auth.login')
-            ->assertSeeText($value, $escaped = true);
-
-        /**
-         * logout test.
-         */
-            $value = 'Logout usuario';
-            $response = $this->get('/logout');
-
-            $response->assertStatus(200)->assertSeeText($value, $escaped = true);
-
-        /**
-         * proyectos index test.
-         */
-            $value = 'Listado proyectos';
-            $response = $this->get('/proyectos');
-
-            $response
-            ->assertStatus(200)
+    public function test_listado_de_proyectos(): void
+    {
+        $this->get('/proyectos')
+            ->assertOk()
             ->assertViewIs('proyectos.index')
-            ->assertSeeText($value, $escaped = true);
+            ->assertViewHas('proyectos')
+            ->assertSeeText('Tecnologías de la Información')
+            ->assertSeeText('Diseño Gráfico');
+    }
 
-        /**
-         * proyectos show test.
-         */
-            $id = rand(1, 10);
-            $value = "Vista detalle proyecto $id";
-            $response = $this->get("/proyectos/show/$id");
-
-            $response
-            ->assertStatus(200)
+    public function test_detalle_y_edicion_de_un_proyecto(): void
+    {
+        $this->get('/proyectos/show/' . self::ID)
+            ->assertOk()
             ->assertViewIs('proyectos.show')
-            ->assertSeeText($value, $escaped = true);
+            ->assertViewHas('id', self::ID)
+            ->assertSeeText('Vista detalle proyecto ' . self::ID);
 
-            $response = $this->get("/proyectos/show/" . chr(ord('A') + $id));
-            $response->assertNotFound();
-
-        /**
-         * proyectos create test.
-         */
-            $value = 'Añadir proyecto';
-            $response = $this->get('/proyectos/create');
-
-            $response
-            ->assertStatus(200)
-            ->assertViewIs('proyectos.create')
-            ->assertSeeText($value, $escaped = true);
-
-        /**
-         * proyectos edit test.
-         */
-            $id = rand(1, 10);
-            $value = "Modificar proyecto $id";
-            $response = $this->get("/proyectos/edit/$id");
-
-            $response
-            ->assertStatus(200)
+        $this->get('/proyectos/edit/' . self::ID)
+            ->assertOk()
             ->assertViewIs('proyectos.edit')
-            ->assertSeeText($value, $escaped = true);
+            ->assertViewHas('id', self::ID)
+            ->assertSeeText('Modificar proyecto ' . self::ID);
+    }
 
-            $response = $this->get("/proyectos/edit/" . chr(ord('A') + $id));
-            $response->assertNotFound();
+    public function test_alta_de_un_proyecto(): void
+    {
+        $this->get('/proyectos/create')
+            ->assertOk()
+            ->assertViewIs('proyectos.create')
+            ->assertSeeText('Añadir proyecto');
+    }
 
-        /**
-         * perfil test.
-         */
-            $id = rand(1, 10);
-            $value = "Visualizar el currículo de $id";
-            $response = $this->get("/perfil/$id");
+    public function test_perfil_con_y_sin_id(): void
+    {
+        $this->get('/perfil/3')
+            ->assertOk()
+            ->assertViewIs('perfil')
+            ->assertSeeText('Visualizar el currículo de 3');
 
-            $response->assertStatus(200)->assertSeeText($value, $escaped = true);
+        $this->get('/perfil')
+            ->assertOk()
+            ->assertSeeText('Visualizar el currículo propio');
+    }
 
-            $value = "Visualizar el currículo propio";
-            $response = $this->get("/perfil");
+    public function test_las_paginas_comparten_el_layout(): void
+    {
+        foreach (['/', '/proyectos', '/proyectos/create'] as $url) {
+            $this->get($url)
+                ->assertSee('images/mp-logo.png', false)
+                ->assertSeeText('CIFP Carlos III');
+        }
+    }
 
-            $response->assertStatus(200)->assertSeeText($value, $escaped = true);
+    public function test_estructura_de_las_vistas(): void
+    {
+        $layout = (string) @file_get_contents(resource_path('views/components/layout.blade.php'));
 
-            $response = $this->get("/perfil/" . chr(ord('A') + $id));
-            $response->assertNotFound();
+        $this->assertMatchesRegularExpression('/\{\{\s*\$slot\s*\}\}/', $layout, 'El layout (components/layout.blade.php) debe mostrar {{ $slot }}.');
+        $this->assertStringContainsString('@vite(', $layout, 'El layout debe enlazar los estilos con @vite.');
+        $this->assertFileExists(resource_path('views/components/navbar.blade.php'));
+        $this->assertFileExists(resource_path('views/components/tarjeta-proyecto.blade.php'));
+        $this->assertFileExists(public_path('build/manifest.json'), 'Compila los estilos: npm run build.');
     }
 }
