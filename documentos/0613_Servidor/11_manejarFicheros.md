@@ -1,6 +1,6 @@
 # 11. Manejar Ficheros en la API
 
-Como comentamos en el capítulo dedicado a los [datos de entrada](./035_datosEntrada.md#ficheros-de-entrada) y en el capítulo [utilización de ficheros](./0476_utilizarFicheros.md), _Laravel_ facilita el manejo de ficheros, tanto si se van a almacenar en el sistema de ficheros _local_, como si se van a almacenar en un servicio como _Amazon S3_.
+Como comentamos en el capítulo dedicado a los [formularios y datos de entrada](./RA5_6_formularios.md#ficheros) y en el capítulo [utilización de ficheros](./0476_utilizarFicheros.md), _Laravel_ facilita el manejo de ficheros, tanto si se van a almacenar en el sistema de ficheros _local_, como si se van a almacenar en un servicio como _Amazon S3_.
 
 En esta práctica guiada, vamos a utilizar el driver que incluye para el almacenamiento en el sistema de archivos `public` para conseguir subir al servidor un archivo comprimido asociado al proyecto, que posteriormente enviaremos a GitHub para su despliegue.
 
