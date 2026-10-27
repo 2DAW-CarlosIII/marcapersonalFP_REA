@@ -75,7 +75,7 @@ Reconstruimos _marcapersonalFP_ con _Laravel_, separando la lógica de negocio d
 5. [Controladores](./RA5_5_controladores.md)
     - Ejercicios colaborativos opcionales: [Reconocimientos](./0363_reconocimientoController.md) · [Actividades](./0364_actividadController.md)
 6. [Formularios, datos de entrada, validación y redirecciones](./RA5_6_formularios.md)
-7. 🔁 _Middleware_ y control de usuarios con _Breeze_ (a partir de [Control de usuarios](./051_Autenticacion.md), [Middleware o filtros](./032_middlewares.md) y [Ejercicios](./052_ejerciciosUsers.md))
+7. [_Middleware_ y control de usuarios con _Breeze_](./RA5_7_breeze.md)
 8. 🆕 *Proyecto:* _marcapersonalFP_ en _Laravel_. Separación de la lógica de negocio: POO y patrones de diseño (MVC, _Singleton_, repositorio, DAO) (borrador: [Controlador de currículos](./0362_curriculoController.md))
 
 ## Bloque 6. Acceso a almacenes de datos (RA6)
@@ -88,6 +88,7 @@ Reconstruimos _marcapersonalFP_ con _Laravel_, separando la lógica de negocio d
     5. [Inicialización de la base de datos (Seeding)](./045_databaseSeeding.md)
     6. [Constructor de consultas (Query Builder)](./046_queryBuilder.md)
     7. [Ejercicios](./047_ejerciciosBD.md): [FamiliaProfesional](./0471_BDFamiliaProfesional.md) · [Currículos](./0472_BDCurriculo.md) · [Reconocimientos](./0473_BDReconocimiento.md) · [Actividades](./0474_BDActividad.md) · [Crear/modificar](./0475_crearModificarFamiliaProfesional.md) · [Ficheros](./0476_utilizarFicheros.md)
+    8. 🔁 [Usuarios: migración, registro y _seeder_](./052_ejerciciosUsers.md) (procede de los antiguos ejercicios de _Breeze_; la instalación está en [5.7](./RA5_7_breeze.md))
 2. [Relaciones entre modelos](./08_relaciones.md)
     1. [Uno a uno](./081_relaciones_unoAuno.md)
     2. [Uno a muchos](./082_relaciones_unoAmuchos.md)

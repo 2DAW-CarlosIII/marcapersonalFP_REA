@@ -33,11 +33,11 @@ Claramente, **la opción que tiene mayores ventajas es la segunda**, que es la q
 
 ## Objetivos del Middleware.
 
-Cuando vimos los fundamentos de Laravel, nos iniciamos en el concepto de [Middleware](./032_middlewares.md), aunque no pudimos realizar ningún ejercicio útil.
+Cuando vimos los fundamentos de Laravel, nos iniciamos en el concepto de [_middleware_](./RA5_7_breeze.md), aunque no pudimos realizar ningún ejercicio útil.
 
 En este momento, vamos a utilizar el Middleware para capturar la respuesta, antes de ser enviada al cliente, y formatearla según las exigencias de éste.
 
-Por lo tanto, será un Middleware que se ejecutará [después de la petición](./032_middlewares.md#middleware-antes-o-después-de-la-petición).
+Por lo tanto, será un Middleware que se ejecutará [después de la petición](./RA5_7_breeze.md#middleware-antes-o-después-de-la-petición).
 
 ## Creación del Middleware.
 

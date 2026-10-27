@@ -1,266 +1,361 @@
-# 5.1. Control de usuarios
+# 5.7. _Middleware_ y control de usuarios con _Breeze_
+<!-- {% raw %} -->
 
-_Laravel_ incluye una serie de métodos y clases que harán que la implementación del control de usuarios sea muy rápida y sencilla. De hecho, casi todo el trabajo ya está hecho, solo tendremos que indicar dónde queremos utilizarlo y algunos pequeños detalles de configuración.
+## De `exigirLogin()` al _middleware_
 
-Por defecto, al crear un nuevo proyecto de _Laravel_, ya se incluye todo lo necesario:
-
-- La configuración predeterminada en `config/auth.php`.
-- La _migración_ para la base de datos de la tabla de usuarios con todos los campos necesarios.
-- El modelo de datos de usuario (`User.php`) dentro de la carpeta `app/Models` con toda la implementación necesaria.
-- Los controladores para gestionar todas las acciones relacionadas con el control de usuarios (dentro de `App\Http\Controllers\Auth`).
-
-Además de esto, tendremos que ejecutar los siguientes comandos para generar las rutas y vistas necesarias para realizar el _login_, registro y para recuperar la contraseña con **Laravel/Breeze**.
-
-```bash
-composer update
-composer require laravel/breeze --dev
-```
-
-Una vez instalado el paquete breeze, ejecutamos el siguiente comando _Artisan_ para publicar todos los recursos necesarios para la autenticación:
-
-```bash
-php artisan breeze:install
-```
-
-En el momento de la ejecución del comando anterior, se nos preguntará por nuestra elección de _frameworks_ para el frontend o los tests.
-
-Más adelante trabajaremos con React pero, para esta práctica, nuestra selección será la siguiente:
-
-```
-    ┌ Which Breeze stack would you like to install? ───────────────┐
-    │ › ● Blade with Alpine                                           │
-    │   ○ Livewire (Volt Class API) with Alpine                       │
-    │   ○ Livewire (Volt Functional API) with Alpine                  │
-    │   ○ React with Inertia                                          │
-    │   ○ Vue with Inertia                                            │
-    │   ○ API only                                                    │
-    └───────────────────────────────────────────────────────┘
-
-    ┌ Would you like dark mode support? ─────────────────────────┐
-    │ ○ Yes / ● No                                                    │
-    └───────────────────────────────────────────────────────┘
-
-    ┌ Which testing framework do you prefer? ─────────────────────┐
-    │ › ● PHPUnit                                                     │
-    │   ○ Pest                                                        │
-    └───────────────────────────────────────────────────────┘
-
-```
-
-Para finalizar y probarlo, ejecutamos los siguientes comandos:
-
-```bash
-php artisan migrate
-```
-
-En los siguientes apartados vamos a ver en detalle cada uno de estos puntos, desde la configuración hasta los módulos, rutas y vistas por los que está compuesto. En las últimas secciones revisaremos también cómo utilizar este sistema para proteger nuestro sitio web.
-
-## Configuración inicial
-
-La configuración del sistema de autenticación se puede encontrar en el fichero `config/auth.php`, el cual contiene varias opciones (bien documentadas) que nos permitirán, por ejemplo: **cambiar el sistema de autenticación** (que por defecto es a través de _Eloquent_), **cambiar el modelo de datos usado para los usuarios** (por defecto será `User`) y **cambiar la tabla de usuarios** (que por defecto será `users`). Si vamos a utilizar estos valores no será necesario que realicemos ningún cambio.
-
-La migración de la tabla de usuarios (llamada `users`) también está incluida (ver carpeta `database/migrations`). Por defecto, incluye todos los campos necesarios (ver el código siguiente), pero si necesitamos alguno más lo podemos añadir para guardar por ejemplo la dirección o el teléfono del usuario. A continuación se incluye el código de la función up de la migración:
+En 4.2, cada página privada de _v0_ empezaba igual:
 
 ```php
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
+$usuario = exigirLogin();
 ```
 
-Como se puede ver el nombre de la tabla es `users`, con un índice `id` _autoincremental_, y los campos de `name`, `email`, `password`, donde el campo `email` se establece como único para que no se puedan almacenar _emails_ repetidos. Además, se añaden los _timestamps_ que usa _Eloquent_ para almacenar automáticamente la fecha de registro y actualización, y el campo `remember_token` para que no sea necesario solicitar credenciales al usuario cuando ha expirado su sesión.
+Funcionaba, pero tenía un punto débil: la protección dependía de que **cada página** recordara llamar a la función. Una página nueva en la que se olvidara esa línea quedaba abierta a cualquiera, y nada avisaba del olvido.
 
-En la carpeta `app/Models` se encuentra el modelo de datos (llamado `User.php`) para trabajar con los usuarios. Esta clase ya incluye toda la implementación necesaria y por defecto no tendremos que modificar nada. No obstante, deberemos ampliar esta clase si queremos podemos modificar esta clase para añadirle más métodos o relaciones con otras tablas, etc.
+_Laravel_ saca esa comprobación de las páginas y la pone **alrededor** de ellas: en un **_middleware_**. Las rutas declaran qué _middleware_ las protege, y `php artisan route:list -v` muestra de un vistazo qué rutas están protegidas y cuáles no.
 
-_Laravel_ también incluye varios controladores para la autenticación de usuarios, que puedes encontrar en `App/Http/Controllers/Auth`. `AuthenticatedSessionController` y `RegisteredUserController` incluyen métodos para ayudarnos en el proceso de autenticación, registro y cierre de sesión; mientras que `PasswordResetLinkController` contienen la lógica para ayudarnos en el proceso de restaurar una contraseña. Para la mayoría de aplicaciones con estos métodos será suficiente y no tendremos que añadir nada más.
+## Qué es un _middleware_
 
-## Rutas
+En el ciclo de vida de una petición (5.2), el _middleware_ son las capas que la petición atraviesa antes de llegar al controlador, y que la respuesta atraviesa de vuelta. Ya hemos usado varios sin saberlo: el que abre la sesión, el que comprueba el _token_ CSRF (5.6) o el que comparte `$errors` con las vistas.
 
-Por defecto, _Laravel_ no incluye las rutas para el control de usuarios. No obstante, al instalar _Laravel/Breeze_, podemos observar que se modifica el contenido del fichero `routes/web.php`. Entre otros cambios, el fichero incluye la siguiente línea:
+Cada _middleware_ es una clase con un método `handle()`:
 
 ```php
-require __DIR__.'/auth.php';
-```
-
-Esa línea incluye todas las rutas definidas en el fichero `routes/auth.php`, las cuales puedes comprobar con el comando
-
-```bash
-php artisan route:list
-```
-
-Como se puede ver, estas rutas ya están enlazadas con los controladores y métodos que incorpora el propio _Laravel_.
-
-Como la instalación de _Laravel/Breeze_ ha regenerado el fichero `routes/web.php`, debemos volver a incorporar las rutas eliminadas. Para ello:
-
-1. Mostramos los cambios provocados en el archivo `routes/web.php`
-    ```bash
-    git diff routes/web.php
-    ```
-1. Volvemos a la versión anterior del archivo `routes/web.php`
-    ```bash
-    git restore routes/web.php
-    ```
-1. Añadimos las líneas verdes obtenidas con el comando `git diff` anterior, excepto las correspondientes a la ruta `/`, al fichero `routes/web.php`. A esas líneas, debemos eliminar el carácter `+`.
-1. Eliminar las rutas correspondientes a `login` y `logout` del fichero `routes/web.php`.
-
-## Vistas
-
-Al instalar _Laravel/Breeze_, también se generarán todas las vistas necesarias para realizar el _login_, _registro_ y para _recuperar la contraseña_. Todas estas vistas las podremos encontrar en la carpeta `resources/views/auth` con los nombres `login.blade.php` para el formulario de login, `register.blade.php` , etcétera. Estos nombres y rutas son obligatorios ya que los controladores que incluye _Laravel_ accederán a ellos, por lo que no deberemos cambiarlos.
-
-> Aprovecha para incluir el logo de MarcaPersonalFP en las vistas de autenticación. Para ello, modifica el archivo `resources/views/components/application-logo.blade.php` con el siguiente código:
->
->```html
-><img src="/images/mp-logo.png" width="64px">
->```
-
-## Autenticación de un usuario
-
-Una vez configurado todo el sistema, añadidas las rutas y las vistas para realizar el control de usuarios ya podemos utilizarlo. Si accedemos a la ruta _login_ nos aparecerá la vista con el formulario de login, solicitando nuestro email y contraseña para acceder. El campo tipo _checkbox_ llamado `remember` nos permitirá indicar si deseamos que la sesión permanezca abierta hasta que se cierre manualmente. Es decir, aunque se cierre el navegador y pasen varios días el usuario seguiría estando autorizado.
-
-Si los datos introducidos son correctos se creará la sesión del usuario y se le redirigirá a la ruta `/dashboard`. Si queremos cambiar esta ruta tenemos que modificar la redirección del método `store()` del controlador `/app/Http/Controllers/Auth/AuthenticatedSessionController.php`, por ejemplo:
-
-```php
-        return redirect()->intended(route('home', absolute: false));
-```
-
-En el ejemplo anterior, se supone que existe una ruta con el nombre `home`:
-
-```php
-Route::get('/', [HomeController::class, 'getHome'])
-    ->name('home');
-```
-
-## Registro de un usuario
-
-Si accedemos a la ruta `register` nos aparecerá la vista con el formulario de registro, solicitándonos los campos nombre, email y contraseña. Al pulsar el botón de envío del formulario se llamará a la ruta `register` por `POST` y se almacenará el nuevo usuario en la base de datos.
-
-Si no hemos añadido ningún campo más en la migración no tendremos que configurar nada más. **Sin embargo, si hemos añadido algún campo más a la tabla de usuarios, tendremos que actualizar el controlador `RegisteredUserController`: `validate` y `create`**. En la llamada a `validate()` simplemente tendremos que añadir dicho campo al _array_ de validaciones (solo en el caso que necesitemos validarlo). Y en la llamada al método `create()` tendremos que añadir los campos adicionales que deseemos almacenar. El código de este método es el siguiente:
-
-```php
-    public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        return redirect(RouteServiceProvider::HOME);
-    }
-```
-
-> También habrá que modificar el _array_ que devuelve el método `rules()` de `app/Http/Requests/ProfileUpdateRequest.php` si queremos poder modificar esos datos en el perfil del usuario.
-
-Como podemos ver, utiliza el modelo de datos `User` para crear el usuario y almacenar las variables que recibe en el array de datos `$request`. En este _array_ de datos nos llegarán todos los valores de los campos del formulario, por lo tanto, si añadimos más campos al formulario y a la tabla de usuarios simplemente tendremos que añadirlos también en este método.
-
-Es importante destacar que la contraseña se cifra usando el método `bcrypt()`, por lo tanto las contraseñas se almacenaran cifradas en la base de datos. Este cifrado se basa en la clave _hash_ que se genera al crear un nuevo proyecto de _Laravel_ (ver capítulo de "Instalación") y que se encuentra almacenada en el fichero `.env` en la variable `APP_KEY`. Es importante que este _hash_ se haya establecido al inicio (que no esté vacío o se uno por defecto) y que además no se modifique una vez la aplicación se suba a producción.
-
-## Registro manual de un usuario
-
-Si queremos añadir un usuario manualmente lo podemos hacer de forma normal usando el modelo `User` de _Eloquent_, replicando el código anterior.
-
-## Acceder a los datos del usuario autenticado
-
-Una vez que el usuario está autenticado podemos acceder a los datos del mismo a través del método `Auth::user()`, por ejemplo:
-
-```php
-$user = Auth::user();
-```
-
-Este método nos devolverá `null` en caso de que no esté autenticado. Si estamos seguros de que el usuario está autenticado (porque estamos en una ruta protegida) podremos acceder directamente a sus propiedades:
-
-```php
-$email = Auth::user()->email;
-```
-
-> Importante: para utilizar la clase `Auth` tenemos que añadir el espacio de nombres use `Illuminate\Support\Facades\Auth`, de otra forma nos aparecerá un error indicando que no puede encontrar la clase.
-
-El usuario también se inyecta en los parámetros de entrada de la petición (en la clase `Request`). Por lo tanto, si en un método de un controlador usamos la inyección de dependencias también podremos acceder a los datos del usuario:
-
-```php
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
-class ProfileController extends Controller
+public function handle(Request $request, Closure $next): Response
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): View
-    {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
-    }
-...
-```
-
-## Cerrar la sesión
-
-Si accedemos a la ruta `logout` por `POST` se cerrará la sesión y se redirigirá a la ruta `/`. Todo esto lo hará automáticamente el método `destroy()` del controlador AuthenticatedSessionController.
-
-Para cerrar manualmente la sesión del usuario actualmente autenticado tenemos que utilizar el método:
-
-```php
-Auth::logout();
-```
-
-Posteriormente, podremos hacer una redirección a una página principal para usuarios no autenticados.
-
-> **Importante:** para utilizar la clase `Auth` tenemos que añadir el espacio de nombres use `Illuminate\Support\Facades\Auth`, de otra forma nos aparecerá un error indicando que no puede encontrar la clase.
-
-## Comprobar si un usuario está autenticado
-
-Para comprobar si el usuario actual se ha autenticado en la aplicación podemos utilizar el método `Auth::check()` de la forma:
-
-```php
-if (Auth::check()) {
-    // El usuario está correctamente autenticado
+    // ...
+    return $next($request);
 }
 ```
 
-Sin embargo, lo recomendable es utilizar **Middleware** (como veremos a continuación) para realizar esta comprobación antes de permitir el acceso a determinadas rutas.
+- **`$request`** es la petición.
+- **`$next`** es "lo que viene después": el siguiente _middleware_ y, al final, el controlador. Llamar a `$next($request)` deja pasar la petición, y devuelve la respuesta que se ha generado.
 
-> **Importante:** Recuerda que para utilizar la clase `Auth` tenemos que añadir el espacio de nombres use `Illuminate\Support\Facades\Auth`, de otra forma nos aparecerá un error indicando que no puede encontrar la clase.
+Con una petición, un _middleware_ puede hacer tres cosas:
 
-## Proteger rutas
+| Decisión | Código |
+|---|---|
+| Dejarla pasar | `return $next($request);` |
+| Desviarla a otra página | `return redirect()->route('login');` |
+| Cortarla con un error | `abort(403);` |
 
-El sistema de autenticación de _Laravel_ también incorpora una serie de filtros o _Middleware_ (ver carpeta `app/Http/Middleware` y el fichero `app/Http/Kernel.php`) para comprobar que el usuario que accede a una determinada ruta o grupo de rutas esté autenticado. En concreto, para proteger el acceso a rutas y solo permitir su visualización por usuarios correctamente autenticados usaremos el middleware `\Illuminate\Auth\Middleware\Authenticate.php` cuyo alias es `auth`. Para utilizar este _middleware_ tenemos que editar el fichero `routes/web.php` y modificar las rutas que queramos proteger, por ejemplo:
+<!-- DIAGRAMA: la petición atraviesa las capas de middleware (sesión, CSRF, auth) hasta el controlador y la respuesta vuelve por ellas; con auth sin sesión, la capa auth devuelve una redirección a /login sin llegar al controlador -->
+
+### _Middleware_ antes o después de la petición
+
+El código que va **antes** de `$next($request)` se ejecuta antes de que la petición llegue al controlador; el que va **después**, con la respuesta ya generada:
 
 ```php
-// Para proteger una clausula:
-Route::get('admin/proyectos', function() {
-    // Solo se permite el acceso a usuarios autenticados
-})->middleware('auth');
+public function handle(Request $request, Closure $next): Response
+{
+    // Antes: se puede examinar la petición y decidir si continúa.
 
-// Para proteger una acción de un controlador:
-Route::get('profile', [ProfileController::class, 'show'])->middleware('auth');
+    $response = $next($request);
+
+    // Después: se puede examinar o modificar la respuesta.
+
+    return $response;
+}
 ```
 
-Si el usuario que accede no está validado se generará una excepción que le redirigirá a la ruta `login`. Si deseamos cambiar esta dirección tendremos que modificar el método que gestiona la excepción por no estar autenticado.
+`exigirLogin()` actuaba antes: si no había usuario, redirigía y la página no llegaba a ejecutarse. El _middleware_ que abre la sesión actúa en los dos momentos: la abre antes y la guarda después.
 
-Si deseamos proteger el acceso a toda una zona de nuestro sitio web (por ejemplo, la parte de administración o la gestión de un recurso), lo más cómodo es crear un grupo con todas esas rutas que utilice el middleware `auth`, por ejemplo:
+## Un _middleware_ propio
+
+Se crean con _Artisan_:
+
+```bash
+php artisan make:middleware CabeceraCentro
+```
+
+Que genera `app/Http/Middleware/CabeceraCentro.php`. Este, por ejemplo, actúa **después**: añade a cada respuesta una cabecera HTTP con el nombre del centro de la configuración de 5.2.
 
 ```php
-Route::group(['middleware' => 'auth'], function() {
-    Route::get('proyectos', [ProyectosController::class, 'getIndex']);
-    Route::get('proyectos/create', [ProyectosController::class, 'getCreate']);
-    // ...
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class CabeceraCentro
+{
+    public function handle(Request $request, Closure $next): Response
+    {
+        $response = $next($request);
+
+        $response->headers->set('X-Centro', config('marcapersonalfp.centro'));
+
+        return $response;
+    }
+}
+```
+
+### Dónde se aplica
+
+Un _middleware_ no hace nada hasta que se aplica. Hay tres formas:
+
+1. **A todas las peticiones** (_middleware_ global), en `bootstrap/app.php`.
+2. **A un grupo de _middleware_**. Todas las rutas de `routes/web.php`, y las de los ficheros que este incluye, pertenecen al grupo **`web`**. Se añade también en `bootstrap/app.php`:
+
+    ```php
+    use App\Http\Middleware\CabeceraCentro;
+
+    ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            CabeceraCentro::class,
+        ]);
+    })
+    ```
+
+3. **A rutas concretas**, con `->middleware()`, sobre una ruta o un grupo:
+
+    ```php
+    Route::get('perfil/{id?}', PerfilController::class)->middleware(CabeceraCentro::class);
+    ```
+
+El grupo `web` ya trae estos _middleware_, que se ejecutan en este orden:
+
+| _Middleware_ | Qué hace |
+|---|---|
+| `EncryptCookies` | Cifra las _cookies_ con la `APP_KEY` (5.1) |
+| `AddQueuedCookiesToResponse` | Añade a la respuesta las _cookies_ pendientes |
+| `StartSession` | Abre la sesión y la guarda al final (5.2) |
+| `ShareErrorsFromSession` | Pasa `$errors` a las vistas (5.6) |
+| `PreventRequestForgery` | Comprueba el _token_ CSRF (5.6). Hasta _Laravel_ 12 se llamaba `ValidateCsrfToken` |
+| `SubstituteBindings` | Prepara los parámetros de las rutas para el controlador |
+
+### Alias
+
+Los _middleware_ de uso frecuente tienen un **alias**, un nombre corto que se usa en las rutas en lugar de la clase. Estos son los que usaremos:
+
+| Alias | Qué comprueba |
+|---|---|
+| `auth` | Que haya un usuario identificado. Si no, redirige al _login_ |
+| `guest` | Lo contrario: que **no** lo haya. Para las páginas de _login_ y registro |
+| `verified` | Que el usuario haya verificado su correo electrónico |
+| `can` | Que el usuario tenga permiso para algo. Lo veremos en el Bloque 7 |
+
+Algunos aceptan **parámetros**, después de dos puntos: `->middleware('can:update,proyecto')`.
+
+## _Breeze_: el control de usuarios, ya hecho
+
+En 4.2 programamos a mano el _login_ de _v0_: un array de usuarios, `password_hash()`, una clase `Autenticador`, `session_regenerate_id()` y el _logout_ por `POST`. Una aplicación real necesita además registrarse, recuperar la contraseña olvidada, verificar el correo, limitar los intentos fallidos… Escribirlo todo, y sin errores de seguridad, es mucho trabajo.
+
+**_Laravel Breeze_** es un paquete oficial que lo genera por nosotros: rutas, controladores, vistas y tests del control de usuarios, con _Blade_ y _Tailwind_. Lo usaremos como una **caja negra**: lo instalamos, comprobamos qué hace por nosotros y aprendemos dónde está cada pieza. Los usuarios se guardan en la tabla `users`, que ya existe en nuestra base _SQLite_ desde 5.1.
+
+> **Antes de instalarlo, haz un _commit_.** `breeze:install` **sobrescribe** varios ficheros del proyecto, entre ellos `routes/web.php`, `resources/css/app.css` y la configuración de _Vite_. Con todo guardado en _git_, `git diff` te mostrará qué ha cambiado y podrás recuperar lo tuyo.
+
+### Instalación
+
+En el terminal de `workspace`:
+
+```bash
+composer require laravel/breeze:^2.4 --dev
+php artisan breeze:install
+```
+
+`breeze:install` hace tres preguntas. Respóndelas así:
+
+| Pregunta | Respuesta |
+|---|---|
+| _Which Breeze stack would you like to install?_ | _Blade with Alpine_ |
+| _Would you like dark mode support?_ | _No_ |
+| _Which testing framework do you prefer?_ | _PHPUnit_ |
+
+Al terminar, compila los estilos y comprueba las tablas:
+
+```bash
+npm install
+npm run build
+php artisan migrate
+```
+
+`migrate` no debería crear nada: la tabla `users` ya existía. Si dejaste `npm run build -- --watch` en otro terminal, detenlo y vuelve a lanzarlo, porque _Breeze_ ha cambiado la configuración de _Tailwind_.
+
+### Recuperar nuestras rutas
+
+_Breeze_ ha sustituido `routes/web.php` por el suyo. Compáralo con el que teníamos:
+
+```bash
+git diff routes/web.php
+```
+
+Las líneas en rojo son nuestras y las verdes, de _Breeze_. El fichero tiene que quedar con las dos cosas: nuestras rutas, y las de _Breeze_ salvo su ruta `/`, que mostraba la página de bienvenida. Queda así:
+
+```php
+<?php
+
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
+
+// Nuestras rutas (5.3 a 5.6)
+Route::get('/', HomeController::class);
+// ... /hola, /centro, perfil ...
+require __DIR__ . '/proyectos.php';
+
+// Las rutas de Breeze
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__ . '/auth.php';
+```
+
+La última línea incluye `routes/auth.php`, el fichero con las rutas del _login_, el registro y el _logout_. Compruébalas con `php artisan route:list --path=login`.
+
+### Qué ha añadido _Breeze_
+
+| Pieza | Dónde |
+|---|---|
+| Rutas del control de usuarios | `routes/auth.php` |
+| Controladores | `app/Http/Controllers/Auth/` y `ProfileController.php` |
+| _Form Requests_ | `app/Http/Requests/Auth/LoginRequest.php` y `ProfileUpdateRequest.php` |
+| Vistas | `resources/views/auth/` (_login_, registro…), `profile/` y `dashboard.blade.php` |
+| _Layouts_ y componentes | `resources/views/layouts/` y varios componentes en `components/` |
+| Tests | `tests/Feature/Auth/` y `ProfileTest.php` |
+
+Las vistas de _Breeze_ usan sus propios _layouts_, `<x-app-layout>` y `<x-guest-layout>`, construidos igual que nuestro `<x-layout>` de 5.4. Para que muestren nuestro logo, cambia el contenido de `resources/views/components/application-logo.blade.php` por:
+
+```blade
+<img src="{{ asset('images/mp-logo.png') }}" alt="marcapersonalFP" {{ $attributes }}>
+```
+
+## Lo que _Breeze_ automatiza
+
+Cada pieza de nuestro _login_ de 4.2 tiene su equivalente en el código que ha generado _Breeze_:
+
+| En _v0_ (4.2) | Con _Breeze_ | Dónde |
+|---|---|---|
+| El array de usuarios | La tabla `users` y el modelo `User` | `app/Models/User.php` |
+| `password_hash()` | `Hash::make()` | `RegisteredUserController::store()` |
+| `Autenticador::autenticar()` | `Auth::attempt()` | `LoginRequest::authenticate()` |
+| `session_regenerate_id()` | `$request->session()->regenerate()` | `AuthenticatedSessionController::store()` |
+| `usuarioActual()` | `Auth::user()` o `$request->user()` | En cualquier controlador o vista |
+| _Logout_ por `POST` | `Auth::guard('web')->logout()`, más invalidar la sesión | `AuthenticatedSessionController::destroy()` |
+| `exigirLogin()` | El _middleware_ `auth` | En las rutas |
+
+Y lo que en _v0_ no llegamos a hacer:
+
+- **Registro** de usuarios nuevos y **recuperación de la contraseña** por correo electrónico.
+- **Límite de intentos**: tras cinco contraseñas incorrectas seguidas, el _login_ se bloquea durante un minuto.
+- **Recordarme**: una _cookie_ que mantiene la sesión abierta aunque se cierre el navegador.
+- **Volver a donde ibas**: si una página protegida te manda al _login_, al entrar vuelves a esa página y no al principio (`redirect()->intended()`).
+
+Los roles (alumno o docente) y la propiedad de los datos (que cada alumno solo edite su currículo, como `exigirRol()` en 4.4) son **autorización**, y llegarán en el Bloque 7. Los campos propios de la tabla `users`, como los apellidos, en el Bloque 6.
+
+## Proteger rutas con `auth`
+
+El _middleware_ `auth` se aplica como cualquier otro. Sobre una ruta:
+
+```php
+Route::get('proyectos/create', [ProyectosController::class, 'create'])->middleware('auth');
+```
+
+O, mejor, sobre un grupo, para no olvidar ninguna ruta. En `routes/proyectos.php`, las rutas de consulta pueden seguir siendo públicas, y las que crean o modifican quedan protegidas:
+
+```php
+Route::controller(ProyectosController::class)->prefix('proyectos')->name('proyectos.')->group(function () {
+    // Públicas
+    Route::get('/', 'index')->name('index');
+    Route::get('show/{id}', 'show')->whereNumber('id')->name('show');
+
+    // Solo para usuarios identificados
+    Route::middleware('auth')->group(function () {
+        Route::get('create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('edit/{id}', 'edit')->whereNumber('id')->name('edit');
+        Route::put('edit/{id}', 'update')->whereNumber('id')->name('update');
+    });
 });
 ```
+
+Si alguien sin sesión pide una de esas rutas, `auth` lo redirige a `/login`. Es lo que hacía `exigirLogin()`, pero declarado en un único sitio.
+
+## El usuario en las vistas
+
+En _Blade_, las directivas **`@auth`** y **`@guest`** muestran su contenido solo si hay un usuario identificado, o si no lo hay. Y `auth()->user()` es el usuario, o `null`:
+
+```blade
+@auth
+    <span class="text-gray-600">{{ auth()->user()->name }}</span>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="text-gray-600 hover:text-gray-900">Salir</button>
+    </form>
+@endauth
+
+@guest
+    <a href="{{ route('login') }}" class="text-gray-600 hover:text-gray-900">Entrar</a>
+    <a href="{{ route('register') }}" class="text-gray-600 hover:text-gray-900">Registrarse</a>
+@endguest
+```
+
+El _logout_ sigue siendo un formulario `POST` con `@csrf`, como en 4.2: un enlace `GET` podría dispararlo cualquier otra página.
+
+## Preparación del entorno de trabajo
+
+Seguimos en el proyecto `marcapersonalfp`, con los formularios de [5.6](./RA5_6_formularios.md). Crea la rama del apartado en el terminal de la máquina virtual:
+
+```bash
+git switch main
+git pull upstream main
+git switch -c RA5_7
+```
+
+## Ejercicios
+
+1. **Un _middleware_ propio.** Crea el _middleware_ `CabeceraCentro` de este apartado y añádelo al grupo `web` en `bootstrap/app.php`. Comprueba en la pestaña **Red** de las herramientas de desarrollo que todas las respuestas llevan la cabecera `X-Centro`.
+
+2. **Instala _Breeze_.** Haz un _commit_ con todo lo anterior, instala _Breeze_ y recupera tus rutas. Cambia el logo de `application-logo.blade.php`. Comprueba que siguen funcionando tus páginas y que existen `/login` y `/register`.
+
+3. **Ana López se registra.** En `http://marcapersonalfp.test/register`, registra a la alumna de 4.2: Ana López, `ana.lopez@marcapersonalfp.test`, con la contraseña `ana-secreta`. Cierra la sesión y vuelve a entrar. Después, en `php artisan tinker`, busca su contraseña guardada:
+
+    ```php
+    App\Models\User::first()->password
+    ```
+
+    ¿Empieza igual que los _hashes_ que generaste en 4.2? ¿Por qué?
+
+4. **Protege las altas y las ediciones.** En `routes/proyectos.php`, aplica `auth` a las rutas `create`, `store`, `edit` y `update`, como en este apartado. El listado y el detalle siguen siendo públicos.
+
+5. **La barra de navegación.** Añade a `components/navbar.blade.php`, alineados a la derecha (`ml-auto`), los enlaces "Entrar" y "Registrarse" para los invitados, y el nombre del usuario y el botón "Salir" para los usuarios identificados, como en este apartado.
+
+6. **Investiga.** Responde en tu _pull request_:
+    - Sin sesión, pide `/proyectos/edit/3`. ¿A dónde te lleva? Entra como Ana: ¿a qué página vuelves? Busca en `AuthenticatedSessionController` la línea responsable.
+    - Escribe mal la contraseña de Ana seis veces seguidas. ¿Qué mensaje aparece? Busca en `LoginRequest` dónde se decide.
+    - Ejecuta `php artisan route:list -v --path=proyectos`. ¿Qué rutas tienen el _middleware_ `auth`?
+
+> **Puente.** En _v0_, cada página privada tenía que acordarse de llamar a `exigirLogin()`, y el _login_, el _hash_ de la contraseña y la regeneración de la sesión los escribimos nosotros. En _Laravel_, el _middleware_ `auth` protege grupos enteros de rutas desde un solo sitio, y _Breeze_ genera el control de usuarios completo, con registro, recuperación de contraseña y límite de intentos. Esto que hicimos a mano, el framework lo automatiza así.
+
+## Comprueba tu solución automáticamente (opcional)
+
+Para los ejercicios 1, 2, 4 y 5, copia el archivo [RA5_7_BreezeTest.php](./materiales/ejercicios-laravel/tests/Feature/RA5_7_BreezeTest.php) a la carpeta `tests/Feature/` de tu proyecto y ejecuta, en el terminal de `workspace`, ese test en concreto:
+
+```bash
+php artisan test --filter=RA5_7_BreezeTest
+```
+
+El test comprueba:
+- la cabecera `X-Centro` de tu _middleware_;
+- que _Breeze_ está instalado, con sus rutas de _login_ y registro;
+- que un invitado no puede dar de alta ni editar proyectos, pero sí ver el listado y el detalle;
+- que un usuario identificado sí puede;
+- la barra de navegación, con y sin sesión.
+
+Si todo está bien: `Tests: 6 passed (20 assertions)`.
+
+> Los tests de 5.3 a 5.6 entran a las páginas de alta y edición como un usuario identificado, así que siguen pasando con las rutas protegidas.
+
+---
+
+**Siguiente:** [5.8. Proyecto: _marcapersonalFP_ en _Laravel_. POO y patrones de diseño](./RA5_8_proyecto.md)
+<!-- {% endraw %} -->
