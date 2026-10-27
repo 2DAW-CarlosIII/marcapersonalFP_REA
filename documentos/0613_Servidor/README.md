@@ -76,7 +76,7 @@ Reconstruimos _marcapersonalFP_ con _Laravel_, separando la lógica de negocio d
     - Ejercicios colaborativos opcionales: [Reconocimientos](./0363_reconocimientoController.md) · [Actividades](./0364_actividadController.md)
 6. [Formularios, datos de entrada, validación y redirecciones](./RA5_6_formularios.md)
 7. [_Middleware_ y control de usuarios con _Breeze_](./RA5_7_breeze.md)
-8. 🆕 *Proyecto:* _marcapersonalFP_ en _Laravel_. Separación de la lógica de negocio: POO y patrones de diseño (MVC, _Singleton_, repositorio, DAO) (borrador: [Controlador de currículos](./0362_curriculoController.md))
+8. *Proyecto:* [_marcapersonalFP_ en _Laravel_. POO y patrones de diseño (MVC, repositorio, _Singleton_, DAO)](./RA5_8_proyecto.md)
 
 ## Bloque 6. Acceso a almacenes de datos (RA6)
 
