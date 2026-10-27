@@ -1,4 +1,5 @@
 # 3.8. Proyecto: alta y validación de un currículo
+<!-- {% raw %} -->
 
 **Presentación de apoyo** (_RevealJS_): [RA3_8_proyectoAltaCurriculo_slides.html](./materiales/slides/RA3_8_proyectoAltaCurriculo_slides.html)
 
@@ -287,3 +288,4 @@ Y si quieres comprobar que no has roto nada del Bloque 2 por el camino, ejecuta 
 ---
 
 **Siguiente:** Bloque 4 — Desarrollo de aplicaciones web utilizando código embebido (RA4): estado, sesiones y autenticación.
+<!-- {% endraw %} -->

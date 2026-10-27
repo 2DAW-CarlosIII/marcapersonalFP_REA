@@ -1,4 +1,5 @@
 # 3.2. Bucles
+<!-- {% raw %} -->
 
 **Presentación de apoyo** (_RevealJS_): [RA3_2_bucles_slides.html](./materiales/slides/RA3_2_bucles_slides.html)
 
@@ -229,3 +230,4 @@ Si todo está bien: `OK (2 tests, 9 assertions)`.
 ---
 
 **Siguiente:** [3.3. Arrays y tipos compuestos](./RA3_3_arrays.md)
+<!-- {% endraw %} -->

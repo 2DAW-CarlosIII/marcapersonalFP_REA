@@ -1,4 +1,5 @@
 # 3.6. Formularios web: recuperación, procesamiento y validación
+<!-- {% raw %} -->
 
 **Presentación de apoyo** (_RevealJS_): [RA3_6_formularios_slides.html](./materiales/slides/RA3_6_formularios_slides.html)
 
@@ -292,3 +293,4 @@ Si todo está bien: `OK (8 tests, 15 assertions)`.
 ---
 
 **Siguiente:** [3.7. Comentarios](./RA3_7_comentarios.md)
+<!-- {% endraw %} -->

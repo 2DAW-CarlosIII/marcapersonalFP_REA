@@ -1,4 +1,5 @@
 # 5.1. Instalación de _Laravel_ y desarrollo colaborativo
+<!-- {% raw %} -->
 
 > **Bloque 5 · Generación dinámica de páginas web: introducción a _Laravel_ (RA5).** _marcapersonalFP v0_ funciona, pero cada página es un script que mezcla HTML, lógica y datos, y todo lo hemos programado a mano: la sesión, el _login_, la validación, el escape de la salida. En este bloque la reconstruimos con _Laravel_, un _framework_ que **separa la lógica de negocio de la presentación** y automatiza buena parte de ese trabajo. Los datos de la aplicación seguirán en arrays hasta el Bloque 6, donde llegarán _MariaDB_ y _Eloquent_. Mientras tanto, _Laravel_ guarda sus propias tablas (sesiones, caché, usuarios) en un fichero _SQLite_.
 
@@ -242,3 +243,4 @@ Si todo está bien: `Tests: 6 passed (13 assertions)`.
 ---
 
 **Siguiente:** [5.2. Estructura de un proyecto, configuración y _Artisan_](./RA5_2_estructura.md)
+<!-- {% endraw %} -->
