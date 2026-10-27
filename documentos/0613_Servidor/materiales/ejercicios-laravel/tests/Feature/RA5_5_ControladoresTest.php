@@ -2,123 +2,89 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
-class ControllersExerciseTest extends TestCase
+class RA5_5_ControladoresTest extends TestCase
 {
-    public function test_controladores(): void
+    private const CONTROLADORES = 'App\\Http\\Controllers\\';
+
+    protected function setUp(): void
     {
-        /**
-         * main page test.
-         */
-            $value = 'Pantalla principal';
-            $response = $this->get('/');
+        parent::setUp();
+        $this->withoutVite();
+    }
 
-            $response
-                ->assertRedirect('/proyectos');
+    /** Acción (Clase@método) de la ruta con ese nombre, o cadena vacía si no existe. */
+    private function accion(string $nombre): string
+    {
+        return (string) Route::getRoutes()->getByName($nombre)?->getActionName();
+    }
 
-        /**
-         * login test.
-         */
-            $value = 'Login usuario';
-            $response = $this->get('/login');
+    public function test_las_rutas_de_proyectos_usan_su_controlador(): void
+    {
+        foreach (['index', 'show', 'create', 'edit'] as $metodo) {
+            $this->assertSame(self::CONTROLADORES . "ProyectosController@$metodo", $this->accion("proyectos.$metodo"));
+        }
+    }
 
-            $response
-            ->assertStatus(200)
-            ->assertViewIs('auth.login')
-            ->assertSeeText($value, $escaped = true);
+    public function test_las_rutas_de_proyectos_estan_en_su_fichero(): void
+    {
+        $this->assertFileExists(base_path('routes/proyectos.php'));
+        $this->assertStringContainsString('proyectos.php', (string) file_get_contents(base_path('routes/web.php')), 'Incluye routes/proyectos.php desde routes/web.php.');
+    }
 
-        /**
-         * logout test.
-         */
-            $value = 'Logout usuario';
-            $response = $this->get('/logout');
+    public function test_pagina_principal_con_controlador_invocable(): void
+    {
+        $accion = Route::getRoutes()->match(Request::create('/'))->getActionName();
 
-            $response->assertStatus(200)->assertSeeText($value, $escaped = true);
+        $this->assertStringStartsWith(self::CONTROLADORES . 'HomeController', $accion);
+        $this->get('/')->assertOk()->assertViewIs('home');
+    }
 
-        /**
-         * proyectos index test.
-         */
-            $response = $this->get('/proyectos');
-            $nombres = [
-                'Tecnologías de la Información',
-                'Diseño Gráfico',
-                'Electrónica',
-                'Ingeniería Civil',
-                'Gastronomía',
-                'Medicina',
-                'Mecatrónica',
-                'Arquitectura',
-                'Automoción',
-                'Turismo',
-            ];
-
-            $response
-            ->assertStatus(200)
+    public function test_listado_completo(): void
+    {
+        $this->get('/proyectos')
+            ->assertOk()
             ->assertViewIs('proyectos.index')
-            ->assertSeeTextInOrder($nombres, $escaped = true);
+            ->assertViewHas('proyectos', fn ($proyectos) => count($proyectos) === 10)
+            ->assertSeeText('Tecnologías de la Información')
+            ->assertSeeText('Turismo');
+    }
 
-        /**
-         * proyectos show test.
-         */
-            $response = $this->get("/proyectos/show/1");
-
-            $response
-            ->assertStatus(200)
+    public function test_detalle_con_su_estado(): void
+    {
+        $this->get('/proyectos/show/1')
+            ->assertOk()
             ->assertViewIs('proyectos.show')
-            ->assertSeeText('Diseño Gráfico', $escaped = true);
+            ->assertViewHas('proyecto', fn ($proyecto) => $proyecto['nombre'] === 'Diseño Gráfico')
+            ->assertSeeText('Diseño Gráfico')
+            ->assertSeeText('Proyecto suspenso');
 
-            $response = $this->get("/proyectos/show/2");
+        $this->get('/proyectos/show/2')
+            ->assertSeeText('Electrónica')
+            ->assertSeeText('Proyecto aprobado');
+    }
 
-            $response
-            ->assertSeeText('Electrónica', $escaped = true);
-
-            $response = $this->get("/proyectos/show/A");
-            $response->assertNotFound();
-
-        /**
-         * proyectos create test.
-         */
-            $value = 'Añadir proyecto';
-            $response = $this->get('/proyectos/create');
-
-            $response
-            ->assertStatus(200)
-            ->assertViewIs('proyectos.create')
-            ->assertSeeText($value, $escaped = true);
-
-        /**
-         * proyectos edit test.
-         */
-            $id = rand(1, 10);
-            $value = "Modificar proyecto";
-            $response = $this->get("/proyectos/edit/$id");
-
-            $response
-            ->assertStatus(200)
+    public function test_edicion(): void
+    {
+        $this->get('/proyectos/edit/3')
+            ->assertOk()
             ->assertViewIs('proyectos.edit')
-            ->assertSeeText($value, $escaped = true);
+            ->assertViewHas('proyecto', fn ($proyecto) => $proyecto['nombre'] === 'Ingeniería Civil')
+            ->assertSeeText('Ingeniería Civil');
+    }
 
-            $response = $this->get("/proyectos/edit/A");
-            $response->assertNotFound();
+    public function test_un_proyecto_inexistente_da_404(): void
+    {
+        $this->get('/proyectos/show/99')->assertNotFound();
+        $this->get('/proyectos/edit/99')->assertNotFound();
+    }
 
-        /**
-         * perfil test.
-         */
-            $id = rand(1, 10);
-            $value = "Visualizar el currículo de $id";
-            $response = $this->get("/perfil/$id");
-
-            $response->assertStatus(200)->assertSeeText($value, $escaped = true);
-
-            $value = "Visualizar el currículo propio";
-            $response = $this->get("/perfil");
-
-            $response->assertStatus(200)->assertSeeText($value, $escaped = true);
-
-            $response = $this->get("/perfil/" . chr(ord('A') + $id));
-            $response->assertNotFound();
+    public function test_perfil_con_controlador_invocable(): void
+    {
+        $this->assertStringStartsWith(self::CONTROLADORES . 'PerfilController', $this->accion('perfil'));
+        $this->get('/perfil/3')->assertOk()->assertSeeText('Visualizar el currículo de 3');
     }
 }

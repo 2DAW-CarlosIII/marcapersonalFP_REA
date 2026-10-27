@@ -1,101 +1,268 @@
-# 3.1. Controladores
+# 5.5. Controladores
+<!-- {% raw %} -->
 
-Hasta el momento, hemos visto solamente cómo devolver una cadena para una ruta y cómo asociar una vista a una ruta directamente en el fichero de rutas. Pero, en general, la forma recomendable de trabajar será **asociar dichas rutas a un método de un controlador**. Esto nos permitirá separar mucho mejor el código y crear clases (_controladores_) que agrupen toda la funcionalidad de un determinado recurso. Por ejemplo, _podemos crear un controlador para gestionar toda la lógica asociada al control de usuarios o cualquier otro tipo de recurso_.
+## Demasiado código en las rutas
 
-Como ya vimos en la [sección de introducción](./01_introduccion.md), los _controladores_ son el punto de entrada de las peticiones de los usuarios y son los que **deben contener toda la lógica asociada al procesamiento de una petición**, encargándose de realizar las consultas necesarias a la base de datos, de preparar los datos y de llamar a la vista correspondiente con dichos datos.
+Al terminar 5.4, `routes/web.php` ya no solo decía qué dirección lleva a qué página: también contenía datos, el array de proyectos, y preparaba lo que cada vista necesitaba. Con cuatro rutas todavía se lee; con cuarenta sería imposible de mantener.
 
-## Controlador básico
+La solución es la **C** de MVC: el **controlador**. Un controlador es una clase que agrupa las acciones de un mismo recurso. Para cada petición:
 
-Los controladores se almacenan en _ficheros PHP_ en la carpeta `app/Http/Controllers` y normalmente se les añade el sufijo _Controller_, por ejemplo `UserController.php` o `ProyectosController.php`. A continuación se incluye un ejemplo básico de un controlador almacenado en el fichero `app/Http/Controllers/UserController.php`:
+1. recibe los datos de la petición, como el `{id}` de la ruta;
+2. pide al **modelo** los datos que necesita;
+3. elige la **vista** y se los pasa.
 
-```php
-<?php
-namespace App\Http\Controllers;
+El fichero de rutas queda como lo que debe ser: un índice de direcciones, en el que cada una apunta a un método de un controlador.
 
-use App\Http\Controllers\Controller;
+<!-- DIAGRAMA: el mismo flujo antes y después: ruta con función (datos + vista dentro de routes/web.php) frente a ruta → ProyectosController@show → $arrayProyectos → view('proyectos.show') -->
 
-class UserController extends Controller
-{
-    /**
-     * Mostrar información de un usuario.
-     * @param  string  $nombre
-     * @return Response
-     */
-    public function showProfile($nombre)
-    {
-        return view('user.profile', ['user' => $nombre]);
-    }
-}
-```
+## Un controlador básico
 
-Todos los controladores tienen que extender la clase base `Controller`. Esta clase viene ya creada por defecto con la instalación de _Laravel_, encontrándose en la carpeta `app/Http/Controllers`. Se utiliza para centralizar toda la lógica que se vaya a utilizar de forma compartida por los controladores de nuestra aplicación. Por defecto, solo carga código para _validación_ y _autorización_, pero podemos añadir en la misma todos los métodos que necesitemos.
-
-El código del ejemplo anterior, el método `showProfile($nombre)` únicamente se encarga de obtener los datos de un usuario, generar la vista `user/profile.blade.php` a partir de los datos obtenidos y devolverla como valor de retorno para que se muestre por pantalla.
-
-Una vez definido un _controlador_, ya podremos asociarlo a una _ruta_. Para esto tenemos que modificar el fichero de rutas `routes.php` de la forma:
-
-```php
-use App\Http\Controllers\UserController;
-
-Route::get('user/{nombre}', [UserController::class, 'showProfile']);
-```
-
-En lugar de pasar una función como segundo parámetro, tenemos que escribir un _array_ que contenga la **_clase del controlador_** y el **_nombre del método_** que queremos asociar. No es necesario añadir nada más, ni los parámetros que recibe el método en cuestión, todo esto se hace de forma automática.
-
-## Crear un nuevo controlador
-
-Como hemos visto, los controladores se almacenan dentro de la carpeta `app/Http/Controllers` como ficheros _PHP_. Para crear uno nuevo, bien lo podemos hacer a mano y rellenar nosotros todo el código, o podemos utilizar el siguiente comando de _Artisan_ que nos facilitará todo el trabajo:
+Los controladores son clases de la carpeta `app/Http/Controllers/`, con el espacio de nombres `App\Http\Controllers` (5.2) y el sufijo `Controller` en el nombre. Se crean con _Artisan_:
 
 ```bash
 php artisan make:controller ProyectosController
 ```
 
-Este comando creará el controlador `ProyectosController` dentro de la carpeta `app/Http/Controllers` y lo completará con el código básico que hemos visto antes.
-
-## Controladores y espacios de nombres
-
-También podemos crear _sub-carpetas_ dentro de la carpeta `Controllers` para organizarnos mejor. En este caso, la estructura de carpetas que creemos no tendrá nada que ver con la ruta asociada a la petición y, de hecho, a la hora de hacer referencia al controlador únicamente tendremos que hacerlo a través de su espacio de nombres.
-
-Como hemos visto al referenciar el _controlador_ en el fichero de rutas únicamente tenemos que indicar su nombre y no toda la ruta ni el espacio de nombres `App\Http\Controllers`. Esto es porque el servicio encargado de cargar las rutas añade automáticamente el espacio de nombres raíz para los controladores. Si metemos todos nuestros controladores dentro del mismo espacio de nombres no tendremos que añadir nada más. Pero si decidimos crear sub-carpetas y organizar nuestros controladores en sub-espacios de nombres, entonces sí que tendremos que añadir esa parte.
-
-Por ejemplo, si creamos un controlador en `App\Http\Controllers\Photos\AdminController`, entonces para registrar una ruta hasta dicho controlador tendríamos que hacer:
+Que genera esta clase vacía, en `app/Http/Controllers/ProyectosController.php`:
 
 ```php
-use App\Http\Controllers\Photos\AdminController;
+<?php
 
-Route::get('foo', [AdminController::class, 'method']);
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class ProyectosController extends Controller
+{
+    //
+}
 ```
 
-## Generar una URL a una acción
-
-Para generar la URL que apunte a una acción de un controlador podemos usar el método action de la forma:
+Todos heredan de `Controller`, la clase base que trae el proyecto. Cada **método público** es una **acción**, que devuelve lo mismo que devolvían las funciones de las rutas: una vista, un texto, un array…
 
 ```php
-$url = action([FooController::class, 'method']);
+use Illuminate\View\View;
+
+class ProyectosController extends Controller
+{
+    public function index(): View
+    {
+        return view('proyectos.index', ['proyectos' => $this->arrayProyectos]);
+    }
+}
 ```
 
-Por ejemplo, para crear en una plantilla con Blade un enlace que apunte a una acción haríamos:
+`View` es el tipo de lo que devuelve `view()`. Declararlo, como en 3.4, documenta el método y deja que PHP compruebe que devuelve lo que promete.
 
-{% raw %}
+## Rutas que apuntan a controladores
+
+En la ruta, en lugar de una función, se escribe un array con la **clase** del controlador y el **nombre del método**:
+
 ```php
-<a href="{{ action([FooController::class, 'method']) }}">¡Aprieta aquí!</a>
+use App\Http\Controllers\ProyectosController;
+
+Route::get('proyectos', [ProyectosController::class, 'index'])->name('proyectos.index');
 ```
-{% endraw %}
 
-## Caché de rutas
+`ProyectosController::class` es el nombre completo de la clase, `App\Http\Controllers\ProyectosController`, y el `use` del principio permite escribirlo abreviado.
 
-Si definimos todas nuestras rutas para que utilicen controladores podemos aprovechar la funcionalidad para crear una _caché de las rutas_. Es importante que estén basadas en controladores porque si definimos respuestas directas desde el fichero de rutas (como vimos en el capítulo anterior) la caché no funcionará.
+Cuando todas las rutas de un grupo van al mismo controlador, `Route::controller()` evita repetirlo. Se combina con el prefijo y el nombre de 5.3:
 
-Gracias a la caché Laravel indican que se puede acelerar el proceso de registro de rutas hasta 100 veces. Para generar la caché simplemente tenemos que ejecutar el comando de Artisan:
+```php
+Route::controller(ProyectosController::class)->prefix('proyectos')->name('proyectos.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('show/{id}', 'show')->whereNumber('id')->name('show');
+    Route::get('create', 'create')->name('create');
+    Route::get('edit/{id}', 'edit')->whereNumber('id')->name('edit');
+});
+```
+
+### Los nombres de las acciones
+
+Usamos los nombres que _Laravel_ propone para las acciones de un recurso. Cada uno tiene un significado fijo:
+
+| Acción | Para qué | Apartado |
+|---|---|---|
+| `index` | El listado | 5.5 |
+| `show` | El detalle de un elemento | 5.5 |
+| `create` | El formulario de alta | 5.5 |
+| `store` | Guardar el alta | 5.6 |
+| `edit` | El formulario de edición | 5.5 |
+| `update` | Guardar la edición | 5.6 |
+| `destroy` | Borrar | Bloque 7 |
+
+Coinciden con la segunda parte del nombre de las rutas (`proyectos.index`, `proyectos.show`…), y en el Bloque 7 _Laravel_ generará las siete de golpe.
+
+## Los parámetros llegan al método
+
+Un parámetro de la ruta llega al método como argumento, por su **nombre**: `{id}` llega a `$id`.
+
+```php
+public function show(int $id): View
+{
+    abort_unless(isset($this->arrayProyectos[$id]), 404);
+
+    return view('proyectos.show', [
+        'proyecto' => $this->arrayProyectos[$id],
+        'id' => $id,
+    ]);
+}
+```
+
+- **`int $id`**: el `7` llega de la dirección como texto (`'7'`), y PHP lo convierte en entero al llamar al método. `whereNumber('id')` garantiza que la conversión es posible.
+- **`abort_unless(condición, 404)`** corta la petición con un error 404 si la condición no se cumple. Sin esa línea, `/proyectos/show/99` daría un error 500 al buscar una posición que no existe en el array. Es lo que en _v0_ hacíamos con `http_response_code(404)` y `exit`, o con `exigirRol()` y el 403 de 4.4.
+
+Para cortar sin condición, `abort(404)`; para el caso contrario, `abort_if(condición, 404)`.
+
+## Datos en el controlador, de momento
+
+Hasta el Bloque 6 no hay base de datos, así que los proyectos viven en una **propiedad** del controlador, como en las clases de 3.5:
+
+```php
+class ProyectosController extends Controller
+{
+    private array $arrayProyectos = [
+        [
+            'docente_id' => 1,
+            'nombre' => 'Tecnologías de la Información',
+            // ...
+        ],
+        // ...
+    ];
+```
+
+No es su sitio definitivo: guardar los datos es cosa del **modelo**. En 5.8 los sacaremos a una clase propia y, en el Bloque 6, a la base de datos. El controlador apenas cambiará, porque solo **coordina**.
+
+## Controladores de una sola acción
+
+Si un controlador solo tiene una acción, se puede escribir en un único método especial, **`__invoke()`**. Es un **controlador invocable**:
 
 ```bash
-php artisan route:cache
+php artisan make:controller HomeController --invokable
 ```
 
-Si creamos más rutas y queremos añadirlas a la caché simplemente tenemos que volver a lanzar el mismo comando. Para borrar la caché de rutas y no generar una nueva caché tenemos que ejecutar:
+```php
+class HomeController extends Controller
+{
+    public function __invoke(): View
+    {
+        return view('home', ['centro' => config('marcapersonalfp.centro')]);
+    }
+}
+```
+
+En la ruta basta con la clase, sin nombre de método:
+
+```php
+Route::get('/', HomeController::class);
+```
+
+## Un fichero de rutas por recurso
+
+Cuando varias personas trabajan a la vez en el mismo `routes/web.php`, los _pull requests_ chocan. Para evitarlo, las rutas de cada recurso pueden ir en su propio fichero, por ejemplo `routes/proyectos.php`, que `routes/web.php` incluye:
+
+```php
+require __DIR__ . '/proyectos.php';
+```
+
+`routes/proyectos.php` empieza como `routes/web.php`, con `<?php` y los `use` que necesite, y contiene solo el grupo de proyectos. Así, quien trabaje en otro recurso, como los reconocimientos de los ejercicios opcionales, crea su propio fichero y solo añade una línea a `routes/web.php`.
+
+En `php artisan route:list`, la columna de la acción muestra ahora `ProyectosController@index`, `ProyectosController@show`…
+
+## Preparación del entorno de trabajo
+
+Seguimos en el proyecto `marcapersonalfp`, con las vistas de [5.4](./RA5_4_vistas.md) y la compilación de estilos vigilando (`npm run build -- --watch`). Crea la rama del apartado en el terminal de la máquina virtual:
 
 ```bash
-php artisan route:clear
+git switch main
+git pull upstream main
+git switch -c RA5_5
 ```
 
-La caché se recomienda crearla solo cuando ya vayamos a pasar a producción nuestra web. Cuando estamos trabajando en la web es posible que añadamos nuevas rutas y sino nos acordamos de regenerar la caché la ruta no funcionará.
+## Ejercicios
+
+1. **La página principal.** Crea el controlador invocable `HomeController` de este apartado y haz que la ruta `/` lo use.
+
+2. **El controlador de proyectos.** Crea `ProyectosController` con las acciones `index`, `show`, `create` y `edit`:
+    - Copia como propiedad de la clase el array de [`array_proyectos.php`](./materiales/ejercicios-laravel/array_proyectos.php), con sus diez proyectos. Ya no hace falta el array de tres proyectos de la ruta de 5.4.
+    - `index` pasa a la vista todos los proyectos; `show` y `edit`, el proyecto y su `id`; `create`, nada.
+    - `show` y `edit` responden 404 si el `id` no existe en el array.
+    - Las vistas son las de 5.4. Si cambias algo de ellas, mantén su título.
+
+3. **Las rutas, a su fichero.** Mueve el grupo de rutas de proyectos a `routes/proyectos.php`, con `Route::controller()`, e inclúyelo desde `routes/web.php`.
+
+4. **La vista de detalle.** Completa `proyectos/show.blade.php` para que muestre el proyecto. Puedes partir de este código:
+
+    ```blade
+    <x-layout :titulo="'Vista detalle proyecto ' . $id">
+        <div class="grid gap-6 rounded-lg bg-white p-6 shadow sm:grid-cols-3">
+            <img src="{{ asset('images/mp-logo.png') }}" alt="" class="h-40 object-contain">
+
+            <div class="space-y-3 sm:col-span-2">
+                <h2 class="text-2xl font-semibold">{{ $proyecto['nombre'] }}</h2>
+                <p>
+                    <strong>Repositorio:</strong>
+                    <a href="https://github.com/2DAW-CarlosIII/{{ $proyecto['dominio'] }}" class="text-blue-700 hover:underline">
+                        github.com/2DAW-CarlosIII/{{ $proyecto['dominio'] }}
+                    </a>
+                </p>
+                <p><strong>Docente:</strong> {{ $proyecto['docente_id'] }}</p>
+                <ul class="list-inside list-disc">
+                    @foreach ($proyecto['metadatos'] as $clave => $valor)
+                        <li>{{ $clave }}: {{ $valor }}</li>
+                    @endforeach
+                </ul>
+
+                {{-- TODO: el estado, "Proyecto aprobado" o "Proyecto suspenso" según la calificación --}}
+
+                <div class="flex gap-3 pt-2">
+                    <a href="{{ route('proyectos.edit', $id) }}" class="rounded bg-yellow-500 px-4 py-2 font-semibold text-white hover:bg-yellow-600">
+                        Editar proyecto
+                    </a>
+                    <a href="{{ route('proyectos.index') }}" class="rounded border px-4 py-2 hover:bg-gray-50">
+                        Volver al listado
+                    </a>
+                </div>
+            </div>
+        </div>
+    </x-layout>
+    ```
+
+    En la vista de edición, muestra de momento el nombre del proyecto debajo del título. El formulario llegará en 5.6.
+
+5. **El perfil.** Crea el controlador invocable `PerfilController` para la ruta `perfil`, que sigue recibiendo un `{id}` opcional. Pista: `public function __invoke(?int $id = null): View`.
+
+6. **Investiga.** Responde en tu _pull request_:
+    - Ejecuta `php artisan route:list`. ¿Qué muestra ahora la columna de la acción? ¿Cómo aparece la ruta de `HomeController`?
+    - Quita temporalmente el `abort_unless()` de `show` y pide `/proyectos/show/99`. ¿Qué ves con `APP_DEBUG=true`? ¿Qué vería un usuario en producción? Vuelve a ponerlo.
+    - En 3.4 vimos `declare(strict_types=1)`. Si lo añades al principio de `ProyectosController.php`, ¿siguen funcionando `show(int $id)` y `/proyectos/show/7`? Busca en la documentación de PHP a qué llamadas afecta `strict_types`: ¿a las que se hacen **desde** el fichero que lo declara, o a las que se hacen **hacia** sus funciones?
+
+### Ejercicios colaborativos opcionales
+
+Para practicar en equipo, cada miembro puede crear el controlador, las rutas y las vistas de otro recurso de _marcapersonalFP_, con su propio fichero de rutas:
+
+- [Reconocimientos](./0363_reconocimientoController.md)
+- [Actividades](./0364_actividadController.md)
+
+> **Puente.** En _v0_, cada script de `public/` hacía de todo: leía la petición, preparaba los datos, decidía qué responder y escribía el HTML. En _Laravel_, el controlador **coordina**: recibe la petición, pide los datos y elige la vista. Y `abort()` sustituye a la pareja `http_response_code()` y `exit`. Esto que hicimos a mano, el framework lo automatiza así.
+
+## Comprueba tu solución automáticamente (opcional)
+
+Para los ejercicios 1 a 5, copia el archivo [RA5_5_ControladoresTest.php](./materiales/ejercicios-laravel/tests/Feature/RA5_5_ControladoresTest.php) a la carpeta `tests/Feature/` de tu proyecto y ejecuta, en el terminal de `workspace`, ese test en concreto:
+
+```bash
+php artisan test --filter=RA5_5_ControladoresTest
+```
+
+El test comprueba:
+- que cada ruta apunta a la acción de su controlador, y que las de proyectos están en `routes/proyectos.php`;
+- el listado completo, el detalle con su estado y la edición;
+- el 404 cuando el proyecto no existe;
+- el perfil, ahora con su controlador.
+
+Si todo está bien: `Tests: 8 passed (30 assertions)`.
+
+---
+
+**Siguiente:** [5.6. Formularios, datos de entrada, validación y redirecciones](./RA5_6_formularios.md)
+<!-- {% endraw %} -->

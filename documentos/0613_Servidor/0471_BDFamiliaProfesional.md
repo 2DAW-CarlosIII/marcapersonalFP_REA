@@ -72,7 +72,7 @@ Ahora vamos a proceder a rellenar la tabla de la base de datos con los datos ini
 
 ### Ciclos Formativos
 
-Para poder utilizar los datos de _ciclos formativos_, debemos generar los controladores, rutas y vistas correspondientes. Para ello, sigue los pasos de los ejercicios de la [sección 3 ](./0311_ejerciciosControladores.md) adaptándolos para los datos ciclos formativos.
+Para poder utilizar los datos de _ciclos formativos_, debemos generar los controladores, rutas y vistas correspondientes. Para ello, sigue los pasos de los ejercicios de la [5.5. Controladores](./RA5_5_controladores.md) adaptándolos para los datos ciclos formativos.
 
 Los datos que los controladores anteriores deben suministrar a las vistas, ya no estarán almacenados en _arrays_ sino que se obtendrán de la base de datos según las siguientes directrices:
 
@@ -88,7 +88,7 @@ Además, en la vista `ciclos/index.blade.php`, en vez de utilizar el índice del
 
 ### Familias Profesionales
 
-Para poder utilizar los datos de las _familias profesionales_, debemos generar los controladores, rutas y vistas correspondientes. Para ello, sigue los pasos de los ejercicios de la [sección 3 ](./0311_ejerciciosControladores.md) adaptándolos para los datos familias profesionales.
+Para poder utilizar los datos de las _familias profesionales_, debemos generar los controladores, rutas y vistas correspondientes. Para ello, sigue los pasos de los ejercicios de la [5.5. Controladores](./RA5_5_controladores.md) adaptándolos para los datos familias profesionales.
 
 Los datos que los controladores anteriores deben suministrar a las vistas, ya no estarán almacenados en _arrays_ sino que se obtendrán de la base de datos según las siguientes directrices:
 
