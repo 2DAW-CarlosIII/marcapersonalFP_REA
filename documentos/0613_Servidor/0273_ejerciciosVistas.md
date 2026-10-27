@@ -2,7 +2,7 @@
 
 ## Crear las vistas asociadas a las rutas definidas
 
-En este apartado, vamos terminar una primera versión estable de la web. En primer lugar, crearemos las vistas asociadas a cada ruta, las cuales tendrán que extender del _layout_ que hemos hecho en el apartado anterior y mostrar (en la sección `content` del _layout_) el texto de ejemplo que habíamos definido [para cada ruta](./023_rutas.md#ejercicios). En general, todas las vistas tendrán un código similar al siguiente (variando únicamente la sección `content`):
+En este apartado, vamos terminar una primera versión estable de la web. En primer lugar, crearemos las vistas asociadas a cada ruta, las cuales tendrán que extender del _layout_ que hemos hecho en el apartado anterior y mostrar (en la sección `content` del _layout_) el texto de ejemplo que habíamos definido [para cada ruta](./RA5_3_rutas.md#ejercicios). En general, todas las vistas tendrán un código similar al siguiente (variando únicamente la sección `content`):
 
 ```php
 @extends('layouts.master')

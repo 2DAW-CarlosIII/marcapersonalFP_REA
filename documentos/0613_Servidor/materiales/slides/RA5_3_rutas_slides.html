@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>5.3. Rutas · marcapersonalFP</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 5 · RA5</p>
+        <h1 class="titulo">5.3. Rutas</h1>
+        <p class="muted">Qué código atiende cada petición</p>
+        <p class="small-text muted">Adiós a "un script por página"</p>
+        <aside class="notes">
+          Primera fila del plan del bloque: "un script en public/ por página → rutas y controladores". Aquí, las rutas; los controladores, en 5.5.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · De un script a una ruta -->
+      <section>
+        <h2>De un script a una ruta</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>En <em>v0</em></h3>
+            <p class="small-text">La dirección es el fichero: <code>/RA2_proyectoListado.php</code></p>
+            <p class="small-text muted">Los datos, en <code>$_GET</code>, sin comprobar.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En <em>Laravel</em></h3>
+            <p class="small-text"><code>routes/web.php</code> asocia <strong>método</strong> + <strong>dirección</strong> → <strong>acción</strong></p>
+          </div>
+        </div>
+        <pre class="compacto fragment"><code class="language-php" data-trim>
+Route::get('/', function () {
+    return view('welcome');
+});
+        </code></pre>
+      </section>
+
+      <!-- 3 · Ventajas -->
+      <section>
+        <h2>¿Qué ganamos?</h2>
+        <ul class="small-text">
+          <li class="fragment"><strong>Direcciones limpias</strong>: <code>/proyectos/show/7</code>, no <code>/RA3_detalle.php?id=7</code></li>
+          <li class="fragment"><strong>Un solo lugar</strong> con todas las páginas de la aplicación</li>
+          <li class="fragment"><strong>Los datos, dentro de la dirección</strong>, y comprobados por el <em>framework</em></li>
+          <li class="fragment"><strong>Reorganizar el código</strong> sin cambiar las direcciones</li>
+        </ul>
+      </section>
+
+      <!-- 4 · Métodos HTTP -->
+      <section>
+        <h2>Métodos HTTP</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>GET</code></th><td>Consultar, sin cambiar nada</td><td><code>Route::get()</code></td></tr>
+            <tr class="fragment"><th><code>POST</code></th><td>Crear algo nuevo</td><td><code>Route::post()</code></td></tr>
+            <tr class="fragment"><th><code>PUT</code> / <code>PATCH</code></th><td>Modificar</td><td><code>Route::put()</code></td></tr>
+            <tr class="fragment"><th><code>DELETE</code></th><td>Borrar</td><td><code>Route::delete()</code></td></tr>
+          </tbody>
+        </table>
+        <p class="small-text fragment" style="margin-top:0.8em">Dirección que existe, pero otro método: <strong>405</strong>. Formularios: solo <code>GET</code> y <code>POST</code> (5.6).</p>
+      </section>
+
+      <!-- 5 · Qué devuelve una acción -->
+      <section>
+        <h2>¿Qué devuelve una acción?</h2>
+        <ul class="small-text">
+          <li class="fragment"><strong>Un texto</strong> → HTML. En este apartado.</li>
+          <li class="fragment"><strong>Un array</strong> → <strong>JSON</strong>. Así responderá la API (Bloque 7).</li>
+          <li class="fragment"><strong>Una vista</strong> (5.4) o <strong>una redirección</strong> (5.6).</li>
+        </ul>
+      </section>
+
+      <!-- 6 · Parámetros -->
+      <section>
+        <h2>Parámetros</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="1|2">
+Route::get('proyectos/show/{id}', function ($id) {
+    return 'Vista detalle proyecto ' . $id;
+});
+        </code></pre>
+        <p class="small-text fragment"><code>/proyectos/show/7</code> → "Vista detalle proyecto 7". <code>/proyectos/show</code> → 404.</p>
+        <p class="label fragment">Opcional: <code>?</code> y un valor por defecto</p>
+        <pre class="compacto fragment"><code class="language-php" data-trim>
+Route::get('perfil/{id?}', function ($id = null) {
+    // ...
+});
+        </code></pre>
+      </section>
+
+      <!-- 7 · Restricciones -->
+      <section>
+        <h2>Restricciones</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3">
+Route::get('proyectos/show/{id}', function ($id) {
+    return 'Vista detalle proyecto ' . $id;
+})-&gt;whereNumber('id');
+        </code></pre>
+        <table class="fragment">
+          <tbody>
+            <tr><th><code>whereNumber('id')</code></th><td>Solo dígitos</td></tr>
+            <tr><th><code>whereAlpha('nombre')</code></th><td>Solo letras</td></tr>
+            <tr><th><code>where('ciclo', 'DAW|DAM|ASIR')</code></th><td>Una expresión regular</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text fragment"><code>/proyectos/show/abc</code> → <strong>404</strong>, sin ejecutar nuestro código.</p>
+      </section>
+
+      <!-- 8 · Escápalo -->
+      <section>
+        <h2>Lo que devuelves, escápalo</h2>
+        <p class="small-text">El parámetro lo escribe el usuario en la dirección. Como en 3.6:</p>
+        <pre class="compacto"><code class="language-php" data-trim>
+Route::get('hola/{nombre?}', function ($nombre = 'mundo') {
+    return '¡Hola, ' . e($nombre) . '!';
+});
+        </code></pre>
+        <p class="small-text fragment"><code>e()</code> también existe en <em>Laravel</em>. En 5.4, <em>Blade</em> escapará solo.</p>
+      </section>
+
+      <!-- 9 · Rutas con nombre -->
+      <section>
+        <h2>Rutas con nombre</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3|5">
+Route::get('proyectos/show/{id}', function ($id) {
+    return 'Vista detalle proyecto ' . $id;
+})-&gt;whereNumber('id')-&gt;name('proyectos.show');
+
+route('proyectos.show', 7);    // http://marcapersonalfp.test/proyectos/show/7
+        </code></pre>
+        <p class="small-text fragment">Si cambia la dirección, los enlaces hechos con <code>route()</code> se actualizan solos.</p>
+        <p class="small-text muted fragment">Convenio: <code>recurso.acción</code> → <code>proyectos.index</code>, <code>proyectos.show</code>…</p>
+      </section>
+
+      <!-- 10 · Grupos -->
+      <section>
+        <h2>Grupos de rutas</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="1|2-3">
+Route::prefix('proyectos')-&gt;name('proyectos.')-&gt;group(function () {
+    Route::get('/', function () { /* ... */ })-&gt;name('index');
+    Route::get('create', function () { /* ... */ })-&gt;name('create');
+});
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment"><code>prefix('proyectos')</code>: antepone <code>proyectos/</code> a cada dirección.</li>
+          <li class="fragment"><code>name('proyectos.')</code>: antepone <code>proyectos.</code> a cada nombre.</li>
+          <li class="fragment">Un grupo también puede compartir <em>middleware</em> (5.7).</li>
+        </ul>
+      </section>
+
+      <!-- 11 · Cómo elige el router (SVG animado) -->
+      <section>
+        <style>
+          .reveal svg.anim { display: block; margin: 0 auto; width: 100%; height: auto; }
+          .reveal svg.anim text { font-family: var(--r-main-font); }
+          .reveal svg.anim .mono { font-family: var(--r-code-font); }
+          .reveal ol.leyenda { columns: 2; column-gap: 40px; font-size: 0.5em; max-width: 920px; margin: 8px auto 0; padding-left: 1.4em; text-align: left; }
+          .reveal ol.leyenda li { margin: 2px 0; break-inside: avoid; }
+          @media (prefers-reduced-motion: reduce) { .reveal svg .punto { display: none; } }
+        </style>
+        <h2>Cómo decide el <em>router</em></h2>
+        <svg class="anim" viewBox="0 0 960 420" style="max-height:395px" role="img" aria-label="El router compara GET /proyectos/show/7 con cada ruta de routes/web.php, en orden: las dos primeras no coinciden, la tercera sí; el 7 pasa a $id y la acción devuelve la respuesta">
+          <defs>
+            <marker id="r-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+            <marker id="r-fl-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="420" rx="14" fill="#F8FAFC"/>
+
+          <!-- routes/web.php -->
+          <rect x="340" y="20" width="600" height="262" rx="10" fill="#F1F5F9" stroke="#CBD5E1"/>
+          <text x="355" y="45" font-size="14" font-weight="700" class="mono" fill="#334155">routes/web.php</text>
+          <rect x="350" y="58" width="580" height="38" rx="6" fill="#FFFFFF" stroke="#E5E7EB"/>
+          <rect x="362" y="65" width="46" height="24" rx="5" fill="#2563EB"/><text x="385" y="82" text-anchor="middle" font-size="13" class="mono" fill="#fff">GET</text>
+          <text x="422" y="83" font-size="16" class="mono" fill="#111827">/</text>
+          <rect x="350" y="102" width="580" height="38" rx="6" fill="#FFFFFF" stroke="#E5E7EB"/>
+          <rect x="362" y="109" width="46" height="24" rx="5" fill="#2563EB"/><text x="385" y="126" text-anchor="middle" font-size="13" class="mono" fill="#fff">GET</text>
+          <text x="422" y="127" font-size="16" class="mono" fill="#111827">/proyectos</text>
+          <rect x="350" y="146" width="580" height="38" rx="6" fill="#FFFFFF" stroke="#E5E7EB"/>
+          <rect x="362" y="153" width="46" height="24" rx="5" fill="#2563EB"/><text x="385" y="170" text-anchor="middle" font-size="13" class="mono" fill="#fff">GET</text>
+          <text x="422" y="171" font-size="16" class="mono" fill="#111827">/proyectos/show/{id}</text>
+          <text x="700" y="170" font-size="12" class="mono" fill="#6B7280">whereNumber('id')</text>
+          <rect x="350" y="190" width="580" height="38" rx="6" fill="#FFFFFF" stroke="#E5E7EB"/>
+          <rect x="362" y="197" width="46" height="24" rx="5" fill="#2563EB"/><text x="385" y="214" text-anchor="middle" font-size="13" class="mono" fill="#fff">GET</text>
+          <text x="422" y="215" font-size="16" class="mono" fill="#111827">/proyectos/create</text>
+          <rect x="350" y="234" width="580" height="38" rx="6" fill="#FFFFFF" stroke="#E5E7EB"/>
+          <rect x="362" y="241" width="46" height="24" rx="5" fill="#2563EB"/><text x="385" y="258" text-anchor="middle" font-size="13" class="mono" fill="#fff">GET</text>
+          <text x="422" y="259" font-size="16" class="mono" fill="#111827">/proyectos/edit/{id}</text>
+          <text x="700" y="258" font-size="12" class="mono" fill="#6B7280">whereNumber('id')</text>
+
+          <!-- 1 · llega la petición -->
+          <g class="fragment" data-fragment-index="1">
+            <rect x="20" y="40" width="280" height="76" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+            <text x="35" y="62" font-size="13" fill="#1E40AF">Petición</text>
+            <text x="35" y="96" font-size="16" class="mono" fill="#1E3A8A">GET /proyectos/show/7</text>
+            <path d="M300 78 L 336 78" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#r-fl-gris)"/>
+          </g>
+          <!-- 2 · las compara en orden -->
+          <g class="fragment" data-fragment-index="2">
+            <text x="22" y="152" font-size="14" fill="#374151">Compara método, dirección</text>
+            <text x="22" y="171" font-size="14" fill="#374151">y restricciones, en orden</text>
+            <circle cx="905" cy="77" r="13" fill="#DC2626"/><text x="905" y="82" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">✗</text>
+            <circle cx="905" cy="121" r="13" fill="#DC2626"/><text x="905" y="126" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">✗</text>
+          </g>
+          <!-- 3 · la primera que coincide -->
+          <g class="fragment" data-fragment-index="3">
+            <rect x="350" y="146" width="580" height="38" rx="6" fill="none" stroke="#059669" stroke-width="3"/>
+            <circle cx="905" cy="165" r="13" fill="#059669"/><text x="905" y="170" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">✓</text>
+            <path d="M348 165 C 315 165, 315 352, 338 352" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#r-fl-verde)"/>
+            <rect x="244" y="240" width="80" height="26" rx="6" fill="#ECFDF5" stroke="#059669"/>
+            <text x="284" y="258" text-anchor="middle" font-size="13" class="mono" fill="#065F46">$id = 7</text>
+            <rect x="340" y="310" width="600" height="90" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+            <text x="355" y="332" font-size="13" fill="#5B21B6">Acción</text>
+            <text x="355" y="364" font-size="14" class="mono" fill="#4C1D95">function ($id) { return 'Vista detalle proyecto ' . $id; }</text>
+            <path d="M340 380 L 304 380" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#r-fl-gris)"/>
+            <rect x="20" y="310" width="280" height="90" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+            <text x="35" y="332" font-size="13" fill="#1E40AF">Respuesta 200</text>
+            <text x="35" y="368" font-size="17" font-weight="700" fill="#1E3A8A">Vista detalle proyecto 7</text>
+          </g>
+          <!-- 4 · con abc no coincide ninguna: 404 -->
+          <g class="fragment" data-fragment-index="4">
+            <rect x="12" y="132" width="331" height="282" fill="#F8FAFC"/>
+            <rect x="339" y="292" width="608" height="122" fill="#F8FAFC"/>
+            <rect x="20" y="40" width="280" height="76" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+            <text x="35" y="62" font-size="13" fill="#991B1B">Petición</text>
+            <text x="35" y="96" font-size="16" class="mono" fill="#7F1D1D">GET /proyectos/show/abc</text>
+            <rect x="341" y="143" width="592" height="44" fill="#F1F5F9"/>
+            <rect x="350" y="146" width="580" height="38" rx="6" fill="#FFFFFF" stroke="#E5E7EB"/>
+            <rect x="362" y="153" width="46" height="24" rx="5" fill="#2563EB"/><text x="385" y="170" text-anchor="middle" font-size="13" class="mono" fill="#fff">GET</text>
+            <text x="422" y="171" font-size="16" class="mono" fill="#111827">/proyectos/show/{id}</text>
+            <text x="700" y="170" font-size="12" class="mono" font-weight="700" fill="#DC2626">whereNumber('id')</text>
+            <circle cx="905" cy="165" r="13" fill="#DC2626"/><text x="905" y="170" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">✗</text>
+            <circle cx="905" cy="209" r="13" fill="#DC2626"/><text x="905" y="214" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">✗</text>
+            <circle cx="905" cy="253" r="13" fill="#DC2626"/><text x="905" y="258" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">✗</text>
+            <rect x="340" y="310" width="600" height="90" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+            <text x="355" y="342" font-size="17" font-weight="700" fill="#991B1B">Ninguna ruta coincide</text>
+            <text x="355" y="372" font-size="14" class="mono" fill="#7F1D1D">'abc' no cumple whereNumber('id'): la acción no se ejecuta</text>
+            <path d="M340 355 L 304 355" fill="none" stroke="#DC2626" stroke-width="3"/>
+            <rect x="20" y="310" width="280" height="90" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+            <text x="35" y="332" font-size="13" fill="#991B1B">Respuesta</text>
+            <text x="35" y="370" font-size="22" font-weight="700" fill="#991B1B">404 Not Found</text>
+          </g>
+
+          <!-- Animación del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.2s" repeatCount="indefinite" path="M300 78 L 336 78"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><rect x="350" y="58" width="580" height="38" rx="6" fill="#FDE68A" opacity="0.55"><animate attributeName="y" values="58;102;146" dur="1.8s" repeatCount="indefinite"/></rect></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#059669"><animateMotion dur="1.8s" repeatCount="indefinite" path="M348 165 C 315 165, 315 352, 338 352 L 340 380 L 304 380"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="4"><rect x="350" y="58" width="580" height="38" rx="6" fill="#FECACA" opacity="0.55"><animate attributeName="y" values="58;102;146;190;234" dur="2.5s" repeatCount="indefinite"/></rect></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1">Llega <code>GET /proyectos/show/7</code></li>
+          <li class="fragment" data-fragment-index="2">El <em>router</em> compara las rutas <strong>en orden</strong></li>
+          <li class="fragment" data-fragment-index="3">Gana la <strong>primera</strong> que coincide: el 7 pasa a <code>$id</code></li>
+          <li class="fragment" data-fragment-index="4">Con <code>abc</code>, ninguna coincide: <strong>404</strong>, sin ejecutar nuestro código</li>
+        </ol>
+        <aside class="notes">
+          Paso 2: la barra amarilla recorre las rutas en orden. Paso 4: ahora con abc; la restricción descarta la tercera y ninguna otra encaja.
+          En v0, esta comprobación del id la teníamos que hacer nosotros con $_GET.
+        </aside>
+      </section>
+
+      <!-- 12 · El orden importa -->
+      <section>
+        <h2>El orden importa</h2>
+        <pre class="compacto"><code class="language-php" data-trim>
+Route::get('proyectos/{id}', fn ($id) =&gt; "Proyecto $id");     // antes...
+Route::get('proyectos/create', fn () =&gt; 'Añadir proyecto');   // ...nunca se alcanza
+        </code></pre>
+        <p class="small-text fragment"><code>/proyectos/create</code> coincide con la primera, con <code>$id = 'create'</code>.</p>
+        <ul class="small-text">
+          <li class="fragment">Rutas fijas <strong>antes</strong> que las que llevan parámetros…</li>
+          <li class="fragment">…y el parámetro, <strong>restringido</strong>: <code>whereNumber('id')</code>.</li>
+        </ul>
+      </section>
+
+      <!-- 13 · route:list -->
+      <section>
+        <h2><em>Artisan</em>: <code>route:list</code></h2>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan route:list
+php artisan route:list --path=proyectos
+        </code></pre>
+        <p class="small-text">Método, dirección, nombre y acción de cada ruta.</p>
+        <p class="small-text muted fragment">También salen las del <em>framework</em>, como <code>/up</code>: ¿está viva la aplicación?</p>
+      </section>
+
+      <!-- 14 · Entorno -->
+      <section>
+        <h2>El entorno</h2>
+        <p class="small-text">Terminal de <code>workspace</code> como <code>laradock</code>. Rama nueva, en la VM:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+git switch main
+git pull upstream main
+git switch -c RA5_3
+        </code></pre>
+        <p class="small-text">Todas las rutas, en <code>routes/web.php</code>.</p>
+      </section>
+
+      <!-- 15 · Ejercicio 1 -->
+      <section>
+        <h2>Ejercicios (1/2)</h2>
+        <ol class="pasos compacta">
+          <li><strong>Una primera ruta.</strong> <code>/hola/{nombre?}</code>, con <code>mundo</code> por defecto y <code>e()</code>. Prueba <code>/hola</code> y <code>/hola/Ana</code>.</li>
+          <li><strong>Las rutas del sitio</strong> (siguiente diapositiva). Las de proyectos, en <strong>un grupo</strong>; todos los <code>{id}</code>, <strong>números</strong>.</li>
+        </ol>
+      </section>
+
+      <!-- 16 · Las rutas del sitio (1) -->
+      <section>
+        <h2>Las rutas del sitio (1/2)</h2>
+        <table>
+          <tbody>
+            <tr><th><code>/</code></th><td>Pantalla principal</td></tr>
+            <tr><th><code>/proyectos</code><br><code>proyectos.index</code></th><td>Listado proyectos</td></tr>
+            <tr><th><code>/proyectos/show/{id}</code><br><code>proyectos.show</code></th><td>Vista detalle proyecto {id}</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted">Todas <code>GET</code>. La de <code>/</code> sustituye a la bienvenida.</p>
+      </section>
+
+      <!-- 16b · Las rutas del sitio (2) -->
+      <section>
+        <h2>Las rutas del sitio (2/2)</h2>
+        <table>
+          <tbody>
+            <tr><th><code>/proyectos/create</code><br><code>proyectos.create</code></th><td>Añadir proyecto</td></tr>
+            <tr><th><code>/proyectos/edit/{id}</code><br><code>proyectos.edit</code></th><td>Modificar proyecto {id}</td></tr>
+            <tr><th><code>/perfil/{id?}</code><br><code>perfil</code></th><td>Visualizar el currículo de {id}, o "propio" sin <code>{id}</code></td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted">Las de proyectos, en un grupo. Todos los <code>{id}</code>, números.</p>
+      </section>
+
+      <!-- 17 · Ejercicios 3-5 -->
+      <section>
+        <h2>Ejercicios (2/2)</h2>
+        <ol class="pasos compacta" start="3">
+          <li><strong>JSON.</strong> <code>/centro</code> devuelve <code>['centro' =&gt; config('marcapersonalfp.centro')]</code>. Mira <code>Content-Type</code> en F12.</li>
+          <li><strong>Comprueba tus rutas</strong> con <code>route:list</code>.</li>
+          <li><strong>Investiga.</strong> <code>curl -i -X POST</code> a <code>/proyectos</code>; <code>/proyectos/show/abc</code> sin <code>whereNumber</code>; una ruta <code>proyectos/{id}</code> antes del grupo.</li>
+        </ol>
+      </section>
+
+      <!-- 18 · Puente -->
+      <section>
+        <h2>Puente</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>En <em>v0</em></h3>
+            <p class="small-text">Cada dirección, un fichero de <code>public/</code>; los datos, en <code>$_GET</code>, sin comprobar.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En <em>Laravel</em></h3>
+            <p class="small-text">Todas las direcciones en <code>routes/web.php</code>; los parámetros, en la dirección y con restricciones.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+      </section>
+
+      <!-- 19 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA5_3_RutasTest.php</code> a <code>tests/Feature/</code></li>
+          <li>En el terminal de <code>workspace</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan test --filter=RA5_3_RutasTest
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 a 3</strong>. <code>/centro</code> necesita <code>config/marcapersonalfp.php</code> (5.2).</p>
+        <p class="small-text">Si todo está bien: <code class="nw">Tests: 8 passed (29 assertions)</code></p>
+      </section>
+
+      <!-- 20 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>5.4. Vistas, <em>Blade</em> y <em>layouts</em></h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>
