@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 450" width="960" height="450" role="img" aria-label="Qué demuestra quién eres en cada petición: con formulario y sesión, la cookie de sesión; con HTTP Basic, el usuario y la contraseña en cada petición; con un token, la cabecera Authorization Bearer; con un proveedor externo, el paso por Google y después la sesión propia" font-family="'Source Sans Pro', Helvetica, Arial, sans-serif">
+  <title>Qué demuestra quién eres en cada petición: con formulario y sesión, la cookie de sesión; con HTTP Basic, el usuario y la contraseña en cada petición; con un token, la cabecera Authorization Bearer; con un proveedor externo, el paso por Google y después la sesión propia</title>
+  <defs>
+    <marker id="a42m-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#64748B"/></marker>
+    <marker id="a42m-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#2563EB"/></marker>
+    <marker id="a42m-rojo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#DC2626"/></marker>
+    <marker id="a42m-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+    <marker id="a42m-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+  </defs>
+  <rect x="0" y="0" width="960" height="450" rx="14" fill="#F8FAFC"/>
+
+  <!-- Columnas: navegador y servidor -->
+  <rect x="15" y="15" width="165" height="420" rx="12" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="97" y="40" text-anchor="middle" font-size="16" font-weight="700" fill="#1E40AF">Navegador</text>
+  <rect x="780" y="15" width="165" height="420" rx="12" fill="#F5F3FF" stroke="#C4B5FD"/>
+  <text x="862" y="40" text-anchor="middle" font-size="16" font-weight="700" fill="#5B21B6">Servidor</text>
+
+  <!-- Qué significa cada tipo de flecha -->
+  <line x1="240" y1="36" x2="280" y2="36" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="288" y="41" font-size="13" fill="#64748B">una vez, al identificarse</text>
+  <line x1="500" y1="36" x2="540" y2="36" stroke="#64748B" stroke-width="3"/>
+  <text x="548" y="41" font-size="13" fill="#64748B">en cada petición siguiente</text>
+
+  <!-- Separadores de carril -->
+  <line x1="15" y1="147" x2="945" y2="147" stroke="#E2E8F0"/>
+  <line x1="15" y1="242" x2="945" y2="242" stroke="#E2E8F0"/>
+  <line x1="15" y1="337" x2="945" y2="337" stroke="#E2E8F0"/>
+
+  <!-- Nombres de los mecanismos -->
+  <text x="97" y="93" text-anchor="middle" font-size="15" font-weight="700" fill="#1E3A8A">Formulario</text>
+  <text x="97" y="112" text-anchor="middle" font-size="13" fill="#1E3A8A">+ sesión</text>
+  <text x="97" y="188" text-anchor="middle" font-size="15" font-weight="700" fill="#1E3A8A">HTTP Basic</text>
+  <text x="97" y="207" text-anchor="middle" font-size="13" fill="#1E3A8A">(cuadro del navegador)</text>
+  <text x="97" y="283" text-anchor="middle" font-size="15" font-weight="700" fill="#1E3A8A">Token</text>
+  <text x="97" y="302" text-anchor="middle" font-size="13" fill="#1E3A8A">(API, app móvil)</text>
+  <text x="97" y="378" text-anchor="middle" font-size="15" font-weight="700" fill="#1E3A8A">Proveedor</text>
+  <text x="97" y="397" text-anchor="middle" font-size="13" fill="#1E3A8A">externo</text>
+
+  <!-- 1 · Formulario + sesión -->
+  <g>
+    <text x="478" y="77" text-anchor="middle" font-size="13" fill="#475569">POST email + contraseña</text>
+    <path d="M185 87 L 772 87" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a42m-gris)"/>
+    <text x="478" y="117" text-anchor="middle" font-size="14" font-family="'Source Code Pro', Consolas, monospace" fill="#1D4ED8">Cookie: PHPSESSID=…</text>
+    <path d="M185 127 L 772 127" fill="none" stroke="#2563EB" stroke-width="3" marker-end="url(#a42m-azul)"/>
+    <circle cx="205" cy="108" r="12" fill="#2563EB"/><text x="205" y="113" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+    <text x="862" y="98" text-anchor="middle" font-size="14" font-family="'Source Code Pro', Consolas, monospace" fill="#5B21B6">$_SESSION</text>
+    <text x="862" y="117" text-anchor="middle" font-size="12" fill="#5B21B6">recuerda al usuario</text>
+  </g>
+  <!-- 2 · HTTP Basic -->
+  <g>
+    <text x="478" y="175" text-anchor="middle" font-size="13" font-style="italic" fill="#475569">sin paso previo: el navegador pide usuario y contraseña</text>
+    <text x="478" y="207" text-anchor="middle" font-size="14" font-family="'Source Code Pro', Consolas, monospace" fill="#B91C1C">Authorization: Basic YW5hLmxvcGV6QG1hcmNh…</text>
+    <path d="M185 217 L 772 217" fill="none" stroke="#DC2626" stroke-width="3" marker-end="url(#a42m-rojo)"/>
+    <text x="478" y="236" text-anchor="middle" font-size="12" font-weight="700" fill="#B91C1C">¡usuario y contraseña en cada petición, solo codificados en Base64!</text>
+    <circle cx="205" cy="198" r="12" fill="#DC2626"/><text x="205" y="203" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+    <text x="862" y="193" text-anchor="middle" font-size="12" fill="#5B21B6">comprueba la</text>
+    <text x="862" y="211" text-anchor="middle" font-size="12" fill="#5B21B6">contraseña cada vez</text>
+  </g>
+  <!-- 3 · Token -->
+  <g>
+    <text x="478" y="267" text-anchor="middle" font-size="13" fill="#475569">POST credenciales → recibe un token</text>
+    <path d="M185 277 L 772 277" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a42m-gris)"/>
+    <text x="478" y="307" text-anchor="middle" font-size="14" font-family="'Source Code Pro', Consolas, monospace" fill="#B45309">Authorization: Bearer 7|Xk2p…</text>
+    <path d="M185 317 L 772 317" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#a42m-ambar)"/>
+    <circle cx="205" cy="298" r="12" fill="#D97706"/><text x="205" y="303" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+    <text x="862" y="288" text-anchor="middle" font-size="12" fill="#5B21B6">busca el token</text>
+    <text x="862" y="306" text-anchor="middle" font-size="12" fill="#5B21B6">(Bloque 7, Sanctum)</text>
+  </g>
+  <!-- 4 · Proveedor externo -->
+  <g>
+    <text x="330" y="362" text-anchor="middle" font-size="12" fill="#475569">te identificas en Google</text>
+    <text x="640" y="362" text-anchor="middle" font-size="12" fill="#475569">vuelve con un código</text>
+    <path d="M185 372 L 434 372" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4"/>
+    <rect x="438" y="360" width="84" height="24" rx="12" fill="#fff" stroke="#64748B"/>
+    <text x="480" y="377" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Google</text>
+    <path d="M526 372 L 772 372" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a42m-gris)"/>
+    <text x="478" y="402" text-anchor="middle" font-size="14" font-family="'Source Code Pro', Consolas, monospace" fill="#047857">Cookie: sesión de nuestra app</text>
+    <path d="M185 412 L 772 412" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#a42m-verde)"/>
+    <circle cx="205" cy="393" r="12" fill="#059669"/><text x="205" y="398" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+    <text x="862" y="383" text-anchor="middle" font-size="12" fill="#5B21B6">confía en Google</text>
+    <text x="862" y="401" text-anchor="middle" font-size="12" fill="#5B21B6">(OAuth 2 / OIDC)</text>
+  </g>
+  <!-- 5 · Segundo factor -->
+  <g>
+    <rect x="640" y="62" width="118" height="22" rx="11" fill="#FEF3C7" stroke="#D97706"/>
+    <text x="699" y="77" text-anchor="middle" font-size="12" font-weight="700" fill="#92400E">+ 2.º factor</text>
+    <rect x="640" y="252" width="118" height="22" rx="11" fill="#FEF3C7" stroke="#D97706"/>
+    <text x="699" y="267" text-anchor="middle" font-size="12" font-weight="700" fill="#92400E">+ 2.º factor</text>
+  </g>
+
+</svg>

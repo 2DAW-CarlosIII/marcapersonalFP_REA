@@ -303,20 +303,124 @@
         <p class="small-text muted fragment" style="margin-top:1em">Aquí, las dos primeras. La autorización, con los <strong>roles</strong>: en 4.4 y en el Bloque 7.</p>
       </section>
 
-      <!-- 4 · Mecanismos -->
+      <!-- 4 · Mecanismos (SVG animado: un mecanismo por fragmento) -->
       <section>
-        <h2>Mecanismos de autenticación</h2>
-        <table>
-          <tbody>
-            <tr class="fragment"><th>Formulario + sesión</th><td>Aquí, a mano; con <em>Breeze</em> en el Bloque 5</td></tr>
-            <tr class="fragment"><th>HTTP <em>Basic</em></th><td>Credenciales en <strong>cada</strong> petición; sin <em>logout</em> ni página propia</td></tr>
-            <tr class="fragment"><th><em>Tokens</em></th><td>Lo habitual en las API: Bloque 7 (<em>Sanctum</em>)</td></tr>
-            <tr class="fragment"><th>Proveedor externo</th><td>"Iniciar sesión con Google" (<em>OAuth 2</em>, <em>OpenID Connect</em>)</td></tr>
-            <tr class="fragment"><th>Segundo factor</th><td>Código del móvil (2FA); <em>passkeys</em></td></tr>
-          </tbody>
-        </table>
+        <style>
+          .reveal svg.anim { display: block; margin: 0 auto; width: 100%; height: auto; }
+          .reveal svg.anim text { font-family: var(--r-main-font); }
+          .reveal svg.anim .mono { font-family: var(--r-code-font); }
+          .reveal ol.leyenda { columns: 2; column-gap: 40px; font-size: 0.5em; max-width: 920px; margin: 8px auto 0; padding-left: 1.4em; text-align: left; }
+          .reveal ol.leyenda li { margin: 2px 0; break-inside: avoid; }
+          @media (prefers-reduced-motion: reduce) { .reveal svg .punto { display: none; } }
+        </style>
+        <h2>Formas de autenticarse</h2>
+        <svg class="anim" viewBox="0 0 960 450" style="max-height:400px" role="img" aria-label="Qué demuestra quién eres en cada petición: con formulario y sesión, la cookie de sesión; con HTTP Basic, el usuario y la contraseña en cada petición; con un token, la cabecera Authorization Bearer; con un proveedor externo, el paso por Google y después la sesión propia">
+          <defs>
+            <marker id="a42m-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#64748B"/></marker>
+            <marker id="a42m-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#2563EB"/></marker>
+            <marker id="a42m-rojo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#DC2626"/></marker>
+            <marker id="a42m-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+            <marker id="a42m-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="450" rx="14" fill="#F8FAFC"/>
+
+          <!-- Columnas: navegador y servidor -->
+          <rect x="15" y="15" width="165" height="420" rx="12" fill="#EFF6FF" stroke="#93C5FD"/>
+          <text x="97" y="40" text-anchor="middle" font-size="16" font-weight="700" fill="#1E40AF">Navegador</text>
+          <rect x="780" y="15" width="165" height="420" rx="12" fill="#F5F3FF" stroke="#C4B5FD"/>
+          <text x="862" y="40" text-anchor="middle" font-size="16" font-weight="700" fill="#5B21B6">Servidor</text>
+
+          <!-- Qué significa cada tipo de flecha -->
+          <line x1="240" y1="36" x2="280" y2="36" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4"/>
+          <text x="288" y="41" font-size="13" fill="#64748B">una vez, al identificarse</text>
+          <line x1="500" y1="36" x2="540" y2="36" stroke="#64748B" stroke-width="3"/>
+          <text x="548" y="41" font-size="13" fill="#64748B">en cada petición siguiente</text>
+
+          <!-- Separadores de carril -->
+          <line x1="15" y1="147" x2="945" y2="147" stroke="#E2E8F0"/>
+          <line x1="15" y1="242" x2="945" y2="242" stroke="#E2E8F0"/>
+          <line x1="15" y1="337" x2="945" y2="337" stroke="#E2E8F0"/>
+
+          <!-- Nombres de los mecanismos -->
+          <text x="97" y="93" text-anchor="middle" font-size="15" font-weight="700" fill="#1E3A8A">Formulario</text>
+          <text x="97" y="112" text-anchor="middle" font-size="13" fill="#1E3A8A">+ sesión</text>
+          <text x="97" y="188" text-anchor="middle" font-size="15" font-weight="700" fill="#1E3A8A">HTTP Basic</text>
+          <text x="97" y="207" text-anchor="middle" font-size="13" fill="#1E3A8A">(cuadro del navegador)</text>
+          <text x="97" y="283" text-anchor="middle" font-size="15" font-weight="700" fill="#1E3A8A">Token</text>
+          <text x="97" y="302" text-anchor="middle" font-size="13" fill="#1E3A8A">(API, app móvil)</text>
+          <text x="97" y="378" text-anchor="middle" font-size="15" font-weight="700" fill="#1E3A8A">Proveedor</text>
+          <text x="97" y="397" text-anchor="middle" font-size="13" fill="#1E3A8A">externo</text>
+
+          <!-- 1 · Formulario + sesión -->
+          <g class="fragment" data-fragment-index="1">
+            <text x="478" y="77" text-anchor="middle" font-size="13" fill="#475569">POST email + contraseña</text>
+            <path d="M185 87 L 772 87" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a42m-gris)"/>
+            <text x="478" y="117" text-anchor="middle" font-size="14" class="mono" fill="#1D4ED8">Cookie: PHPSESSID=…</text>
+            <path d="M185 127 L 772 127" fill="none" stroke="#2563EB" stroke-width="3" marker-end="url(#a42m-azul)"/>
+            <circle cx="205" cy="108" r="12" fill="#2563EB"/><text x="205" y="113" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+            <text x="862" y="98" text-anchor="middle" font-size="14" class="mono" fill="#5B21B6">$_SESSION</text>
+            <text x="862" y="117" text-anchor="middle" font-size="12" fill="#5B21B6">recuerda al usuario</text>
+          </g>
+          <!-- 2 · HTTP Basic -->
+          <g class="fragment" data-fragment-index="2">
+            <text x="478" y="175" text-anchor="middle" font-size="13" font-style="italic" fill="#475569">sin paso previo: el navegador pide usuario y contraseña</text>
+            <text x="478" y="207" text-anchor="middle" font-size="14" class="mono" fill="#B91C1C">Authorization: Basic YW5hLmxvcGV6QG1hcmNh…</text>
+            <path d="M185 217 L 772 217" fill="none" stroke="#DC2626" stroke-width="3" marker-end="url(#a42m-rojo)"/>
+            <text x="478" y="236" text-anchor="middle" font-size="12" font-weight="700" fill="#B91C1C">¡usuario y contraseña en cada petición, solo codificados en Base64!</text>
+            <circle cx="205" cy="198" r="12" fill="#DC2626"/><text x="205" y="203" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+            <text x="862" y="193" text-anchor="middle" font-size="12" fill="#5B21B6">comprueba la</text>
+            <text x="862" y="211" text-anchor="middle" font-size="12" fill="#5B21B6">contraseña cada vez</text>
+          </g>
+          <!-- 3 · Token -->
+          <g class="fragment" data-fragment-index="3">
+            <text x="478" y="267" text-anchor="middle" font-size="13" fill="#475569">POST credenciales → recibe un token</text>
+            <path d="M185 277 L 772 277" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a42m-gris)"/>
+            <text x="478" y="307" text-anchor="middle" font-size="14" class="mono" fill="#B45309">Authorization: Bearer 7|Xk2p…</text>
+            <path d="M185 317 L 772 317" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#a42m-ambar)"/>
+            <circle cx="205" cy="298" r="12" fill="#D97706"/><text x="205" y="303" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+            <text x="862" y="288" text-anchor="middle" font-size="12" fill="#5B21B6">busca el token</text>
+            <text x="862" y="306" text-anchor="middle" font-size="12" fill="#5B21B6">(Bloque 7, Sanctum)</text>
+          </g>
+          <!-- 4 · Proveedor externo -->
+          <g class="fragment" data-fragment-index="4">
+            <text x="330" y="362" text-anchor="middle" font-size="12" fill="#475569">te identificas en Google</text>
+            <text x="640" y="362" text-anchor="middle" font-size="12" fill="#475569">vuelve con un código</text>
+            <path d="M185 372 L 434 372" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4"/>
+            <rect x="438" y="360" width="84" height="24" rx="12" fill="#fff" stroke="#64748B"/>
+            <text x="480" y="377" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Google</text>
+            <path d="M526 372 L 772 372" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a42m-gris)"/>
+            <text x="478" y="402" text-anchor="middle" font-size="14" class="mono" fill="#047857">Cookie: sesión de nuestra app</text>
+            <path d="M185 412 L 772 412" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#a42m-verde)"/>
+            <circle cx="205" cy="393" r="12" fill="#059669"/><text x="205" y="398" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+            <text x="862" y="383" text-anchor="middle" font-size="12" fill="#5B21B6">confía en Google</text>
+            <text x="862" y="401" text-anchor="middle" font-size="12" fill="#5B21B6">(OAuth 2 / OIDC)</text>
+          </g>
+          <!-- 5 · Segundo factor -->
+          <g class="fragment" data-fragment-index="5">
+            <rect x="640" y="62" width="118" height="22" rx="11" fill="#FEF3C7" stroke="#D97706"/>
+            <text x="699" y="77" text-anchor="middle" font-size="12" font-weight="700" fill="#92400E">+ 2.º factor</text>
+            <rect x="640" y="252" width="118" height="22" rx="11" fill="#FEF3C7" stroke="#D97706"/>
+            <text x="699" y="267" text-anchor="middle" font-size="12" font-weight="700" fill="#92400E">+ 2.º factor</text>
+          </g>
+
+          <!-- Un punto recorre la petición de cada mecanismo -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.6s" repeatCount="indefinite" path="M185 127 L 765 127"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#DC2626"><animateMotion dur="1.6s" repeatCount="indefinite" path="M185 217 L 765 217"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#D97706"><animateMotion dur="1.6s" repeatCount="indefinite" path="M185 317 L 765 317"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="4"><circle r="7" fill="#059669"><animateMotion dur="1.6s" repeatCount="indefinite" path="M185 412 L 765 412"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1"><strong>Formulario + sesión</strong>: credenciales una vez; luego, la cookie</li>
+          <li class="fragment" data-fragment-index="2"><strong>HTTP <em>Basic</em></strong>: usuario y contraseña en <strong>cada</strong> petición</li>
+          <li class="fragment" data-fragment-index="3"><strong><em>Token</em></strong>: se obtiene una vez y viaja siempre (API)</li>
+          <li class="fragment" data-fragment-index="4"><strong>Proveedor externo</strong>: identifica Google; luego, nuestra sesión</li>
+          <li class="fragment" data-fragment-index="5"><strong>Segundo factor</strong> (2FA): un paso más al entrar</li>
+        </ol>
         <aside class="notes">
+          Un mecanismo por pulsación; el punto recorre lo que viaja en cada petición siguiente.
           Todos acaban igual: en cada petición, la aplicación tiene que saber qué usuario la hace. Con formulario + sesión, ese dato vive en $_SESSION.
+          HTTP Basic: Base64 no es cifrado, cualquiera lo decodifica; solo tiene sentido con HTTPS.
+          Proveedor externo y segundo factor quedan fuera del alcance del módulo.
         </aside>
       </section>
 
@@ -399,25 +503,121 @@ class Autenticador
         <p class="small-text muted">El mismo patrón que <code>ValidadorCurriculo</code> (3.8).</p>
       </section>
 
-      <!-- 11 · El login paso a paso -->
+      <!-- 11 · El login paso a paso (SVG animado: un paso por fragmento) -->
       <section>
         <h2>El <em>login</em>, paso a paso</h2>
-        <ol class="pasos">
-          <li class="fragment"><strong>Regenera</strong> el identificador: <code>session_regenerate_id(true)</code></li>
-          <li class="fragment">Guarda el usuario en <code>$_SESSION['usuario']</code></li>
-          <li class="fragment">Mensaje <em>flash</em> y <strong>303</strong> al área del usuario, como en 4.1</li>
+        <svg class="anim" viewBox="0 0 960 460" style="max-height:390px" role="img" aria-label="El login de v0 paso a paso: un atacante consigue que el navegador de Ana use el identificador abc; Ana envía email y contraseña con esa cookie; el servidor comprueba la contraseña con password_verify, regenera la sesión con un identificador nuevo, xyz, borra abc y responde 303 con la cookie nueva; Ana entra en su área con xyz; el atacante prueba con abc y no le sirve">
+          <defs>
+            <marker id="a42l-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#2563EB"/></marker>
+            <marker id="a42l-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+            <marker id="a42l-rojo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#DC2626"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="460" rx="14" fill="#F8FAFC"/>
+
+          <!-- Navegador de Ana -->
+          <rect x="20" y="20" width="230" height="270" rx="12" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+          <text x="135" y="50" text-anchor="middle" font-size="17" font-weight="700" fill="#1E40AF">Navegador de Ana</text>
+          <text x="135" y="74" text-anchor="middle" font-size="12" class="mono" fill="#1E40AF">ana.lopez@…</text>
+          <text x="135" y="225" text-anchor="middle" font-size="13" fill="#1E40AF">Su cookie de sesión:</text>
+          <!-- desaparece en el paso 5: la cookie antigua -->
+          <g class="fragment fade-out" data-fragment-index="5">
+            <rect x="40" y="235" width="190" height="34" rx="17" fill="#fff" stroke="#DC2626" stroke-width="2"/>
+            <text x="135" y="257" text-anchor="middle" font-size="14" class="mono" fill="#B91C1C">PHPSESSID=abc</text>
+          </g>
+
+          <!-- Atacante -->
+          <rect x="20" y="320" width="230" height="120" rx="12" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+          <text x="135" y="350" text-anchor="middle" font-size="17" font-weight="700" fill="#991B1B">Atacante</text>
+          <text x="135" y="374" text-anchor="middle" font-size="12" class="mono" fill="#991B1B">conoce PHPSESSID=abc</text>
+
+          <!-- Servidor -->
+          <rect x="640" y="20" width="300" height="420" rx="12" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+          <text x="790" y="50" text-anchor="middle" font-size="17" font-weight="700" fill="#5B21B6">Servidor</text>
+          <rect x="660" y="250" width="260" height="105" rx="10" fill="#fff" stroke="#C4B5FD"/>
+          <text x="790" y="273" text-anchor="middle" font-size="13" font-weight="700" fill="#5B21B6">Sesiones guardadas</text>
+          <!-- desaparece en el paso 4: la sesión antigua -->
+          <g class="fragment fade-out" data-fragment-index="4">
+            <text x="680" y="303" font-size="14" class="mono" fill="#475569">abc → (vacía)</text>
+          </g>
+
+          <!-- 1 · El atacante fija el identificador -->
+          <g class="fragment" data-fragment-index="1">
+            <path d="M135 320 L 135 274" fill="none" stroke="#DC2626" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a42l-rojo)"/>
+            <circle cx="160" cy="298" r="12" fill="#DC2626"/><text x="160" y="303" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+            <text x="135" y="400" text-anchor="middle" font-size="12" fill="#991B1B">le hace usar ese identificador</text>
+            <text x="135" y="418" text-anchor="middle" font-size="12" fill="#991B1B">(un enlace preparado…)</text>
+          </g>
+          <!-- 2 · POST de las credenciales -->
+          <g class="fragment" data-fragment-index="2">
+            <text x="445" y="72" text-anchor="middle" font-size="14" fill="#1E40AF">POST email + contraseña</text>
+            <path d="M255 82 L 635 82" fill="none" stroke="#2563EB" stroke-width="3" marker-end="url(#a42l-azul)"/>
+            <text x="445" y="100" text-anchor="middle" font-size="12" class="mono" fill="#B91C1C">Cookie: PHPSESSID=abc</text>
+            <circle cx="275" cy="64" r="12" fill="#2563EB"/><text x="275" y="69" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+          </g>
+          <!-- 3 · password_verify -->
+          <g class="fragment" data-fragment-index="3">
+            <circle cx="672" cy="86" r="12" fill="#059669"/><text x="672" y="91" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+            <text x="692" y="91" font-size="14" class="mono" fill="#047857">password_verify() ✓</text>
+          </g>
+          <!-- 4 · session_regenerate_id -->
+          <g class="fragment" data-fragment-index="4">
+            <circle cx="672" cy="120" r="12" fill="#D97706"/><text x="672" y="125" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+            <text x="692" y="125" font-size="14" class="mono" fill="#B45309">session_regenerate_id(true)</text>
+            <text x="680" y="303" font-size="14" class="mono" fill="#047857">xyz → usuario: Ana</text>
+            <text x="680" y="330" font-size="13" fill="#B91C1C">abc: borrada</text>
+          </g>
+          <!-- 5 · 303 con la cookie nueva -->
+          <g class="fragment" data-fragment-index="5">
+            <text x="445" y="142" text-anchor="middle" font-size="14" fill="#B45309">303 → RA4_perfil.php</text>
+            <path d="M635 152 L 255 152" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#a42l-ambar)"/>
+            <text x="445" y="170" text-anchor="middle" font-size="12" class="mono" fill="#B45309">Set-Cookie: PHPSESSID=xyz</text>
+            <circle cx="615" cy="134" r="12" fill="#D97706"/><text x="615" y="139" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+            <rect x="40" y="235" width="190" height="34" rx="17" fill="#fff" stroke="#059669" stroke-width="2"/>
+            <text x="135" y="257" text-anchor="middle" font-size="14" class="mono" fill="#047857">PHPSESSID=xyz</text>
+          </g>
+          <!-- 6 · Ana entra en su área -->
+          <g class="fragment" data-fragment-index="6">
+            <text x="445" y="207" text-anchor="middle" font-size="14" fill="#1E40AF">GET RA4_perfil.php</text>
+            <path d="M255 217 L 635 217" fill="none" stroke="#2563EB" stroke-width="3" marker-end="url(#a42l-azul)"/>
+            <text x="445" y="235" text-anchor="middle" font-size="12" class="mono" fill="#047857">Cookie: PHPSESSID=xyz</text>
+            <circle cx="275" cy="199" r="12" fill="#2563EB"/><text x="275" y="204" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">6</text>
+            <text x="672" y="200" font-size="14" class="mono" fill="#047857">exigirLogin() ✓</text>
+            <text x="672" y="222" font-size="13" fill="#047857">→ Mi área de Ana</text>
+          </g>
+          <!-- 7 · El atacante prueba con abc -->
+          <g class="fragment" data-fragment-index="7">
+            <text x="445" y="375" text-anchor="middle" font-size="14" fill="#991B1B">GET RA4_perfil.php</text>
+            <path d="M255 385 L 635 385" fill="none" stroke="#DC2626" stroke-width="3" marker-end="url(#a42l-rojo)"/>
+            <text x="445" y="403" text-anchor="middle" font-size="12" class="mono" fill="#B91C1C">Cookie: PHPSESSID=abc</text>
+            <circle cx="275" cy="367" r="12" fill="#DC2626"/><text x="275" y="372" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">7</text>
+            <text x="672" y="392" font-size="14" font-weight="700" fill="#B91C1C">✗ abc no existe</text>
+            <text x="672" y="414" font-size="13" fill="#B91C1C">→ redirige al login</text>
+          </g>
+
+          <!-- Un punto recorre la petición o respuesta del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#DC2626"><animateMotion dur="1.2s" repeatCount="indefinite" path="M135 320 L 135 278"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.6s" repeatCount="indefinite" path="M255 82 L 628 82"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="5"><circle r="7" fill="#D97706"><animateMotion dur="1.6s" repeatCount="indefinite" path="M635 152 L 262 152"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="6"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.6s" repeatCount="indefinite" path="M255 217 L 628 217"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="7"><circle r="7" fill="#DC2626"><animateMotion dur="1.6s" repeatCount="indefinite" path="M255 385 L 628 385"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1">Ana usará un id que el atacante <strong>conoce</strong> (<strong>fijación</strong>)</li>
+          <li class="fragment" data-fragment-index="2">Ana envía email y contraseña con esa cookie</li>
+          <li class="fragment" data-fragment-index="3"><code>password_verify()</code> compara con el <em>hash</em></li>
+          <li class="fragment" data-fragment-index="4"><code>session_regenerate_id(true)</code>: <code>abc</code>, <strong>borrada</strong></li>
+          <li class="fragment" data-fragment-index="5"><strong>303</strong> con la cookie <strong>nueva</strong> (<code>xyz</code>)</li>
+          <li class="fragment" data-fragment-index="6">Ana entra: <code>exigirLogin()</code> la reconoce</li>
+          <li class="fragment" data-fragment-index="7"><code>abc</code> ya no existe: <strong>sin regenerar, entraría</strong></li>
         </ol>
+        <aside class="notes">
+          Un paso por pulsación; el punto recorre la petición o la respuesta del paso actual.
+          PHP acepta por defecto identificadores que le llegan del cliente; por eso la fijación es posible.
+          El true de session_regenerate_id(true) es lo que borra la sesión antigua: sin él, abc seguiría existiendo (vacía).
+        </aside>
       </section>
 
-      <!-- 12 · Fijación de sesión -->
-      <section>
-        <h2>¿Por qué regenerar? Fijación de sesión</h2>
-        <p class="small-text">Un atacante consigue que tu navegador use un <code>PHPSESSID</code> que <strong>él conoce</strong> (un enlace preparado; PHP acepta por defecto identificadores del cliente).</p>
-        <p class="small-text fragment">Si al hacer <em>login</em> no cambia, el atacante <strong>ya está dentro</strong> de tu sesión autenticada.</p>
-        <p class="small-text fragment">Con <code>session_regenerate_id(true)</code>: identificador nuevo, y el antiguo se <strong>borra</strong> (el <code>true</code>).</p>
-      </section>
-
-      <!-- 13 · Mismo mensaje -->
+      <!-- 12 · Mismo mensaje -->
       <section>
         <h2>Si las credenciales fallan</h2>
         <ul class="small-text">
@@ -426,7 +626,7 @@ class Autenticador
         </ul>
       </section>
 
-      <!-- 14 · Páginas privadas -->
+      <!-- 13 · Páginas privadas -->
       <section>
         <h2>Páginas privadas: <code>exigirLogin()</code></h2>
         <pre class="medio"><code class="language-php" data-trim>
@@ -443,7 +643,7 @@ function exigirLogin(): array
         <p class="small-text muted">Y <code>iniciarSesion()</code>: el <code>session_start([...])</code> de 4.1, en una función.</p>
       </section>
 
-      <!-- 15 · Logout -->
+      <!-- 14 · Logout -->
       <section>
         <h2>Cerrar la sesión</h2>
         <ol class="pasos compacta">
@@ -454,7 +654,7 @@ function exigirLogin(): array
         <p class="small-text fragment" style="margin-top:0.8em">Con un formulario <strong>POST</strong>, no con un enlace: un GET lo dispararía cualquier página ajena (una imagen basta), y <code>SameSite=Lax</code> no protege los GET.</p>
       </section>
 
-      <!-- 16 · Entorno -->
+      <!-- 15 · Entorno -->
       <section>
         <h2>Seguimos en <code>vanilla_php</code></h2>
         <p class="small-text">Con el código común de 4.1. Ficheros nuevos o modificados:</p>
@@ -470,7 +670,7 @@ vanilla_php/
         </code></pre>
       </section>
 
-      <!-- 17 · Ejercicios 1-2 -->
+      <!-- 16 · Ejercicios 1-2 -->
       <section>
         <h2>Ejercicios (1/3)</h2>
         <ol class="pasos compacta">
@@ -484,7 +684,7 @@ docker compose exec workspace \
         <p class="small-text">y añade a <code>src/RA4_comun.php</code> <code>usuarios()</code>, <code>iniciarSesion()</code>, <code>usuarioActual()</code> y <code>exigirLogin()</code>.</p>
       </section>
 
-      <!-- 18 · Ejercicios 3-5 -->
+      <!-- 17 · Ejercicios 3-5 -->
       <section>
         <h2>Ejercicios (2/3)</h2>
         <ol class="pasos compacta" start="3">
@@ -494,7 +694,7 @@ docker compose exec workspace \
         </ol>
       </section>
 
-      <!-- 19 · Ejercicios 6-7 -->
+      <!-- 18 · Ejercicios 6-7 -->
       <section>
         <h2>Ejercicios (3/3)</h2>
         <ol class="pasos compacta" start="6">
@@ -503,7 +703,7 @@ docker compose exec workspace \
         </ol>
       </section>
 
-      <!-- 20 · Puente al Bloque 5 -->
+      <!-- 19 · Puente al Bloque 5 -->
       <section>
         <h2>Puente al Bloque 5</h2>
         <table>
@@ -520,7 +720,7 @@ docker compose exec workspace \
         </aside>
       </section>
 
-      <!-- 21 · Autocorrección -->
+      <!-- 20 · Autocorrección -->
       <section>
         <h2>Comprueba tu solución (opcional)</h2>
         <ol class="pasos">
@@ -535,7 +735,7 @@ docker compose exec --workdir /var/www/vanilla_php workspace \
         <p class="small-text">Si todo está bien: <code class="nw">OK (9 tests, 22 assertions)</code></p>
       </section>
 
-      <!-- 22 · Siguiente -->
+      <!-- 21 · Siguiente -->
       <section>
         <p class="small-text muted">Siguiente</p>
         <h2>4.3. Depuración con Xdebug</h2>

@@ -30,6 +30,15 @@ Hay varias formas de que un usuario demuestre quién es en una aplicación web:
 
 Todos ellos acaban en lo mismo: en cada petición, la aplicación tiene que poder saber qué usuario la hace. Con formulario + sesión, ese dato vive en `$_SESSION`.
 
+![Qué demuestra quién eres en cada petición, según el mecanismo: con formulario y sesión, la cookie de sesión; con HTTP Basic, el usuario y la contraseña en cada petición; con un token, la cabecera Authorization Bearer; con un proveedor externo, el paso por Google y después la sesión propia. El segundo factor añade un paso al identificarse](./images/RA4_2_mecanismos.svg)
+
+El diagrama se fija en **lo que viaja** entre el navegador y el servidor:
+
+- la flecha **discontinua** es el paso de identificarse, que ocurre una sola vez;
+- la flecha **continua** es lo que acompaña a **cada** petición siguiente.
+
+Fíjate en HTTP _Basic_: lo que viaja siempre son el usuario y la contraseña. Van solo codificados en _Base64_, que cualquiera puede decodificar, así que únicamente tiene sentido sobre HTTPS.
+
 ## Las contraseñas no se guardan: se guarda su _hash_
 
 Una aplicación **nunca** debe guardar las contraseñas tal cual. Si alguien consiguiera el fichero o la base de datos de usuarios, tendría las contraseñas de todos. Y, como mucha gente repite contraseña, también tendría acceso a sus otras cuentas.
@@ -78,6 +87,10 @@ Cuando el formulario llega con datos correctos, la página de _login_:
 3. Deja un mensaje _flash_ y redirige (303) al área del usuario, como en 4.1.
 
 ¿Por qué regenerar el identificador? Imagina que un atacante consigue que tu navegador use un `PHPSESSID` que él conoce. Por ejemplo, con un enlace preparado, o porque PHP acepta por defecto identificadores que le llegan del cliente. Si al hacer _login_ ese identificador no cambia, el atacante **ya está dentro de tu sesión** autenticada. A este ataque se le llama **fijación de sesión**. Con `session_regenerate_id(true)`, la sesión autenticada tiene un identificador nuevo, y el antiguo, que el atacante conocía, se borra (por eso el `true`).
+
+![El login de v0 paso a paso: el atacante consigue que el navegador de Ana use el identificador abc; Ana envía email y contraseña con esa cookie; el servidor comprueba la contraseña con password_verify, regenera la sesión con un identificador nuevo, xyz, borra abc y responde 303 con la cookie nueva; Ana entra en su área con xyz; el atacante prueba con abc y no le sirve](./images/RA4_2_login.svg)
+
+El diagrama recorre el ataque completo. Sin `session_regenerate_id(true)` (paso 4), la sesión autenticada seguiría siendo `abc`, y en el paso 7 el atacante entraría como Ana.
 
 Si los datos no son correctos, el mensaje de error es **el mismo** tanto si el email no existe como si la contraseña está mal. Así la página no revela qué emails tienen cuenta. Tampoco se vuelve a escribir la contraseña en el formulario: solo el email.
 
