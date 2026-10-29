@@ -503,7 +503,136 @@ class Autenticador
         <p class="small-text muted">El mismo patrón que <code>ValidadorCurriculo</code> (3.8).</p>
       </section>
 
-      <!-- 11 · El login paso a paso (SVG animado: un paso por fragmento) -->
+      <!-- 11 · autenticar() en ejecución (SVG animado: una llamada por fragmento) -->
+      <section>
+        <h2><code>autenticar()</code>, en ejecución</h2>
+        <svg class="anim" viewBox="0 0 960 460" style="max-height:390px" role="img" aria-label="Diagrama de secuencia del login de Ana: RA4_login.php llama a usuarios(), que devuelve el array con los hashes; crea un Autenticador, cuyo constructor guarda los usuarios en $this->usuarios; llama a autenticar con el email y la contraseña; el objeto busca el email en $this->usuarios, llama a password_verify, que devuelve true, y devuelve los datos de Ana sin el hash. Si el email no existe o la contraseña no coincide, devuelve null">
+          <defs>
+            <marker id="a42f-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#2563EB"/></marker>
+            <marker id="a42f-morado" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#7C3AED"/></marker>
+            <marker id="a42f-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+            <marker id="a42f-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+            <marker id="a42f-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#64748B"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="460" rx="14" fill="#F8FAFC"/>
+
+          <!-- Participantes (cabeceras) -->
+          <rect x="20" y="15" width="190" height="42" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+          <text x="115" y="34" text-anchor="middle" font-size="15" font-weight="700" class="mono" fill="#1E40AF">RA4_login.php</text>
+          <text x="115" y="50" text-anchor="middle" font-size="11" fill="#1E40AF">la página (public/)</text>
+          <rect x="235" y="15" width="190" height="42" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+          <text x="330" y="34" text-anchor="middle" font-size="15" font-weight="700" class="mono" fill="#047857">RA4_comun.php</text>
+          <text x="330" y="50" text-anchor="middle" font-size="11" fill="#047857">funciones comunes (src/)</text>
+          <rect x="495" y="15" width="190" height="42" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+          <text x="590" y="34" text-anchor="middle" font-size="15" font-weight="700" class="mono" fill="#5B21B6">Autenticador</text>
+          <text x="590" y="50" text-anchor="middle" font-size="11" fill="#5B21B6">el objeto (src/)</text>
+          <rect x="755" y="15" width="190" height="42" rx="10" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+          <text x="850" y="34" text-anchor="middle" font-size="15" font-weight="700" class="mono" fill="#92400E">password_verify()</text>
+          <text x="850" y="50" text-anchor="middle" font-size="11" fill="#92400E">función nativa de PHP</text>
+
+          <!-- Líneas de vida -->
+          <line x1="115" y1="57" x2="115" y2="385" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="4 5"/>
+          <line x1="330" y1="57" x2="330" y2="385" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="4 5"/>
+          <line x1="590" y1="57" x2="590" y2="385" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="4 5"/>
+          <line x1="850" y1="57" x2="850" y2="385" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="4 5"/>
+
+          <!-- Qué significa cada tipo de flecha -->
+          <line x1="605" y1="78" x2="635" y2="78" stroke="#64748B" stroke-width="2.5"/>
+          <text x="642" y="82" font-size="12" fill="#64748B">llamada</text>
+          <line x1="705" y1="78" x2="735" y2="78" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4"/>
+          <text x="742" y="82" font-size="12" fill="#64748B">devuelve</text>
+
+          <!-- 1 · usuarios() -->
+          <g class="fragment" data-fragment-index="1">
+            <circle cx="138" cy="87" r="12" fill="#059669"/><text x="138" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+            <text x="230" y="93" text-anchor="middle" font-size="14" class="mono" fill="#047857">usuarios()</text>
+            <path d="M120 101 L 324 101" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#a42f-verde)"/>
+            <path d="M325 121 L 121 121" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a42f-gris)"/>
+            <text x="222" y="137" text-anchor="middle" font-size="12" fill="#475569">array: 2 usuarios, con su hash</text>
+          </g>
+
+          <!-- 2 · new Autenticador(...) -->
+          <g class="fragment" data-fragment-index="2">
+            <circle cx="138" cy="153" r="12" fill="#7C3AED"/><text x="138" y="158" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+            <text x="450" y="157" text-anchor="middle" font-size="13" class="mono" fill="#5B21B6">new Autenticador($usuarios)</text>
+            <path d="M120 166 L 584 166" fill="none" stroke="#7C3AED" stroke-width="2.5" marker-end="url(#a42f-morado)"/>
+            <rect x="585" y="150" width="10" height="34" rx="3" fill="#7C3AED"/>
+            <text x="604" y="162" font-size="13" class="mono" fill="#5B21B6">__construct()</text>
+            <text x="604" y="179" font-size="12" class="mono" fill="#5B21B6">$this-&gt;usuarios = …</text>
+          </g>
+
+          <!-- 3 · autenticar($email, $password) -->
+          <g class="fragment" data-fragment-index="3">
+            <circle cx="138" cy="199" r="12" fill="#2563EB"/><text x="138" y="204" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+            <text x="450" y="203" text-anchor="middle" font-size="13" class="mono" fill="#1E40AF">-&gt;autenticar($email, $password)</text>
+            <path d="M120 212 L 584 212" fill="none" stroke="#2563EB" stroke-width="2.5" marker-end="url(#a42f-azul)"/>
+            <text x="450" y="229" text-anchor="middle" font-size="12" class="mono" fill="#475569">'ana.lopez@…', 'ana-secreta'</text>
+            <rect x="585" y="212" width="10" height="160" rx="3" fill="#2563EB" opacity="0.85"/>
+          </g>
+
+          <!-- 4 · Busca el email -->
+          <g class="fragment" data-fragment-index="4">
+            <path d="M596 244 L 638 244 L 638 266 L 602 266" fill="none" stroke="#7C3AED" stroke-width="2.5" marker-end="url(#a42f-morado)"/>
+            <circle cx="660" cy="255" r="12" fill="#7C3AED"/><text x="660" y="260" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+            <text x="574" y="253" text-anchor="end" font-size="12" class="mono" fill="#5B21B6">$this-&gt;usuarios[$email] ?? null</text>
+            <text x="574" y="271" text-anchor="end" font-size="12" fill="#047857">→ encontrada: Ana (con su hash)</text>
+          </g>
+
+          <!-- 5 · password_verify() -->
+          <g class="fragment" data-fragment-index="5">
+            <circle cx="572" cy="300" r="12" fill="#D97706"/><text x="572" y="305" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+            <text x="720" y="291" text-anchor="middle" font-size="11" class="mono" fill="#B45309">password_verify($password, $hash)</text>
+            <path d="M596 300 L 844 300" fill="none" stroke="#D97706" stroke-width="2.5" marker-end="url(#a42f-ambar)"/>
+            <rect x="845" y="300" width="10" height="20" rx="3" fill="#D97706"/>
+            <path d="M845 320 L 602 320" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a42f-gris)"/>
+            <text x="722" y="337" text-anchor="middle" font-size="14" font-weight="700" class="mono" fill="#047857">true ✓</text>
+          </g>
+
+          <!-- 6 · Devuelve los datos sin el hash -->
+          <g class="fragment" data-fragment-index="6">
+            <circle cx="572" cy="364" r="12" fill="#059669"/><text x="572" y="369" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">6</text>
+            <text x="340" y="354" text-anchor="middle" font-size="12" class="mono" fill="#047857">return ['email', 'firstName', 'lastName', 'rol']</text>
+            <path d="M556 364 L 121 364" fill="none" stroke="#059669" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a42f-verde)"/>
+            <text x="340" y="381" text-anchor="middle" font-size="12" font-weight="700" fill="#B91C1C">'password' (el hash) no sale del objeto</text>
+          </g>
+
+          <!-- 7 · Si algo falla: null -->
+          <g class="fragment" data-fragment-index="7">
+            <rect x="15" y="394" width="930" height="56" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+            <circle cx="38" cy="422" r="12" fill="#DC2626"/><text x="38" y="427" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">7</text>
+            <text x="62" y="415" font-size="13" font-weight="700" fill="#991B1B">✗ Email desconocido</text>
+            <text x="62" y="436" font-size="12" class="mono" fill="#B91C1C">?? null → return null (password_verify() ni se llama)</text>
+            <text x="520" y="415" font-size="13" font-weight="700" fill="#991B1B">✗ Contraseña incorrecta</text>
+            <text x="520" y="436" font-size="12" class="mono" fill="#B91C1C">password_verify() → false → return null</text>
+          </g>
+
+          <!-- Un punto recorre la llamada (o el valor devuelto) del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#059669"><animateMotion dur="1.2s" repeatCount="indefinite" path="M120 101 L 318 101"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#7C3AED"><animateMotion dur="1.6s" repeatCount="indefinite" path="M120 166 L 578 166"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.6s" repeatCount="indefinite" path="M120 212 L 578 212"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="4"><circle r="7" fill="#7C3AED"><animateMotion dur="1.2s" repeatCount="indefinite" path="M596 244 L 638 244 L 638 266 L 604 266"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="5"><circle r="7" fill="#D97706"><animateMotion dur="1.4s" repeatCount="indefinite" path="M596 300 L 838 300"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="6"><circle r="7" fill="#059669"><animateMotion dur="1.6s" repeatCount="indefinite" path="M556 364 L 127 364"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1"><code>usuarios()</code> devuelve el array, con los <em>hashes</em></li>
+          <li class="fragment" data-fragment-index="2">El constructor guarda el array en <code>$this-&gt;usuarios</code></li>
+          <li class="fragment" data-fragment-index="3">La página llama a <code>autenticar()</code> con lo que llegó por POST</li>
+          <li class="fragment" data-fragment-index="4">Busca el email; si no está, <code>?? null</code></li>
+          <li class="fragment" data-fragment-index="5"><code>password_verify()</code> rehace el <em>hash</em> y compara</li>
+          <li class="fragment" data-fragment-index="6">Devuelve los datos de Ana, <strong>sin el <em>hash</em></strong></li>
+          <li class="fragment" data-fragment-index="7">Falle lo que falle, <code>null</code>: el <strong>mismo</strong> resultado</li>
+        </ol>
+        <aside class="notes">
+          Una llamada por pulsación; el punto recorre la llamada o el valor devuelto del paso actual.
+          La barra vertical sobre la línea de vida del objeto es su "activación": el tiempo que autenticar() está ejecutándose.
+          Paso 4: el operador ?? evita el aviso de índice inexistente; con el || del if, si $usuario es null, password_verify() ni siquiera se evalúa (evaluación en cortocircuito).
+          Paso 7: los dos fallos devuelven lo mismo, por eso la página puede mostrar un único mensaje y no revela qué emails existen.
+          Lo que pasa después con el array devuelto (regenerar el id y guardarlo en $_SESSION) es la siguiente diapositiva.
+        </aside>
+      </section>
+
+      <!-- 12 · El login paso a paso (SVG animado: un paso por fragmento) -->
       <section>
         <h2>El <em>login</em>, paso a paso</h2>
         <svg class="anim" viewBox="0 0 960 460" style="max-height:390px" role="img" aria-label="El login de v0 paso a paso: un atacante consigue que el navegador de Ana use el identificador abc; Ana envía email y contraseña con esa cookie; el servidor comprueba la contraseña con password_verify, regenera la sesión con un identificador nuevo, xyz, borra abc y responde 303 con la cookie nueva; Ana entra en su área con xyz; el atacante prueba con abc y no le sirve">
@@ -617,7 +746,7 @@ class Autenticador
         </aside>
       </section>
 
-      <!-- 12 · Mismo mensaje -->
+      <!-- 13 · Mismo mensaje -->
       <section>
         <h2>Si las credenciales fallan</h2>
         <ul class="small-text">
@@ -626,7 +755,7 @@ class Autenticador
         </ul>
       </section>
 
-      <!-- 13 · Páginas privadas -->
+      <!-- 14 · Páginas privadas -->
       <section>
         <h2>Páginas privadas: <code>exigirLogin()</code></h2>
         <pre class="medio"><code class="language-php" data-trim>
@@ -643,7 +772,7 @@ function exigirLogin(): array
         <p class="small-text muted">Y <code>iniciarSesion()</code>: el <code>session_start([...])</code> de 4.1, en una función.</p>
       </section>
 
-      <!-- 14 · Logout -->
+      <!-- 15 · Logout -->
       <section>
         <h2>Cerrar la sesión</h2>
         <ol class="pasos compacta">
@@ -654,7 +783,7 @@ function exigirLogin(): array
         <p class="small-text fragment" style="margin-top:0.8em">Con un formulario <strong>POST</strong>, no con un enlace: un GET lo dispararía cualquier página ajena (una imagen basta), y <code>SameSite=Lax</code> no protege los GET.</p>
       </section>
 
-      <!-- 15 · Entorno -->
+      <!-- 16 · Entorno -->
       <section>
         <h2>Seguimos en <code>vanilla_php</code></h2>
         <p class="small-text">Con el código común de 4.1. Ficheros nuevos o modificados:</p>
@@ -670,7 +799,7 @@ vanilla_php/
         </code></pre>
       </section>
 
-      <!-- 16 · Ejercicios 1-2 -->
+      <!-- 17 · Ejercicios 1-2 -->
       <section>
         <h2>Ejercicios (1/3)</h2>
         <ol class="pasos compacta">
@@ -684,7 +813,7 @@ docker compose exec workspace \
         <p class="small-text">y añade a <code>src/RA4_comun.php</code> <code>usuarios()</code>, <code>iniciarSesion()</code>, <code>usuarioActual()</code> y <code>exigirLogin()</code>.</p>
       </section>
 
-      <!-- 17 · Ejercicios 3-5 -->
+      <!-- 18 · Ejercicios 3-5 -->
       <section>
         <h2>Ejercicios (2/3)</h2>
         <ol class="pasos compacta" start="3">
@@ -694,7 +823,7 @@ docker compose exec workspace \
         </ol>
       </section>
 
-      <!-- 18 · Ejercicios 6-7 -->
+      <!-- 19 · Ejercicios 6-7 -->
       <section>
         <h2>Ejercicios (3/3)</h2>
         <ol class="pasos compacta" start="6">
@@ -703,7 +832,7 @@ docker compose exec workspace \
         </ol>
       </section>
 
-      <!-- 19 · Puente al Bloque 5 -->
+      <!-- 20 · Puente al Bloque 5 -->
       <section>
         <h2>Puente al Bloque 5</h2>
         <table>
@@ -720,7 +849,7 @@ docker compose exec workspace \
         </aside>
       </section>
 
-      <!-- 20 · Autocorrección -->
+      <!-- 21 · Autocorrección -->
       <section>
         <h2>Comprueba tu solución (opcional)</h2>
         <ol class="pasos">
@@ -735,7 +864,7 @@ docker compose exec --workdir /var/www/vanilla_php workspace \
         <p class="small-text">Si todo está bien: <code class="nw">OK (9 tests, 22 assertions)</code></p>
       </section>
 
-      <!-- 21 · Siguiente -->
+      <!-- 22 · Siguiente -->
       <section>
         <p class="small-text muted">Siguiente</p>
         <h2>4.3. Depuración con Xdebug</h2>
