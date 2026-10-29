@@ -1,6 +1,8 @@
 # 5.5. Controladores
 <!-- {% raw %} -->
 
+**Presentación de apoyo** (_RevealJS_): [RA5_5_controladores_slides.html](./materiales/slides/RA5_5_controladores_slides.html)
+
 ## Demasiado código en las rutas
 
 Al terminar 5.4, `routes/web.php` ya no solo decía qué dirección lleva a qué página: también contenía datos, el array de proyectos, y preparaba lo que cada vista necesitaba. Con cuatro rutas todavía se lee; con cuarenta sería imposible de mantener.
@@ -13,7 +15,9 @@ La solución es la **C** de MVC: el **controlador**. Un controlador es una clase
 
 El fichero de rutas queda como lo que debe ser: un índice de direcciones, en el que cada una apunta a un método de un controlador.
 
-<!-- DIAGRAMA: el mismo flujo antes y después: ruta con función (datos + vista dentro de routes/web.php) frente a ruta → ProyectosController@show → $arrayProyectos → view('proyectos.show') -->
+![Antes, la función de la ruta tenía los datos y elegía la vista. Los datos pasan a una propiedad de ProyectosController y la vista a su acción show. La ruta solo apunta al controlador. Después, GET /proyectos/show/7 llega a la ruta, la ruta llama a show con el 7, show toma el proyecto de $arrayProyectos y devuelve la vista proyectos.show](./images/RA5_5_rutaControlador.svg)
+
+El diagrama muestra el mismo flujo antes y después: los datos y la elección de la vista salen de la función de la ruta y pasan al controlador, y la ruta se queda en una sola línea que apunta a su acción.
 
 ## Un controlador básico
 

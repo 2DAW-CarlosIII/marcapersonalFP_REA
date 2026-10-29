@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>5.5. Controladores · marcapersonalFP</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 5 · RA5</p>
+        <h1 class="titulo">5.5. Controladores</h1>
+        <p class="muted">La C de MVC</p>
+        <p class="small-text muted">Las rutas, solo un índice de direcciones</p>
+        <aside class="notes">
+          Al terminar 5.4, routes/web.php tenía datos y preparaba las vistas. Aquí lo ordenamos con controladores.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · Demasiado código en las rutas -->
+      <section>
+        <h2>Demasiado código en las rutas</h2>
+        <p class="small-text"><code>routes/web.php</code> ya tiene datos y prepara las vistas. Con cuatro rutas se lee; con cuarenta, no.</p>
+        <p class="label fragment">Un <strong>controlador</strong> agrupa las acciones de un recurso. Para cada petición:</p>
+        <ol class="pasos compacta">
+          <li class="fragment">recibe los datos de la petición, como el <code>{id}</code>;</li>
+          <li class="fragment">pide al <strong>modelo</strong> los datos que necesita;</li>
+          <li class="fragment">elige la <strong>vista</strong> y se los pasa.</li>
+        </ol>
+      </section>
+
+      <!-- 3 · De la ruta al controlador (SVG animado) -->
+      <section>
+        <style>
+          .reveal svg.anim { display: block; margin: 0 auto; width: 100%; height: auto; }
+          .reveal svg.anim text { font-family: var(--r-main-font); }
+          .reveal svg.anim .mono { font-family: var(--r-code-font); }
+          .reveal svg .fragment.custom.mover { transition: transform 1.2s ease-in-out; }
+          .reveal svg .fragment.custom.mover.visible { transform: translate(var(--dx), var(--dy)); }
+          .reveal ol.leyenda { columns: 2; column-gap: 40px; font-size: 0.5em; max-width: 920px; margin: 8px auto 0; padding-left: 1.4em; text-align: left; }
+          .reveal ol.leyenda li { margin: 2px 0; break-inside: avoid; }
+          @media (prefers-reduced-motion: reduce) {
+            .reveal svg .punto { display: none; }
+            .reveal svg .fragment.custom.mover { transition: none; }
+          }
+        </style>
+        <h2>De la ruta al controlador</h2>
+        <svg class="anim" viewBox="0 0 960 410" style="max-height:410px" role="img" aria-label="Antes, la función de la ruta tenía los datos y elegía la vista. Los datos pasan a una propiedad de ProyectosController y la vista a su acción show. La ruta solo apunta al controlador. Después, GET /proyectos/show/7 llega a la ruta, la ruta llama a show con el 7, show toma el proyecto de $arrayProyectos y devuelve la vista proyectos.show">
+          <defs>
+            <marker id="k-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+            <marker id="k-fl-violeta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#7C3AED"/></marker>
+            <marker id="k-fl-rosa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#DB2777"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="410" rx="14" fill="#F8FAFC"/>
+
+          <!-- routes/web.php, antes -->
+          <rect x="20" y="100" width="440" height="200" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+          <text x="35" y="124" font-size="13" font-weight="700" class="mono" fill="#1E40AF">routes/web.php</text>
+          <text x="35" y="152" font-size="13" class="mono" fill="#1E3A8A">Route::get('proyectos/show/{id}', function ($id) {</text>
+          <text x="50" y="176" font-size="13" class="mono" fill="#1E3A8A">$proyectos =</text>
+          <text x="35" y="288" font-size="13" class="mono" fill="#1E3A8A">});</text>
+
+          <!-- 1 · antes: la función lo hace todo -->
+          <g class="fragment" data-fragment-index="1">
+            <rect x="20" y="20" width="300" height="52" rx="10" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2"/>
+            <text x="35" y="38" font-size="12" fill="#1E40AF">Petición</text>
+            <text x="35" y="62" font-size="16" class="mono" fill="#1E3A8A">GET /proyectos/show/7</text>
+            <path d="M170 72 L 170 96" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#k-fl-gris)"/>
+            <circle cx="195" cy="86" r="13" fill="#2563EB"/><text x="195" y="91" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">1</text>
+            <rect x="200" y="330" width="560" height="60" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="2"/>
+            <text x="480" y="356" text-anchor="middle" font-size="14" class="mono" font-weight="700" fill="#9D174D">resources/views/proyectos/show.blade.php</text>
+            <text x="480" y="378" text-anchor="middle" font-size="13" fill="#9D174D">la vista de 5.4 → HTML</text>
+            <path d="M240 300 L 240 326" fill="none" stroke="#DB2777" stroke-width="3" marker-end="url(#k-fl-rosa)"/>
+          </g>
+          <!-- 2 · los datos y la vista, al controlador -->
+          <g class="fragment" data-fragment-index="2">
+            <rect x="520" y="100" width="420" height="200" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+            <text x="535" y="124" font-size="13" font-weight="700" class="mono" fill="#5B21B6">ProyectosController.php</text>
+            <circle cx="915" cy="120" r="13" fill="#7C3AED"/><text x="915" y="125" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">2</text>
+            <text x="535" y="152" font-size="13" class="mono" fill="#4C1D95">private array $arrayProyectos =</text>
+            <text x="535" y="222" font-size="13" class="mono" fill="#4C1D95">public function show(int $id): View {</text>
+            <text x="535" y="288" font-size="13" class="mono" fill="#4C1D95">}</text>
+          </g>
+          <!-- 3 · la ruta solo apunta -->
+          <g class="fragment" data-fragment-index="3">
+            <rect x="23" y="134" width="434" height="163" fill="#EFF6FF"/>
+            <text x="35" y="160" font-size="13" class="mono" fill="#1E3A8A">Route::get('proyectos/show/{id}',</text>
+            <text x="66" y="185" font-size="13" class="mono" font-weight="700" fill="#5B21B6">[ProyectosController::class, 'show']</text>
+            <text x="35" y="210" font-size="13" class="mono" fill="#1E3A8A">)-&gt;whereNumber('id')-&gt;name('proyectos.show');</text>
+            <text x="35" y="262" font-size="14" fill="#1E40AF">Un índice: dirección → acción</text>
+            <rect x="225" y="301" width="30" height="28" fill="#F8FAFC"/>
+            <path d="M460 185 C 490 185, 490 217, 516 217" fill="none" stroke="#7C3AED" stroke-width="3" marker-end="url(#k-fl-violeta)"/>
+            <circle cx="488" cy="160" r="13" fill="#7C3AED"/><text x="488" y="165" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">3</text>
+          </g>
+          <!-- 4 · después: el flujo completo -->
+          <g class="fragment" data-fragment-index="4">
+            <text x="545" y="85" font-size="13" class="mono" fill="#5B21B6">show(7) → $arrayProyectos[7]</text>
+            <path d="M730 300 L 730 326" fill="none" stroke="#DB2777" stroke-width="3" marker-end="url(#k-fl-rosa)"/>
+            <text x="742" y="318" font-size="13" fill="#9D174D">proyecto + id</text>
+            <circle cx="710" cy="313" r="13" fill="#DB2777"/><text x="710" y="318" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">4</text>
+          </g>
+
+          <!-- Los datos y la vista: viajan de la ruta al controlador -->
+          <g class="fragment custom mover" data-fragment-index="2" style="--dx:500px; --dy:-24px">
+            <rect x="50" y="184" width="380" height="36" rx="6" fill="#D1FAE5" stroke="#059669"/>
+            <text x="62" y="207" font-size="13" class="mono" fill="#064E3B">[ ['nombre' =&gt; 'Tecnologías…', …], … ];</text>
+          </g>
+          <g class="fragment custom mover" data-fragment-index="2" style="--dx:500px; --dy:2px">
+            <rect x="50" y="230" width="380" height="36" rx="6" fill="#FCE7F3" stroke="#DB2777"/>
+            <text x="62" y="253" font-size="13" class="mono" fill="#831843">return view('proyectos.show', [ … ]);</text>
+          </g>
+
+          <!-- Animación del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#1D4ED8"><animateMotion dur="2.2s" repeatCount="indefinite" path="M170 72 L 170 150 L 240 248 L 240 328"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#7C3AED"><animateMotion dur="1.2s" repeatCount="indefinite" path="M460 185 C 490 185, 490 217, 518 217"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="4"><circle r="7" fill="#1D4ED8"><animateMotion dur="3s" repeatCount="indefinite" path="M170 72 L 170 185 L 460 185 C 490 185, 490 217, 518 217 L 730 217 L 730 328"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1">Antes: la función de la ruta lo hace <strong>todo</strong>: tiene los datos y elige la vista</li>
+          <li class="fragment" data-fragment-index="2">Se mudan a <code>ProyectosController</code>: los datos, a una propiedad; la vista, a <code>show()</code></li>
+          <li class="fragment" data-fragment-index="3">La ruta solo <strong>apunta</strong>: <code>[ProyectosController::class, 'show']</code></li>
+          <li class="fragment" data-fragment-index="4">Después: ruta → <code>show(7)</code> → <code>$arrayProyectos[7]</code> → <code>view('proyectos.show')</code></li>
+        </ol>
+        <aside class="notes">
+          Paso 2: las dos piezas viajan de verdad desde la función de la ruta al controlador.
+          Paso 3: lo que queda en routes/web.php es un índice de direcciones. Los datos tampoco se quedarán en el controlador: en 5.8 irán a una clase propia y en el Bloque 6, a la base de datos.
+        </aside>
+      </section>
+
+      <!-- 4 · Un controlador básico -->
+      <section>
+        <h2>Un controlador básico</h2>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan make:controller ProyectosController
+        </code></pre>
+        <p class="small-text">En <code>app/Http/Controllers/</code>, espacio de nombres <code>App\Http\Controllers</code> (5.2):</p>
+        <pre class="compacto"><code class="language-php" data-trim>
+&lt;?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class ProyectosController extends Controller
+{
+    //
+}
+        </code></pre>
+        <p class="small-text muted fragment">Sufijo <code>Controller</code>; todos heredan de <code>Controller</code>.</p>
+      </section>
+
+      <!-- 5 · Acciones -->
+      <section>
+        <h2>Cada método público, una acción</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="5|7">
+use Illuminate\View\View;
+
+class ProyectosController extends Controller
+{
+    public function index(): View
+    {
+        return view('proyectos.index', ['proyectos' =&gt; $this-&gt;arrayProyectos]);
+    }
+}
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment">Devuelve lo mismo que las funciones de las rutas: una vista, un texto, un array…</li>
+          <li class="fragment"><code>View</code>: el tipo de lo que devuelve <code>view()</code>. Como en 3.4, documenta y PHP lo comprueba.</li>
+        </ul>
+      </section>
+
+      <!-- 6 · Rutas que apuntan a controladores -->
+      <section>
+        <h2>Rutas que apuntan a controladores</h2>
+        <p class="small-text">En lugar de una función, la <strong>clase</strong> y el <strong>método</strong>:</p>
+        <pre class="ancho"><code class="language-php" data-trim>
+use App\Http\Controllers\ProyectosController;
+
+Route::get('proyectos', [ProyectosController::class, 'index'])-&gt;name('proyectos.index');
+        </code></pre>
+        <p class="small-text fragment"><code>ProyectosController::class</code> → <code>'App\Http\Controllers\ProyectosController'</code></p>
+        <p class="small-text muted fragment">El <code>use</code> permite escribirlo abreviado.</p>
+      </section>
+
+      <!-- 7 · Route::controller() -->
+      <section>
+        <h2>Un grupo, un controlador</h2>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="1|2-5">
+Route::controller(ProyectosController::class)-&gt;prefix('proyectos')-&gt;name('proyectos.')
+    -&gt;group(function () {
+        Route::get('/', 'index')-&gt;name('index');
+        Route::get('show/{id}', 'show')-&gt;whereNumber('id')-&gt;name('show');
+        Route::get('create', 'create')-&gt;name('create');
+        Route::get('edit/{id}', 'edit')-&gt;whereNumber('id')-&gt;name('edit');
+    });
+        </code></pre>
+        <p class="small-text fragment"><code>Route::controller()</code> se combina con el prefijo y el nombre de 5.3: cada ruta solo dice su <strong>método</strong>.</p>
+      </section>
+
+      <!-- 8 · Los nombres de las acciones -->
+      <section>
+        <h2>Nombres de las acciones</h2>
+        <table>
+          <thead><tr><th>Para</th><th>Mostrar</th><th>Guardar</th></tr></thead>
+          <tbody>
+            <tr class="fragment"><th>El listado</th><td><code>index</code> (5.5)</td><td>—</td></tr>
+            <tr class="fragment"><th>Un elemento</th><td><code>show</code> (5.5)</td><td>—</td></tr>
+            <tr class="fragment"><th>El alta</th><td><code>create</code> (5.5)</td><td><code>store</code> (5.6)</td></tr>
+            <tr class="fragment"><th>La edición</th><td><code>edit</code> (5.5)</td><td><code>update</code> (5.6)</td></tr>
+            <tr class="fragment"><th>Borrar</th><td>—</td><td><code>destroy</code> (Bloque 7)</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Coinciden con los nombres de las rutas: <code>proyectos.index</code>, <code>proyectos.show</code>… En el Bloque 7, las siete de golpe.</p>
+      </section>
+
+      <!-- 9 · Los parámetros llegan al método -->
+      <section>
+        <h2>Los parámetros llegan al método</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="1|3|5-8">
+public function show(int $id): View
+{
+    abort_unless(isset($this-&gt;arrayProyectos[$id]), 404);
+
+    return view('proyectos.show', [
+        'proyecto' =&gt; $this-&gt;arrayProyectos[$id],
+        'id' =&gt; $id,
+    ]);
+}
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment">Por su <strong>nombre</strong>: <code>{id}</code> → <code>$id</code>. Llega <code>'7'</code>; <code>int</code> lo convierte (<code>whereNumber</code> lo garantiza).</li>
+          <li class="fragment">Sin <code>abort_unless()</code>, <code>/proyectos/show/99</code> daría un <strong>500</strong>.</li>
+        </ul>
+      </section>
+
+      <!-- 10 · abort -->
+      <section>
+        <h2>Cortar la petición: <code>abort()</code></h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>abort(404)</code></th><td>Siempre</td></tr>
+            <tr class="fragment"><th><code>abort_if($condicion, 404)</code></th><td>Si se cumple</td></tr>
+            <tr class="fragment"><th><code>abort_unless($condicion, 404)</code></th><td>Si <strong>no</strong> se cumple</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text fragment" style="margin-top:0.8em">En <em>v0</em>: <code>http_response_code(404)</code> y <code>exit</code>, o el 403 de <code>exigirRol()</code> (4.4).</p>
+      </section>
+
+      <!-- 11 · Datos en el controlador, de momento -->
+      <section>
+        <h2>Los datos, de momento</h2>
+        <pre class="compacto"><code class="language-php" data-trim>
+class ProyectosController extends Controller
+{
+    private array $arrayProyectos = [
+        [
+            'docente_id' =&gt; 1,
+            'nombre' =&gt; 'Tecnologías de la Información',
+            // ...
+        ],
+        // ...
+    ];
+        </code></pre>
+        <p class="small-text fragment">Una <strong>propiedad</strong>, como en 3.5. No es su sitio: guardar datos es cosa del <strong>modelo</strong>.</p>
+        <p class="small-text muted fragment">En 5.8, a una clase propia; en el Bloque 6, a la base de datos. El controlador apenas cambiará: solo <strong>coordina</strong>.</p>
+      </section>
+
+      <!-- 12 · Invocables -->
+      <section>
+        <h2>Controladores invocables</h2>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan make:controller HomeController --invokable
+        </code></pre>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3">
+class HomeController extends Controller
+{
+    public function __invoke(): View
+    {
+        return view('home', ['centro' =&gt; config('marcapersonalfp.centro')]);
+    }
+}
+        </code></pre>
+        <p class="label fragment">En la ruta, solo la clase:</p>
+        <pre class="compacto fragment"><code class="language-php" data-trim>
+Route::get('/', HomeController::class);
+        </code></pre>
+      </section>
+
+      <!-- 13 · Un fichero de rutas por recurso -->
+      <section>
+        <h2>Un fichero de rutas por recurso</h2>
+        <p class="small-text">Todos en el mismo <code>routes/web.php</code> → los <em>pull requests</em> chocan.</p>
+        <pre class="compacto"><code class="language-php" data-trim>
+// routes/web.php
+require __DIR__ . '/proyectos.php';
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment"><code>routes/proyectos.php</code>: <code>&lt;?php</code>, sus <code>use</code> y solo el grupo de proyectos.</li>
+          <li class="fragment">Otro recurso, otro fichero, y una línea más en <code>web.php</code>.</li>
+          <li class="fragment"><code>route:list</code> muestra ahora <code>ProyectosController@index</code>…</li>
+        </ul>
+      </section>
+
+      <!-- 14 · Entorno -->
+      <section>
+        <h2>El entorno</h2>
+        <p class="small-text">Las vistas de 5.4 y <code>npm run build -- --watch</code> vigilando. Rama nueva, en la VM:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+git switch main
+git pull upstream main
+git switch -c RA5_5
+        </code></pre>
+      </section>
+
+      <!-- 15 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/3)</h2>
+        <ol class="pasos compacta">
+          <li><strong>La página principal.</strong> <code>HomeController</code> invocable para la ruta <code>/</code>.</li>
+          <li><strong>El controlador de proyectos.</strong> <code>index</code>, <code>show</code>, <code>create</code> y <code>edit</code>, con los diez proyectos de <code>array_proyectos.php</code> como propiedad. <code>show</code> y <code>edit</code>: 404 si el <code>id</code> no existe.</li>
+          <li><strong>Las rutas, a su fichero.</strong> El grupo de proyectos, a <code>routes/proyectos.php</code> con <code>Route::controller()</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 16 · Ejercicio 4 -->
+      <section>
+        <h2>Ejercicios (2/3)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong>La vista de detalle.</strong> Completa <code>proyectos/show.blade.php</code> a partir del código del apartado:</li>
+        </ol>
+        <ul class="small-text">
+          <li>nombre, repositorio (<code>github.com/2DAW-CarlosIII/{dominio}</code>), docente y metadatos;</li>
+          <li>el <code>TODO</code>: "Proyecto aprobado" o "Proyecto suspenso", según la calificación;</li>
+          <li>botones "Editar proyecto" y "Volver al listado", con <code>route()</code>.</li>
+        </ul>
+        <p class="small-text muted">En la edición, de momento, el nombre debajo del título. El formulario, en 5.6.</p>
+      </section>
+
+      <!-- 17 · Ejercicios 5-6 -->
+      <section>
+        <h2>Ejercicios (3/3)</h2>
+        <ol class="pasos compacta" start="5">
+          <li><strong>El perfil.</strong> <code>PerfilController</code> invocable, con el <code>{id}</code> opcional: <code>__invoke(?int $id = null)</code>.</li>
+          <li><strong>Investiga.</strong> <code>route:list</code>; <code>/proyectos/show/99</code> sin <code>abort_unless()</code>; <code>declare(strict_types=1)</code> en el controlador: ¿afecta a las llamadas <strong>desde</strong> el fichero o <strong>hacia</strong> él?</li>
+        </ol>
+        <p class="small-text muted fragment">Opcional, en equipo: los controladores de <strong>reconocimientos</strong> y <strong>actividades</strong>, cada uno con su fichero de rutas.</p>
+      </section>
+
+      <!-- 18 · Puente -->
+      <section>
+        <h2>Puente</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>En <em>v0</em></h3>
+            <p class="small-text">Cada script leía la petición, preparaba los datos, decidía qué responder y escribía el HTML.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En <em>Laravel</em></h3>
+            <p class="small-text">El controlador <strong>coordina</strong>: recibe la petición, pide los datos y elige la vista. <code>abort()</code> sustituye a <code>http_response_code()</code> y <code>exit</code>.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+      </section>
+
+      <!-- 19 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA5_5_ControladoresTest.php</code> a <code>tests/Feature/</code></li>
+          <li>En el terminal de <code>workspace</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan test --filter=RA5_5_ControladoresTest
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 a 5</strong>.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">Tests: 8 passed (30 assertions)</code></p>
+      </section>
+
+      <!-- 20 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>5.6. Formularios, datos de entrada, validación y redirecciones</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>
