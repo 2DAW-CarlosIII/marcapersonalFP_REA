@@ -1,6 +1,8 @@
 # 5.8. Proyecto: _marcapersonalFP_ en _Laravel_. POO y patrones de diseño
 <!-- {% raw %} -->
 
+**Presentación de apoyo** (_RevealJS_): [RA5_8_proyecto_slides.html](./materiales/slides/RA5_8_proyecto_slides.html)
+
 ## El hilo `Curriculo`, de vuelta
 
 Hasta ahora, los proyectos han sido el ejemplo guiado del bloque. En este apartado de cierre volvemos al hilo de _v0_, los **currículos**, y reconstruimos con _Laravel_ lo que hicimos a mano en los Bloques 2 a 4:
@@ -26,7 +28,9 @@ El modelo es la pieza que nos falta: un array de datos dentro del controlador no
 - **Las clases del dominio**, `Ciclo` y `Curriculo`: los mismos objetos de 3.5, que ya sabían representar un ciclo o un currículo.
 - **Un repositorio**, que sabe **guardarlos y recuperarlos**.
 
-<!-- DIAGRAMA: MVC completo con el hilo Curriculo: petición → MiCurriculoController → CurriculoRepository (interfaz) → JsonCurriculoRepository → curriculos.json; el controlador construye Curriculo/Ciclo y devuelve la vista curriculos.mio -->
+![GET /mi-curriculo llega a MiCurriculoController, que solo conoce la interfaz CurriculoRepository y le pide el currículo del usuario 7. El contenedor le entregó un JsonCurriculoRepository, que lee curriculos.json y devuelve un objeto Curriculo con su Ciclo. El controlador pasa los datos a la vista curriculos.mio y el HTML vuelve al navegador. En el Bloque 6, un EloquentCurriculoRepository guardará en la base de datos sin cambiar el controlador](./images/RA5_8_mvcRepositorio.svg)
+
+El diagrama resume a dónde vamos en este apartado. El controlador solo conoce la **interfaz** del repositorio; qué implementación recibe lo decide el contenedor de servicios. Lo que vuelve del repositorio no son arrays, sino objetos del dominio, y la vista recibe esos objetos. Las piezas se explican, una a una, en las secciones siguientes.
 
 ## Las clases de _v0_, en `app/`
 

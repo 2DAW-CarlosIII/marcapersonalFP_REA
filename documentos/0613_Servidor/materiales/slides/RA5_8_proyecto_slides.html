@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>5.8. Proyecto: marcapersonalFP en Laravel · marcapersonalFP</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 5 · RA5</p>
+        <h1 class="titulo">5.8. <em>Proyecto:</em> <em>marcapersonalFP</em> en <em>Laravel</em></h1>
+        <p class="muted">POO y patrones de diseño</p>
+        <p class="small-text muted">El cierre del Bloque 5</p>
+        <aside class="notes">
+          Volvemos al hilo de v0, los currículos, y lo reconstruimos con Laravel aplicando patrones: repositorio, inyección de dependencias y Singleton.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · El hilo Curriculo -->
+      <section>
+        <h2>El hilo <code>Curriculo</code>, de vuelta</h2>
+        <p class="small-text">Lo que hicimos a mano en los Bloques 2 a 4, ahora con <em>Laravel</em>:</p>
+        <ul class="small-text">
+          <li class="fragment">el <strong>listado</strong> de currículos (2.5);</li>
+          <li class="fragment">el <strong>alta validada</strong> (3.8);</li>
+          <li class="fragment">el <strong>área privada</strong> "Mi currículo": alta o edición del propio, con el nombre tomado de la sesión (4.4).</li>
+        </ul>
+      </section>
+
+      <!-- 3 · Patrones de diseño -->
+      <section>
+        <h2>Patrones de diseño</h2>
+        <p class="small-text">Soluciones probadas a problemas que se repiten en cualquier aplicación.</p>
+        <ul class="small-text">
+          <li class="fragment">Ya conocemos uno: <strong>MVC</strong>.</li>
+          <li class="fragment">Nuevos: <strong>repositorio</strong>, <strong>inyección de dependencias</strong> y <strong><em>Singleton</em></strong>.</li>
+          <li class="fragment">Para comparar: <strong>DAO</strong> y <strong><em>Active Record</em></strong>.</li>
+        </ul>
+      </section>
+
+      <!-- 4 · MVC, por fin completo -->
+      <section>
+        <h2>MVC, por fin completo</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th>Modelo</th><td>Los datos y sus reglas</td><td>Hasta ahora, un array en el controlador (5.5)</td></tr>
+            <tr class="fragment"><th>Vista</th><td>La presentación</td><td><code>resources/views/</code>, con <em>Blade</em> (5.4)</td></tr>
+            <tr class="fragment"><th>Controlador</th><td>Coordinar</td><td><code>app/Http/Controllers/</code> (5.5)</td></tr>
+          </tbody>
+        </table>
+        <p class="label fragment">Un array en el controlador no es un modelo, es un apaño. El modelo de verdad:</p>
+        <ul class="small-text">
+          <li class="fragment"><strong>Las clases del dominio</strong>, <code>Ciclo</code> y <code>Curriculo</code>, como en 3.5;</li>
+          <li class="fragment"><strong>un repositorio</strong>, que sabe guardarlas y recuperarlas.</li>
+        </ul>
+      </section>
+
+      <!-- 6 · MVC completo, con el repositorio (SVG animado) -->
+      <section>
+        <style>
+          .reveal svg.anim { display: block; margin: 0 auto; width: 100%; height: auto; }
+          .reveal svg.anim text { font-family: var(--r-main-font); }
+          .reveal svg.anim .mono { font-family: var(--r-code-font); }
+          .reveal svg .fragment.custom.mover { transition: transform 1.2s ease-in-out; }
+          .reveal svg .fragment.custom.mover.visible { transform: translate(var(--dx), var(--dy)); }
+          .reveal ol.leyenda { columns: 2; column-gap: 40px; font-size: 0.5em; max-width: 920px; margin: 8px auto 0; padding-left: 1.4em; text-align: left; }
+          .reveal ol.leyenda li { margin: 2px 0; break-inside: avoid; }
+          @media (prefers-reduced-motion: reduce) {
+            .reveal svg .punto { display: none; }
+            .reveal svg .fragment.custom.mover { transition: none; }
+          }
+        </style>
+        <h2>MVC completo</h2>
+        <svg class="anim" viewBox="0 0 960 410" style="max-height:375px" role="img" aria-label="GET /mi-curriculo llega a MiCurriculoController, que solo conoce la interfaz CurriculoRepository y le pide el currículo del usuario 7. El contenedor le entregó un JsonCurriculoRepository, que lee curriculos.json y devuelve un objeto Curriculo con su Ciclo. El controlador pasa los datos a la vista curriculos.mio y el HTML vuelve al navegador. En el Bloque 6, un EloquentCurriculoRepository guardará en la base de datos sin cambiar el controlador">
+          <defs>
+            <marker id="r8-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+            <marker id="r8-fl-violeta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#7C3AED"/></marker>
+            <marker id="r8-fl-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#0D9488"/></marker>
+            <marker id="r8-fl-rosa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#DB2777"/></marker>
+            <marker id="r8-impl" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M1 1 L11 6 L1 11 z" fill="#FFFFFF" stroke="#64748B" stroke-width="1.3"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="410" rx="14" fill="#F8FAFC"/>
+
+          <!-- Navegador -->
+          <rect x="15" y="150" width="120" height="120" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+          <text x="75" y="216" text-anchor="middle" font-size="17" font-weight="700" fill="#1E3A8A">Navegador</text>
+
+          <!-- Controlador -->
+          <rect x="190" y="40" width="240" height="100" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+          <text x="310" y="68" text-anchor="middle" font-size="16" font-weight="700" fill="#5B21B6">MiCurriculoController</text>
+          <text x="310" y="92" text-anchor="middle" font-size="12" class="mono" fill="#4C1D95">edit(): View</text>
+          <text x="310" y="118" text-anchor="middle" font-size="12" fill="#5B21B6">pide un CurriculoRepository</text>
+
+          <!-- Vista -->
+          <rect x="190" y="300" width="240" height="80" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="2"/>
+          <text x="310" y="331" text-anchor="middle" font-size="13" class="mono" font-weight="700" fill="#9D174D">curriculos/mio.blade.php</text>
+          <text x="310" y="356" text-anchor="middle" font-size="12" fill="#9D174D">nombre · ciclos · vídeo</text>
+
+          <!-- Modelo: la interfaz y sus implementaciones -->
+          <rect x="520" y="40" width="260" height="72" rx="10" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2" stroke-dasharray="7 4"/>
+          <text x="650" y="60" text-anchor="middle" font-size="12" font-style="italic" fill="#6B7280">«interface»</text>
+          <text x="650" y="80" text-anchor="middle" font-size="14" class="mono" font-weight="700" fill="#4C1D95">CurriculoRepository</text>
+          <text x="650" y="100" text-anchor="middle" font-size="11" class="mono" fill="#4C1D95">todos() · delUsuario() · guardar()</text>
+          <rect x="470" y="160" width="170" height="60" rx="10" fill="#F1F5F9" stroke="#94A3B8" stroke-width="2"/>
+          <text x="555" y="187" text-anchor="middle" font-size="11" class="mono" font-weight="700" fill="#475569">ArrayCurriculoRepository</text>
+          <text x="555" y="207" text-anchor="middle" font-size="11" fill="#64748B">un array: se pierde</text>
+          <rect x="660" y="160" width="180" height="60" rx="10" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
+          <text x="750" y="187" text-anchor="middle" font-size="11" class="mono" font-weight="700" fill="#115E59">JsonCurriculoRepository</text>
+          <text x="750" y="207" text-anchor="middle" font-size="11" fill="#115E59">un fichero JSON</text>
+          <path d="M555 160 L 600 114" fill="none" stroke="#64748B" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#r8-impl)"/>
+          <path d="M750 160 L 700 114" fill="none" stroke="#64748B" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#r8-impl)"/>
+          <path d="M850 240 L 928 240 L 945 257 L 945 300 L 850 300 Z" fill="#FFFFFF" stroke="#0D9488" stroke-width="2"/>
+          <path d="M928 240 L 928 257 L 945 257" fill="none" stroke="#0D9488" stroke-width="1.5"/>
+          <text x="895" y="285" text-anchor="middle" font-size="10.5" class="mono" fill="#115E59">curriculos.json</text>
+
+          <!-- 1 · la petición llega al controlador -->
+          <g class="fragment" data-fragment-index="1">
+            <text x="75" y="138" text-anchor="middle" font-size="12" class="mono" fill="#1E3A8A">GET /mi-curriculo</text>
+            <path d="M135 190 C 160 190, 160 90, 186 90" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#r8-fl-gris)"/>
+            <circle cx="178" cy="172" r="12" fill="#2563EB"/><text x="178" y="177" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+          </g>
+          <!-- 2 · el controlador pide a la interfaz -->
+          <g class="fragment" data-fragment-index="2">
+            <path d="M430 75 L 516 75" fill="none" stroke="#7C3AED" stroke-width="3" marker-end="url(#r8-fl-violeta)"/>
+            <text x="473" y="67" text-anchor="middle" font-size="12" class="mono" fill="#4C1D95">delUsuario(7)</text>
+            <circle cx="473" cy="95" r="12" fill="#7C3AED"/><text x="473" y="100" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+          </g>
+          <!-- 3 · el contenedor entregó el de JSON, que lee el fichero -->
+          <g class="fragment" data-fragment-index="3">
+            <rect x="658" y="158" width="184" height="64" rx="11" fill="none" stroke="#0D9488" stroke-width="4"/>
+            <text x="805" y="148" text-anchor="middle" font-size="11" class="mono" font-weight="700" fill="#0F766E">singleton()</text>
+            <path d="M840 200 C 880 200, 895 210, 895 236" fill="none" stroke="#0D9488" stroke-width="3" marker-end="url(#r8-fl-teal)"/>
+            <text x="902" y="222" font-size="12" fill="#115E59">lee</text>
+            <circle cx="870" cy="172" r="12" fill="#0D9488"/><text x="870" y="177" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+          </g>
+          <!-- 4 · vuelve un objeto del dominio -->
+          <g class="fragment" data-fragment-index="4">
+            <circle cx="310" cy="206" r="12" fill="#059669"/><text x="310" y="211" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+          </g>
+          <g class="fragment" data-fragment-index="4">
+            <g class="fragment custom mover" data-fragment-index="4" style="--dx:-465px; --dy:-88px">
+              <rect x="700" y="240" width="150" height="36" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+              <text x="775" y="263" text-anchor="middle" font-size="13" class="mono" font-weight="700" fill="#065F46">Curriculo + Ciclo</text>
+            </g>
+          </g>
+          <!-- 5 · la vista y el HTML -->
+          <g class="fragment" data-fragment-index="5">
+            <path d="M410 140 L 410 296" fill="none" stroke="#DB2777" stroke-width="3" marker-end="url(#r8-fl-rosa)"/>
+            <text x="418" y="236" font-size="12" class="mono" fill="#9D174D">curriculo, ciclos</text>
+            <path d="M190 340 C 160 340, 160 250, 139 250" fill="none" stroke="#DB2777" stroke-width="3" marker-end="url(#r8-fl-rosa)"/>
+            <text x="148" y="300" text-anchor="end" font-size="12" font-weight="700" fill="#9D174D">HTML</text>
+            <circle cx="175" cy="368" r="12" fill="#DB2777"/><text x="175" y="373" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+          </g>
+          <!-- 6 · Bloque 6: otra implementación -->
+          <g class="fragment" data-fragment-index="6">
+            <rect x="470" y="305" width="200" height="56" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 4"/>
+            <text x="570" y="328" text-anchor="middle" font-size="11" class="mono" font-weight="700" fill="#475569">EloquentCurriculoRepository</text>
+            <text x="570" y="348" text-anchor="middle" font-size="11" fill="#64748B">Bloque 6</text>
+            <path d="M670 333 L 696 333" fill="none" stroke="#94A3B8" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#r8-fl-gris)"/>
+            <rect x="700" y="310" width="120" height="46" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 4"/>
+            <text x="760" y="338" text-anchor="middle" font-size="13" fill="#475569">base de datos</text>
+            <text x="470" y="390" font-size="13" fill="#475569">Otra implementación y una línea en el contenedor: el controlador no cambia</text>
+            <circle cx="455" cy="333" r="12" fill="#64748B"/><text x="455" y="338" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">6</text>
+          </g>
+
+          <!-- Animación del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.4s" repeatCount="indefinite" path="M135 190 C 160 190, 160 90, 188 90"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#7C3AED"><animateMotion dur="1.2s" repeatCount="indefinite" path="M430 75 L 518 75"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#0D9488"><animateMotion dur="2s" repeatCount="indefinite" path="M650 112 L 750 158 L 840 200 C 880 200, 895 210, 895 238"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="5"><circle r="7" fill="#DB2777"><animateMotion dur="2.4s" repeatCount="indefinite" path="M410 140 L 410 298 L 190 340 C 160 340, 160 250, 137 250"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1"><code>GET /mi-curriculo</code>, con <code>auth</code>: llega a <code>MiCurriculoController</code></li>
+          <li class="fragment" data-fragment-index="2">El controlador solo conoce la <strong>interfaz</strong>: <code>delUsuario(7)</code></li>
+          <li class="fragment" data-fragment-index="3">El contenedor le dio un <code>JsonCurriculoRepository</code> (<em>singleton</em>), que lee el fichero</li>
+          <li class="fragment" data-fragment-index="4">Vuelve un objeto del <strong>dominio</strong>: <code>Curriculo</code>, con su <code>Ciclo</code></li>
+          <li class="fragment" data-fragment-index="5">El controlador pasa los datos a la <strong>vista</strong> y el HTML vuelve al navegador</li>
+          <li class="fragment" data-fragment-index="6">Bloque 6: otra implementación, una línea en el contenedor; el controlador <strong>no cambia</strong></li>
+        </ol>
+        <aside class="notes">
+          El modelo son dos cosas: las clases del dominio (Curriculo, Ciclo) y el repositorio que las guarda y recupera.
+          Paso 4: el objeto viaja de verdad desde el repositorio hasta el controlador. Paso 6: el mismo hueco de la interfaz admite otra implementación.
+        </aside>
+      </section>
+
+      <!-- 7 · Las clases de v0, en app/ -->
+      <section>
+        <h2>Las clases de <em>v0</em>, en <code>app/</code></h2>
+        <ul class="small-text">
+          <li class="fragment">De <code>vanilla_php/src/</code> a <code>app/Dominio/</code>, con espacio de nombres y sin <code>require_once</code> (5.2).</li>
+          <li class="fragment">No en <code>app/Models/</code>: allí vivirán los modelos de <em>Eloquent</em> (Bloque 6), y un <code>App\Models\Curriculo</code> chocaría con el nuestro.</li>
+          <li class="fragment"><code>final</code>: nadie puede heredar de ellas y cambiar su comportamiento.</li>
+        </ul>
+      </section>
+
+      <!-- 8 · Ciclo -->
+      <section>
+        <h2><code>App\Dominio\Ciclo</code></h2>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="3-7|9-12|14-20">
+final class Ciclo
+{
+    public function __construct(
+        public readonly string $codCiclo,
+        public readonly string $nombre,
+        public readonly string $grado,
+    ) {}
+
+    public function titulacion(): string
+    {
+        return $this-&gt;grado === self::GRADO_SUPERIOR ? 'Técnico Superior' : 'Técnico';
+    }
+
+    /** @return array&lt;string, Ciclo&gt; En el Bloque 6, de la base de datos. */
+    public static function catalogo(): array
+    {
+        return [
+            'DAW' =&gt; new self('DAW', 'Desarrollo de Aplicaciones Web', self::GRADO_SUPERIOR),
+            // ... DAM, ASIR, SMR
+        ];
+    }
+}
+        </code></pre>
+        <aside class="notes">Simplificado: en el .md, también las constantes GRADO_MEDIO y GRADO_SUPERIOR y los cuatro ciclos.</aside>
+      </section>
+
+      <!-- 9 · Curriculo -->
+      <section>
+        <h2><code>App\Dominio\Curriculo</code></h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="4|6">
+final class Curriculo
+{
+    public function __construct(
+        public readonly int $userId,
+        public readonly string $alumno,
+        public readonly Ciclo $ciclo,
+        public readonly ?string $videoCurriculum = null,
+    ) {}
+}
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment"><code>userId</code>: el alumno al que pertenece, como anticipaba 4.4.</li>
+          <li class="fragment"><code>Ciclo $ciclo</code>: un objeto, no un código.</li>
+        </ul>
+      </section>
+
+      <!-- 10 · El patrón repositorio -->
+      <section>
+        <h2>El patrón repositorio</h2>
+        <p class="small-text">Guarda y recupera los objetos de un tipo, como una colección. Quien lo usa no sabe <strong>dónde</strong>.</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3|5|7">
+interface CurriculoRepository
+{
+    public function todos(): array;          // list&lt;Curriculo&gt;
+
+    public function delUsuario(int $userId): ?Curriculo;
+
+    public function guardar(Curriculo $curriculo): void;    // alta o sustitución
+}
+        </code></pre>
+        <p class="small-text muted fragment">Una <strong>interfaz</strong> (3.5): qué sabe hacer, sin decir cómo.</p>
+      </section>
+
+      <!-- 11 · ArrayCurriculoRepository -->
+      <section>
+        <h2>Una implementación: un array</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3|5-8|10-13">
+final class ArrayCurriculoRepository implements CurriculoRepository
+{
+    private array $curriculos = [];      // indexados por el id de su usuario
+
+    public function delUsuario(int $userId): ?Curriculo
+    {
+        return $this-&gt;curriculos[$userId] ?? null;
+    }
+
+    public function guardar(Curriculo $curriculo): void
+    {
+        $this-&gt;curriculos[$curriculo-&gt;userId] = $curriculo;
+    }
+    // ... todos(): array_values($this-&gt;curriculos)
+}
+        </code></pre>
+        <p class="small-text fragment">Los controladores dependen solo de la <strong>interfaz</strong>: otra implementación no los toca.</p>
+      </section>
+
+      <!-- 12 · Inyección de dependencias -->
+      <section>
+        <h2>Inyección de dependencias</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3-5|9">
+class CurriculoController extends Controller
+{
+    public function __construct(
+        private readonly CurriculoRepository $curriculos,
+    ) {}
+
+    public function index(): View
+    {
+        return view('curriculos.index', ['curriculos' =&gt; $this-&gt;curriculos-&gt;todos()]);
+    }
+}
+        </code></pre>
+        <p class="small-text fragment">El controlador no lo crea: lo <strong>pide</strong>, y <em>Laravel</em> se lo entrega. Como el <code>Request</code> de 5.6.</p>
+      </section>
+
+      <!-- 13 · El contenedor -->
+      <section>
+        <h2>El contenedor de servicios</h2>
+        <p class="small-text">A una interfaz no se le puede hacer <code>new</code>. En <code>AppServiceProvider::register()</code>:</p>
+        <pre class="ancho"><code class="language-php" data-trim>
+public function register(): void
+{
+    $this-&gt;app-&gt;singleton(CurriculoRepository::class, ArrayCurriculoRepository::class);
+}
+        </code></pre>
+        <p class="small-text fragment">"Cuando alguien pida un <code>CurriculoRepository</code>, entrégale un <code>ArrayCurriculoRepository</code>… y siempre <strong>el mismo</strong>."</p>
+      </section>
+
+      <!-- 14 · Singleton clásico -->
+      <section>
+        <h2>El patrón <em>Singleton</em></h2>
+        <p class="small-text">Una clase con <strong>una sola instancia</strong>, compartida. La forma clásica:</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3|5|7-10">
+final class Configuracion
+{
+    private static ?Configuracion $instancia = null;
+
+    private function __construct() {}     // nadie puede hacer new Configuracion()
+
+    public static function instancia(): self
+    {
+        return self::$instancia ??= new self();
+    }
+}
+        </code></pre>
+      </section>
+
+      <!-- 15 · Clásico frente a contenedor -->
+      <section>
+        <h2><em>Singleton</em>: clásico o del contenedor</h2>
+        <table>
+          <thead><tr><th>Clásico</th><th>Del contenedor</th></tr></thead>
+          <tbody>
+            <tr class="fragment"><td>La clase obliga a una sola instancia</td><td>La clase es normal; el contenedor la comparte</td></tr>
+            <tr class="fragment"><td>Quien la usa queda atado a <code>Configuracion::instancia()</code></td><td>Quien la usa pide la interfaz</td></tr>
+            <tr class="fragment"><td>En los tests no se puede sustituir</td><td>En los tests, una línea</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:0.8em">PHP empieza de cero en cada petición (2.4): "única" durante una petición.</p>
+      </section>
+
+      <!-- 16 · Un repositorio que recuerda -->
+      <section>
+        <h2>Un repositorio que recuerda</h2>
+        <p class="small-text">Con el array, el currículo guardado desaparece en la petición siguiente: la lección de 4.4.</p>
+        <ul class="small-text">
+          <li class="fragment">Sin base de datos hasta el Bloque 6, pero con un sitio que sobrevive y es compartido: un <strong>fichero</strong>.</li>
+          <li class="fragment"><code>JsonCurriculoRepository</code>, con las funciones de PHP que ya conocemos.</li>
+        </ul>
+      </section>
+
+      <!-- 17 · JsonCurriculoRepository -->
+      <section>
+        <h2><code>JsonCurriculoRepository</code></h2>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="3|5-13|15-19">
+final class JsonCurriculoRepository implements CurriculoRepository
+{
+    public function __construct(private readonly string $fichero) {}
+
+    public function guardar(Curriculo $curriculo): void
+    {
+        $todos = $this-&gt;leer();
+        $todos[$curriculo-&gt;userId] = ['user_id' =&gt; $curriculo-&gt;userId, 'alumno' =&gt; $curriculo-&gt;alumno,
+            'ciclo' =&gt; $curriculo-&gt;ciclo-&gt;codCiclo, 'video' =&gt; $curriculo-&gt;videoCurriculum];
+
+        // LOCK_EX: si dos peticiones escriben a la vez, la segunda espera.
+        file_put_contents($this-&gt;fichero, json_encode($todos, JSON_PRETTY_PRINT), LOCK_EX);
+    }
+
+    private function leer(): array
+    {
+        return is_file($this-&gt;fichero)
+            ? json_decode(file_get_contents($this-&gt;fichero), true) ?? [] : [];
+    }
+    // ... todos() y delUsuario() convierten los arrays en objetos Curriculo
+}
+        </code></pre>
+        <aside class="notes">Resumido para que quepa: el código completo, en el .md (con JSON_UNESCAPED_UNICODE y el método aCurriculo()).</aside>
+      </section>
+
+      <!-- 18 · Una línea -->
+      <section>
+        <h2>Cambiar de almacén: una línea</h2>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="3">
+$this-&gt;app-&gt;singleton(
+    CurriculoRepository::class,
+    fn () =&gt; new JsonCurriculoRepository(storage_path('app/curriculos.json')),
+);
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment">Su constructor necesita la ruta: se le pasa una función que lo construye.</li>
+          <li class="fragment">Los controladores <strong>no cambian</strong>.</li>
+          <li class="fragment">En el Bloque 6, otra vez: <code>EloquentCurriculoRepository</code> y otra línea.</li>
+        </ul>
+      </section>
+
+      <!-- 19 · DAO y Active Record -->
+      <section>
+        <h2>Otros dos patrones</h2>
+        <ul class="small-text">
+          <li class="fragment"><strong>DAO</strong> (<em>Data Access Object</em>): un objeto por <strong>tabla</strong>, con insertar, buscar, actualizar y borrar. Habla de filas y columnas.</li>
+          <li class="fragment"><strong><em>Active Record</em></strong>: cada objeto <strong>se guarda a sí mismo</strong>, <code>$curriculo-&gt;save()</code>. Los modelos de <em>Eloquent</em> (Bloque 6).</li>
+        </ul>
+      </section>
+
+      <!-- 20 · Comparación (1) -->
+      <section>
+        <h2>Tres patrones (1/2)</h2>
+        <table>
+          <thead><tr><th></th><th>Repositorio</th><th>DAO</th><th><em>Active Record</em></th></tr></thead>
+          <tbody>
+            <tr class="fragment"><th>Quién guarda</th><td>El repositorio</td><td>El DAO</td><td>El propio objeto</td></tr>
+            <tr class="fragment"><th>Piensa en</th><td>Objetos, como<br>una colección</td><td>Filas de<br>una tabla</td><td>Objetos que<br>conocen su tabla</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 20b · Comparación (2) -->
+      <section>
+        <h2>Tres patrones (2/2)</h2>
+        <table>
+          <thead><tr><th></th><th>Repositorio</th><th>DAO</th><th><em>Active Record</em></th></tr></thead>
+          <tbody>
+            <tr class="fragment"><th>Otro almacén</th><td>Otra<br>implementación</td><td>Otro DAO</td><td>Difícil: atado<br>a la BD</td></tr>
+            <tr class="fragment"><th>En <em>Laravel</em></th><td>Lo escribimos<br>(5.8)</td><td>Como el<br><em>Query Builder</em></td><td><em>Eloquent</em></td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:0.6em">Repositorio y DAO se parecen: uno piensa en <strong>objetos</strong>; el otro, en <strong>tablas</strong>.</p>
+      </section>
+
+      <!-- 21 · El proyecto: rutas -->
+      <section>
+        <h2>El proyecto: las rutas</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>GET /curriculos</code><br><code>curriculos.index</code></th><td><code>CurriculoController</code><br><code>@index</code></td><td>Público</td></tr>
+            <tr class="fragment"><th><code>GET /mi-curriculo</code><br><code>mi-curriculo</code></th><td><code>MiCurriculoController</code><br><code>@edit</code></td><td>Con sesión</td></tr>
+            <tr class="fragment"><th><code>PUT /mi-curriculo</code><br><code>mi-curriculo.update</code></th><td><code>MiCurriculoController</code><br><code>@update</code></td><td>Con sesión</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text fragment" style="margin-top:0.8em">Como en 4.4, <strong>la misma página da de alta y edita</strong>.</p>
+      </section>
+
+      <!-- 22 · update() -->
+      <section>
+        <h2>El nombre sale de la sesión</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3|5-10|12">
+public function update(CurriculoRequest $request): RedirectResponse
+{
+    $datos = $request-&gt;validated();
+
+    $this-&gt;curriculos-&gt;guardar(new Curriculo(
+        $request-&gt;user()-&gt;id,
+        $request-&gt;user()-&gt;name,
+        Ciclo::catalogo()[$datos['ciclo']],
+        $datos['video'] ?? null,
+    ));
+
+    return to_route('mi-curriculo')-&gt;with('mensaje', 'Currículo guardado.');
+}
+        </code></pre>
+      </section>
+
+      <!-- 23 · CurriculoRequest -->
+      <section>
+        <h2><code>CurriculoRequest</code>: el validador de 3.8</h2>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="3-6|8-12">
+public function rules(): array
+{
+    return [
+        'ciclo' =&gt; ['required', Rule::in(array_keys(Ciclo::catalogo()))],
+        'video' =&gt; ['nullable', 'url', 'starts_with:https://', 'max:255'],
+    ];
+}
+
+public function messages(): array
+{
+    return ['ciclo.required' =&gt; 'Elige uno de los ciclos de la lista.', /* ciclo.in, igual */
+            'video.url' =&gt; 'El vídeo debe ser una URL que empiece por https://', /* starts_with, igual */];
+}
+        </code></pre>
+        <p class="small-text fragment"><code>Rule::in()</code> → <code>in:DAW,DAM,ASIR,SMR</code>, desde el catálogo: un ciclo nuevo no obliga a tocarla.</p>
+      </section>
+
+      <!-- 24 · Entorno -->
+      <section>
+        <h2>El entorno</h2>
+        <p class="small-text"><em>Breeze</em> y la sesión de Ana López de 5.7. Rama nueva, en la VM:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+git switch main
+git pull upstream main
+git switch -c RA5_8
+        </code></pre>
+        <p class="small-text">Registra también a Marcos Pérez y a Laura García (<code>@marcapersonalfp.test</code>).</p>
+      </section>
+
+      <!-- 25 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/3)</h2>
+        <ol class="pasos compacta">
+          <li><strong>El dominio.</strong> <code>Ciclo</code> y <code>Curriculo</code>. En <code>tinker</code>: <code>App\Dominio\Ciclo::catalogo()['DAW']-&gt;titulacion()</code>.</li>
+          <li><strong>El repositorio.</strong> La interfaz y <code>ArrayCurriculoRepository</code>, como <em>singleton</em> en <code>AppServiceProvider</code>.</li>
+          <li><strong>El listado.</strong> <code>CurriculoController@index</code> y <code>curriculos/index.blade.php</code>: alumno, ciclo, titulación y vídeo. Las rutas, en <code>routes/curriculos.php</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 26 · Ejercicios 4-5 -->
+      <section>
+        <h2>Ejercicios (2/3)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong>Mi currículo.</strong> <code>CurriculoRequest</code> y <code>MiCurriculoController</code> (<code>edit</code>, <code>update</code>, con <code>auth</code>). En <code>curriculos/mio.blade.php</code>: el nombre (sin campo), <code>&lt;select name="ciclo"&gt;</code> con <code>ciclos</code> y <code>video</code> con <code>old('video', $curriculo?-&gt;videoCurriculum)</code>. Enlaces en la barra.</li>
+          <li><strong>Un repositorio que recuerda.</strong> Guarda y recarga: ¿qué pasa? Cambia a <code>JsonCurriculoRepository</code> y prueba con Ana, Marcos y Laura. ¿Has cambiado algún controlador?</li>
+        </ol>
+      </section>
+
+      <!-- 27 · Ejercicio 6 -->
+      <section>
+        <h2>Ejercicios (3/3): investiga</h2>
+        <ul class="small-text">
+          <li>¿Quién llama al constructor de <code>MiCurriculoController</code>? ¿De dónde sale el repositorio?</li>
+          <li>Añade con F12 <code>&lt;input name="alumno" value="Otra Persona"&gt;</code>, como en 4.4. ¿Qué nombre se guarda?</li>
+          <li>¿Y con <code>bind()</code> en lugar de <code>singleton()</code>? ¿Cuántas veces se construiría?</li>
+          <li>Para <code>EloquentCurriculoRepository</code> (Bloque 6): ¿qué ficheros cambian y cuáles no?</li>
+        </ul>
+      </section>
+
+      <!-- 28 · Puente -->
+      <section>
+        <h2>Puente</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>En <em>v0</em></h3>
+            <p class="small-text">Cada página hacía <code>new ValidadorCurriculo($ciclos)</code>, <code>require_once</code> de sus clases y guardaba en <code>$_SESSION</code>.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En <em>Laravel</em></h3>
+            <p class="small-text">Las clases se cargan solas, el contenedor entrega a cada controlador lo que pide y el repositorio esconde dónde se guardan los datos.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+      </section>
+
+      <!-- 29 · De v0 a Laravel: el Bloque 5 (1) -->
+      <section>
+        <h2>El Bloque 5, cumplido (1/2)</h2>
+        <table style="font-size:0.64em">
+          <thead><tr><th>En <em>v0</em> (a mano)</th><th>En <em>Laravel</em></th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Un script en <code>public/</code> por página</td><td>Rutas y controladores</td><td>5.3, 5.5</td></tr>
+            <tr><td><code>require_once</code> de <code>src/</code></td><td><em>Autoload</em> de <em>Composer</em></td><td>5.2</td></tr>
+            <tr><td><code>session_start()</code></td><td>Lo hace el framework</td><td>5.2</td></tr>
+            <tr><td><code>&lt;?php if (): ?&gt;</code> y <code>&lt;?= e() ?&gt;</code></td><td><em>Blade</em>: <code>@if</code>, <code>{{ }}</code></td><td>5.4</td></tr>
+            <tr><td><code>ValidadorCurriculo::validar()</code></td><td>Un <em>Form Request</em></td><td>5.6, 5.8</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 30 · De v0 a Laravel: el Bloque 5 (2) -->
+      <section>
+        <h2>El Bloque 5, cumplido (2/2)</h2>
+        <table style="font-size:0.64em">
+          <thead><tr><th>En <em>v0</em> (a mano)</th><th>En <em>Laravel</em></th><th></th></tr></thead>
+          <tbody>
+            <tr><td><code>value="&lt;?= e(…) ?&gt;"</code></td><td><code>old('alumno')</code></td><td>5.6</td></tr>
+            <tr><td><code>$_SESSION['mensaje']</code> + <code>unset()</code></td><td><code>redirect()-&gt;with()</code>, <code>@session</code></td><td>5.6</td></tr>
+            <tr><td><code>password_hash()</code>, <code>Autenticador</code></td><td><code>Hash::make()</code>, <code>Auth::attempt()</code></td><td>5.7</td></tr>
+            <tr><td><code>exigirLogin()</code></td><td><em>Middleware</em> <code>auth</code></td><td>5.7</td></tr>
+            <tr><td>Las clases de <code>src/</code></td><td><code>app/Dominio/</code> y un repositorio</td><td>5.8</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 31 · Lo que queda -->
+      <section>
+        <h2>Lo que queda</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th>Bloque 6</th><td>Modelos <em>Eloquent</em> y <code>EloquentCurriculoRepository</code></td></tr>
+            <tr class="fragment"><th>Bloque 6</th><td><code>Ciclo::catalogo()</code> → <code>Ciclo::all()</code>, desde la base de datos</td></tr>
+            <tr class="fragment"><th>Bloque 7</th><td><code>exigirRol()</code>: <em>Gates</em> y <em>Policies</em></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 32 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA5_8_ProyectoTest.php</code> a <code>tests/Feature/</code></li>
+          <li>En el terminal de <code>workspace</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan test --filter=RA5_8_ProyectoTest
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 a 5</strong>. Usa un <code>ArrayCurriculoRepository</code> vacío: no toca tu <code>curriculos.json</code>.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">Tests: 6 passed (25 assertions)</code></p>
+      </section>
+
+      <!-- 33 · Todos los tests del bloque -->
+      <section>
+        <h2>Todos los tests del Bloque 5</h2>
+        <p class="small-text">Con los ocho tests copiados, para lanzar <strong>solo</strong> los del Bloque 5:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan test --filter=RA5_
+        </code></pre>
+        <p class="small-text">Si todo el Bloque 5 está resuelto: <code class="nw">Tests: 52 passed (196 assertions)</code></p>
+        <p class="small-text muted fragment">Necesita <code>nginx</code> y <code>php-fpm</code> levantados (el test de 5.1 hace una petición real) y los estilos compilados.</p>
+      </section>
+
+      <!-- 34 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>Bloque 6 · Acceso a almacenes de datos (RA6)</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>
