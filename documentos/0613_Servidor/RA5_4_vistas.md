@@ -1,6 +1,8 @@
 # 5.4. Vistas, _Blade_ y _layouts_
 <!-- {% raw %} -->
 
+**Presentación de apoyo** (_RevealJS_): [RA5_4_vistas_slides.html](./materiales/slides/RA5_4_vistas_slides.html)
+
 ## De HTML con PHP a vistas
 
 En _v0_, cada página mezclaba la lógica y el HTML en el mismo fichero: el `foreach` que recorría los currículos convivía con las etiquetas `<li>`, y cada dato se escribía con `<?= e(...) ?>`. Además, cada página repetía la estructura común (`<!DOCTYPE html>`, `<head>`, la cabecera, el pie), o la sacábamos a funciones como `pie()` en 2.4.
@@ -37,7 +39,9 @@ php artisan make:view proyectos.index
 
 Los ficheros con extensión **`.blade.php`** usan **_Blade_**, el motor de plantillas de _Laravel_. _Blade_ añade una sintaxis más breve para lo que en _v0_ escribíamos con etiquetas PHP. La primera vez que se pide una vista, _Blade_ la **compila** a PHP normal y guarda el resultado en `storage/framework/views/` (5.2). Las siguientes veces usa directamente esa versión compilada.
 
-<!-- DIAGRAMA: de una vista Blade (home.blade.php) a su versión compilada en storage/framework/views, con las equivalencias {{ }} → echo e(), @foreach → foreach -->
+![La primera vez que se pide la vista proyectos.index, Blade compila index.blade.php a un fichero PHP de storage/framework/views: las dobles llaves pasan a echo e() y @foreach a foreach. PHP ejecuta ese fichero y genera el HTML. Las siguientes peticiones usan directamente la versión compilada, hasta que cambie el .blade.php](./images/RA5_4_compilacion.svg)
+
+En el diagrama, cada color marca una equivalencia: las dobles llaves se convierten en un `echo` con `e()`, y las directivas, en la sintaxis alternativa de PHP. El `foreach` compilado está simplificado: _Blade_ añade también lo necesario para la variable `$loop`.
 
 ### Mostrar datos
 
@@ -218,7 +222,9 @@ Un atributo normal recibe un texto. Si el valor es una **expresión PHP**, el at
 </x-layout>
 ```
 
-<!-- DIAGRAMA: composición de una página: layout (head, x-navbar, main con $slot, footer) + la vista que rellena $slot + componentes dentro (x-tarjeta-proyecto) -->
+![La página /proyectos se compone por piezas: el layout pone el esqueleto con la barra, el título, el hueco $slot y el pie; el componente navbar rellena la barra; la vista proyectos.index pasa el título y lo que escribe entre x-layout y /x-layout ocupa el $slot; cada x-tarjeta-proyecto se sustituye por su componente](./images/RA5_4_composicion.svg)
+
+Así se compone la página del listado: el _layout_ (1) pone el esqueleto; `<x-navbar />` (2) se sustituye por su componente; la vista (3) pasa el título y (4) su contenido ocupa el `{{ $slot }}`; dentro, cada `<x-tarjeta-proyecto />` (5) se sustituye también por su componente.
 
 ### La barra de navegación
 

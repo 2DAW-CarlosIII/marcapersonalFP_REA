@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>5.4. Vistas, Blade y layouts · marcapersonalFP</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 5 · RA5</p>
+        <h1 class="titulo">5.4. Vistas, <em>Blade</em> y <em>layouts</em></h1>
+        <p class="muted">La V de MVC</p>
+        <p class="small-text muted">El HTML, por fin separado de la lógica</p>
+        <aside class="notes">
+          Segunda fila del plan del bloque: "HTML mezclado con PHP → vistas Blade y layouts". Las rutas de 5.3 pasan a devolver vistas.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · De HTML con PHP a vistas -->
+      <section>
+        <h2>De HTML con PHP a vistas</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>En <em>v0</em></h3>
+            <p class="small-text">El <code>foreach</code>, el HTML y el <code>e()</code> de cada dato, en el mismo fichero.</p>
+            <p class="small-text muted">Cada página repetía <code>&lt;head&gt;</code>, cabecera y pie (o <code>pie()</code>, en 2.4).</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En <em>Laravel</em></h3>
+            <p class="small-text">Las <strong>vistas</strong>, en <code>resources/views/</code>, solo <strong>presentan</strong>.</p>
+            <p class="small-text muted">Reciben los datos ya preparados. Es la <strong>V</strong> de MVC (5.2).</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 · Devolver una vista -->
+      <section>
+        <h2>Devolver una vista</h2>
+        <pre class="compacto"><code class="language-php" data-trim>
+Route::get('/', function () {
+    return view('home', ['centro' =&gt; config('marcapersonalfp.centro')]);
+});
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment"><code>home</code> → <code>resources/views/home.blade.php</code>, sin carpeta ni extensión</li>
+          <li class="fragment">Subcarpetas con <strong>puntos</strong>: <code>proyectos.index</code> → <code>proyectos/index.blade.php</code></li>
+          <li class="fragment">Cada clave, una variable: <code>'centro' =&gt; …</code> → <code>$centro</code>. Dato a dato: <code>-&gt;with('id', $id)</code></li>
+        </ul>
+        <pre class="compacto fragment"><code class="language-bash" data-trim>
+php artisan make:view proyectos.index
+        </code></pre>
+      </section>
+
+      <!-- 4 · De Blade a PHP (SVG animado) -->
+      <section>
+        <style>
+          .reveal svg.anim { display: block; margin: 0 auto; width: 100%; height: auto; }
+          .reveal svg.anim text { font-family: var(--r-main-font); }
+          .reveal svg.anim .mono { font-family: var(--r-code-font); }
+          .reveal svg .fragment.custom.mover { transition: transform 1.2s ease-in-out; }
+          .reveal svg .fragment.custom.mover.visible { transform: translate(var(--dx), var(--dy)); }
+          .reveal ol.leyenda { columns: 2; column-gap: 40px; font-size: 0.5em; max-width: 920px; margin: 8px auto 0; padding-left: 1.4em; text-align: left; }
+          .reveal ol.leyenda li { margin: 2px 0; break-inside: avoid; }
+          @media (prefers-reduced-motion: reduce) {
+            .reveal svg .punto { display: none; }
+            .reveal svg .fragment.custom.mover { transition: none; }
+          }
+        </style>
+        <h2><em>Blade</em> compila a PHP</h2>
+        <svg class="anim" viewBox="0 0 960 400" role="img" aria-label="La primera vez que se pide la vista proyectos.index, Blade compila index.blade.php a un fichero PHP de storage/framework/views: las dobles llaves pasan a echo e() y @foreach a foreach. PHP ejecuta ese fichero y genera el HTML. Las siguientes peticiones usan directamente la versión compilada, hasta que cambie el .blade.php">
+          <defs>
+            <marker id="c-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+            <marker id="c-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+            <marker id="c-fl-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="400" rx="14" fill="#F8FAFC"/>
+
+          <!-- La vista Blade -->
+          <rect x="20" y="108" width="390" height="150" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="2"/>
+          <text x="35" y="132" font-size="13" font-weight="700" class="mono" fill="#9D174D">resources/views/proyectos/index.blade.php</text>
+          <text x="35" y="165" font-size="13" class="mono" fill="#831843">&lt;p&gt;{{ count($proyectos) }} proyectos&lt;/p&gt;</text>
+          <text x="35" y="190" font-size="13" class="mono" fill="#831843">@foreach ($proyectos as $proyecto)</text>
+          <text x="66" y="215" font-size="13" class="mono" fill="#831843">&lt;li&gt;{{ $proyecto['nombre'] }}&lt;/li&gt;</text>
+          <text x="35" y="240" font-size="13" class="mono" fill="#831843">@endforeach</text>
+
+          <!-- 1 · se pide la vista -->
+          <g class="fragment" data-fragment-index="1">
+            <rect x="20" y="20" width="390" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+            <text x="35" y="40" font-size="12" fill="#5B21B6">La ruta o el controlador pide</text>
+            <text x="395" y="40" text-anchor="end" font-size="12" font-weight="700" fill="#5B21B6">1.ª petición</text>
+            <text x="35" y="64" font-size="16" class="mono" fill="#4C1D95">view('proyectos.index')</text>
+            <path d="M215 76 L 215 102" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#c-fl-gris)"/>
+            <circle cx="240" cy="91" r="13" fill="#7C3AED"/><text x="240" y="96" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">1</text>
+          </g>
+          <!-- 2 · Blade compila: equivalencias -->
+          <g class="fragment" data-fragment-index="2">
+            <rect x="28" y="150" width="374" height="22" rx="4" fill="#DBEAFE"/>
+            <rect x="28" y="175" width="374" height="22" rx="4" fill="#FEF3C7"/>
+            <rect x="28" y="200" width="374" height="22" rx="4" fill="#DBEAFE"/>
+            <rect x="28" y="225" width="374" height="22" rx="4" fill="#FEF3C7"/>
+            <text x="35" y="165" font-size="13" class="mono" fill="#831843">&lt;p&gt;{{ count($proyectos) }} proyectos&lt;/p&gt;</text>
+            <text x="35" y="190" font-size="13" class="mono" fill="#831843">@foreach ($proyectos as $proyecto)</text>
+            <text x="66" y="215" font-size="13" class="mono" fill="#831843">&lt;li&gt;{{ $proyecto['nombre'] }}&lt;/li&gt;</text>
+            <text x="35" y="240" font-size="13" class="mono" fill="#831843">@endforeach</text>
+            <path d="M410 183 L 514 183" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#c-fl-ambar)"/>
+            <text x="463" y="172" text-anchor="middle" font-size="14" font-weight="700" fill="#B45309">compila</text>
+            <circle cx="463" cy="207" r="13" fill="#D97706"/><text x="463" y="212" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">2</text>
+            <rect x="520" y="108" width="420" height="150" rx="10" fill="#F1F5F9" stroke="#64748B" stroke-width="2"/>
+            <text x="535" y="132" font-size="13" font-weight="700" class="mono" fill="#334155">storage/framework/views/3f9a1c….php</text>
+            <rect x="528" y="150" width="404" height="22" rx="4" fill="#DBEAFE"/>
+            <rect x="528" y="175" width="404" height="22" rx="4" fill="#FEF3C7"/>
+            <rect x="528" y="200" width="404" height="22" rx="4" fill="#DBEAFE"/>
+            <rect x="528" y="225" width="404" height="22" rx="4" fill="#FEF3C7"/>
+            <text x="535" y="165" font-size="13" class="mono" fill="#1F2937">&lt;p&gt;&lt;?php echo e(count($proyectos)); ?&gt; proyectos&lt;/p&gt;</text>
+            <text x="535" y="190" font-size="13" class="mono" fill="#1F2937">&lt;?php foreach ($proyectos as $proyecto): ?&gt;</text>
+            <text x="566" y="215" font-size="13" class="mono" fill="#1F2937">&lt;li&gt;&lt;?php echo e($proyecto['nombre']); ?&gt;&lt;/li&gt;</text>
+            <text x="535" y="240" font-size="13" class="mono" fill="#1F2937">&lt;?php endforeach; ?&gt;</text>
+          </g>
+          <!-- 3 · PHP ejecuta la versión compilada -->
+          <g class="fragment" data-fragment-index="3">
+            <path d="M730 258 L 730 294" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#c-fl-gris)"/>
+            <text x="748" y="282" font-size="14" fill="#374151">PHP la ejecuta</text>
+            <circle cx="710" cy="277" r="13" fill="#3B82F6"/><text x="710" y="282" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">3</text>
+            <rect x="520" y="300" width="420" height="85" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+            <text x="535" y="322" font-size="13" fill="#1E40AF">HTML que recibe el navegador</text>
+            <text x="535" y="347" font-size="13" class="mono" fill="#1E3A8A">&lt;p&gt;3 proyectos&lt;/p&gt;</text>
+            <text x="535" y="370" font-size="13" class="mono" fill="#1E3A8A">&lt;li&gt;Tecnologías de la Información&lt;/li&gt;&lt;li&gt;…</text>
+          </g>
+          <!-- 4 · las siguientes peticiones, directas a la compilada -->
+          <g class="fragment" data-fragment-index="4">
+            <path d="M410 48 L 730 48 L 730 102" fill="none" stroke="#059669" stroke-width="3" stroke-dasharray="8 5" marker-end="url(#c-fl-verde)"/>
+            <text x="440" y="38" font-size="13" fill="#065F46">2.ª petición y siguientes: ya está compilada</text>
+            <circle cx="755" cy="78" r="13" fill="#059669"/><text x="755" y="83" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">4</text>
+            <rect x="20" y="300" width="390" height="85" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+            <text x="35" y="330" font-size="15" font-weight="700" fill="#065F46">¿Has cambiado el .blade.php?</text>
+            <text x="35" y="356" font-size="14" fill="#065F46">Blade lo nota por la fecha del fichero</text>
+            <text x="35" y="376" font-size="14" fill="#065F46">y vuelve a compilarlo.</text>
+          </g>
+
+          <!-- Animación del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#7C3AED"><animateMotion dur="1.2s" repeatCount="indefinite" path="M215 76 L 215 104"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#D97706"><animateMotion dur="1.4s" repeatCount="indefinite" path="M410 183 L 516 183"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#1D4ED8"><animateMotion dur="1.2s" repeatCount="indefinite" path="M730 258 L 730 296"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="4"><circle r="7" fill="#059669"><animateMotion dur="2s" repeatCount="indefinite" path="M410 48 L 730 48 L 730 104"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1">Se pide la vista: <code>resources/views/proyectos/index.blade.php</code></li>
+          <li class="fragment" data-fragment-index="2">La primera vez, <em>Blade</em> la <strong>compila</strong>: <code>{{ }}</code> → <code>echo e()</code>, <code>@foreach</code> → <code>foreach</code></li>
+          <li class="fragment" data-fragment-index="3">PHP <strong>ejecuta</strong> la versión compilada y genera el HTML</li>
+          <li class="fragment" data-fragment-index="4">Las siguientes, directamente la compilada, mientras no cambies el <code>.blade.php</code></li>
+        </ol>
+        <aside class="notes">
+          Paso 2: mismo color, misma equivalencia. Azul: las dobles llaves son echo con e(), el escape de 3.6. Ámbar: las directivas son la sintaxis alternativa de 3.2.
+          El foreach compilado está simplificado: Blade añade también lo necesario para $loop. Lo verán en el ejercicio 6 (Investiga).
+        </aside>
+      </section>
+
+      <!-- 5 · Mostrar datos -->
+      <section>
+        <h2>Mostrar datos</h2>
+        <table>
+          <thead><tr><th>En <em>v0</em></th><th>En <em>Blade</em></th></tr></thead>
+          <tbody>
+            <tr class="fragment"><td><code>&lt;?= e($alumno) ?&gt;</code></td><td><code>{{ $alumno }}</code></td></tr>
+            <tr class="fragment"><td><code>&lt;?= e($video ?? 'Sin vídeo') ?&gt;</code></td><td><code>{{ $video ?? 'Sin vídeo' }}</code></td></tr>
+            <tr class="fragment"><td><code>&lt;?= $html ?&gt;</code> (sin escapar)</td><td><code>{!! $html !!}</code></td></tr>
+            <tr class="fragment"><td><code>&lt;?php // comentario ?&gt;</code></td><td><code>{{-- comentario --}}</code></td></tr>
+          </tbody>
+        </table>
+        <p class="small-text fragment" style="margin-top:0.8em"><code>{{ }}</code> <strong>escapa siempre</strong>. <code>{!! !!}</code>, solo con HTML nuestro, nunca con datos del usuario.</p>
+        <p class="small-text muted fragment">Los comentarios de <em>Blade</em> no llegan al navegador; los <code>&lt;!-- --&gt;</code>, sí.</p>
+      </section>
+
+      <!-- 6 · Estructuras de control -->
+      <section>
+        <h2>Estructuras de control</h2>
+        <p class="small-text">Directivas que empiezan por <code>@</code>: la sintaxis alternativa de 3.2, sin etiquetas.</p>
+        <pre class="compacto"><code class="language-html" data-trim data-line-numbers="1-7|9-11|13-15">
+@if ($proyecto['metadatos']['calificacion'] &gt;= 5)
+    &lt;p&gt;Aprobado&lt;/p&gt;
+@elseif ($proyecto['metadatos']['calificacion'] &gt;= 4)
+    &lt;p&gt;Casi&lt;/p&gt;
+@else
+    &lt;p&gt;Suspenso&lt;/p&gt;
+@endif
+
+@isset($id)
+    &lt;p&gt;Visualizar el currículo de {{ $id }}&lt;/p&gt;
+@endisset
+
+@foreach ($proyectos as $id =&gt; $proyecto)
+    &lt;li&gt;{{ $proyecto['nombre'] }}&lt;/li&gt;
+@endforeach
+        </code></pre>
+      </section>
+
+      <!-- 7 · $loop y @forelse -->
+      <section>
+        <h2><code>$loop</code> y <code>@forelse</code></h2>
+        <table>
+          <tbody>
+            <tr><th><code>$loop-&gt;iteration</code></th><td>Número de vuelta, desde 1</td></tr>
+            <tr><th><code>$loop-&gt;first</code> / <code>last</code></th><td><code>true</code> en la primera / la última</td></tr>
+            <tr><th><code>$loop-&gt;count</code></th><td>Número de elementos</td></tr>
+          </tbody>
+        </table>
+        <p class="label fragment">Una lista que puede estar vacía:</p>
+        <pre class="compacto fragment"><code class="language-html" data-trim>
+@forelse ($proyectos as $id =&gt; $proyecto)
+    &lt;li&gt;{{ $proyecto['nombre'] }}&lt;/li&gt;
+@empty
+    &lt;li&gt;Todavía no hay proyectos.&lt;/li&gt;
+@endforelse
+        </code></pre>
+      </section>
+
+      <!-- 8 · @class -->
+      <section>
+        <h2>Clases condicionales: <code>@class</code></h2>
+        <pre class="compacto"><code class="language-html" data-trim data-line-numbers="2|3-4">
+&lt;p @class([
+    'font-bold',
+    'text-green-700' =&gt; $proyecto['metadatos']['calificacion'] &gt;= 5,
+    'text-red-700' =&gt; $proyecto['metadatos']['calificacion'] &lt; 5,
+])&gt;
+    {{ $proyecto['metadatos']['calificacion'] }}
+&lt;/p&gt;
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment">Sin clave: <strong>siempre</strong>.</li>
+          <li class="fragment">Con condición: <strong>solo si se cumple</strong>.</li>
+        </ul>
+      </section>
+
+      <!-- 9 · Tailwind -->
+      <section>
+        <h2>Estilos con <em>Tailwind CSS</em></h2>
+        <p class="small-text">Sin componentes hechos: <strong>clases de utilidad</strong>, una propiedad cada una.</p>
+        <table>
+          <tbody>
+            <tr><th><code>p-4</code> · <code>mt-2</code></th><td>Relleno 1rem · margen superior 0.5rem</td></tr>
+            <tr><th><code>text-lg</code> · <code>font-bold</code></th><td>Tamaño y grosor de la letra</td></tr>
+            <tr><th><code>text-gray-500</code> · <code>bg-white</code></th><td>Color del texto y del fondo</td></tr>
+            <tr><th><code>rounded-lg</code> · <code>shadow</code></th><td>Bordes redondeados y sombra</td></tr>
+            <tr><th><code>grid</code> · <code>sm:grid-cols-2</code></th><td>Rejilla; dos columnas desde 640 px</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text fragment" style="margin-top:0.6em"><code>&lt;li class="rounded-lg bg-white p-4 shadow"&gt;</code> → una tarjeta</p>
+      </section>
+
+      <!-- 10 · Vite -->
+      <section>
+        <h2>Compilar los estilos con <em>Vite</em></h2>
+        <ol class="pasos compacta">
+          <li class="fragment"><em>Vite</em> lee <code>resources/css/app.css</code>, que importa <em>Tailwind</em>.</li>
+          <li class="fragment"><em>Tailwind</em> busca en las vistas las clases que usas y genera <strong>solo esas</strong>.</li>
+          <li class="fragment">El resultado va a <code>public/build/</code>.</li>
+        </ol>
+        <pre class="compacto fragment"><code class="language-bash" data-trim>
+npm install                  # como composer install, en node_modules/
+npm run build                # compila a public/build/
+npm run build -- --watch     # en un 2.º terminal: recompila solo
+        </code></pre>
+        <p class="small-text muted fragment">¿Una clase nueva? Hay que volver a compilar. <code>node_modules/</code> y <code>public/build/</code> no se suben.</p>
+      </section>
+
+      <!-- 11 · @vite y asset() -->
+      <section>
+        <h2><code>@vite</code> y <code>asset()</code></h2>
+        <p class="label">Enlazar los ficheros compilados:</p>
+        <pre class="compacto"><code class="language-html" data-trim>
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+        </code></pre>
+        <p class="label fragment">Los ficheros que se sirven tal cual, en <code>public/</code>:</p>
+        <pre class="compacto fragment"><code class="language-html" data-trim>
+&lt;img src="{{ asset('images/mp-logo.png') }}" alt="marcapersonalFP"&gt;
+        </code></pre>
+      </section>
+
+      <!-- 12 · Layout -->
+      <section>
+        <h2><em>Layouts</em> con componentes</h2>
+        <p class="small-text"><code>components/layout.blade.php</code> se usa como <code>&lt;x-layout&gt;</code></p>
+        <pre class="ancho"><code class="language-html" data-trim data-line-numbers="1|10|12|13">
+@props(['titulo' =&gt; null])
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;title&gt;{{ $titulo }} · {{ config('app.name') }}&lt;/title&gt;
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+&lt;/head&gt;
+&lt;body class="min-h-screen bg-gray-100 text-gray-800"&gt;
+    &lt;x-navbar /&gt;
+    &lt;main class="mx-auto max-w-5xl p-6"&gt;
+        &lt;h1 class="mb-6 text-3xl font-bold"&gt;{{ $titulo }}&lt;/h1&gt;
+        {{ $slot }}
+    &lt;/main&gt;
+    &lt;footer&gt;{{ config('marcapersonalfp.centro') }}&lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+        </code></pre>
+        <aside class="notes">
+          Simplificado para que quepa: en el .md, el lang sale de app()->getLocale(), el título y el h1 dependen de que haya $titulo (@isset) y el pie lleva clases.
+          Pulsaciones: @props declara los atributos; x-navbar es otro componente; el título; $slot es el hueco del contenido.
+        </aside>
+      </section>
+
+      <!-- 13 · Una vista con el layout -->
+      <section>
+        <h2>Una vista con el <em>layout</em></h2>
+        <pre class="compacto"><code class="language-html" data-trim>
+&lt;x-layout titulo="Pantalla principal"&gt;
+    &lt;p&gt;Bienvenida a marcapersonalFP, la red de currículos del {{ $centro }}.&lt;/p&gt;
+&lt;/x-layout&gt;
+        </code></pre>
+        <p class="small-text fragment">Lo de dentro va al <code>{{ $slot }}</code>; el atributo, a <code>$titulo</code>.</p>
+        <p class="label fragment">Si el valor es una <strong>expresión PHP</strong>, dos puntos delante:</p>
+        <pre class="compacto fragment"><code class="language-html" data-trim>
+&lt;x-layout :titulo="'Vista detalle proyecto ' . $id"&gt;
+        </code></pre>
+      </section>
+
+      <!-- 14 · Composición de una página (SVG animado) -->
+      <section>
+        <h2>Componer una página</h2>
+        <svg class="anim" viewBox="0 0 960 440" style="max-height:400px" role="img" aria-label="La página /proyectos se compone por piezas: el layout pone el esqueleto con la barra, el título, el hueco $slot y el pie; el componente navbar rellena la barra; la vista proyectos.index pasa el título y lo que escribe entre x-layout y /x-layout ocupa el $slot; cada x-tarjeta-proyecto se sustituye por su componente">
+          <defs>
+            <marker id="p-fl-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#3B82F6"/></marker>
+            <marker id="p-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+            <marker id="p-fl-rosa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#DB2777"/></marker>
+            <marker id="p-fl-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="440" rx="14" fill="#F8FAFC"/>
+
+          <!-- La página, en el navegador -->
+          <rect x="470" y="15" width="470" height="410" rx="10" fill="#F3F4F6" stroke="#94A3B8" stroke-width="2"/>
+          <rect x="471" y="16" width="468" height="31" rx="9" fill="#E2E8F0"/>
+          <rect x="471" y="36" width="468" height="11" fill="#E2E8F0"/>
+          <circle cx="489" cy="31" r="5" fill="#EF4444"/><circle cx="505" cy="31" r="5" fill="#F59E0B"/><circle cx="521" cy="31" r="5" fill="#10B981"/>
+          <rect x="540" y="22" width="380" height="18" rx="9" fill="#FFFFFF"/>
+          <text x="552" y="36" font-size="12" class="mono" fill="#475569">marcapersonalfp.test/proyectos</text>
+
+          <!-- 1 · el layout: el esqueleto -->
+          <g class="fragment" data-fragment-index="1">
+            <rect x="20" y="15" width="400" height="120" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+            <text x="35" y="36" font-size="13" font-weight="700" class="mono" fill="#1E40AF">components/layout.blade.php</text>
+            <circle cx="400" cy="33" r="12" fill="#3B82F6"/><text x="400" y="38" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+            <text x="35" y="60" font-size="13" class="mono" fill="#1E3A8A">&lt;head&gt; … @vite([…]) &lt;/head&gt;</text>
+            <text x="35" y="82" font-size="13" class="mono" fill="#1E3A8A">&lt;x-navbar /&gt;</text>
+            <text x="35" y="104" font-size="13" class="mono" fill="#1E3A8A">&lt;main&gt; &lt;h1&gt;{{ $titulo }}&lt;/h1&gt; {{ $slot }} &lt;/main&gt;</text>
+            <text x="35" y="126" font-size="13" class="mono" fill="#1E3A8A">&lt;footer&gt; {{ config('…centro') }} &lt;/footer&gt;</text>
+            <path d="M420 40 L 464 40" fill="none" stroke="#3B82F6" stroke-width="3" marker-end="url(#p-fl-azul)"/>
+            <rect x="480" y="55" width="450" height="40" rx="6" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <text x="495" y="80" font-size="13" class="mono" fill="#64748B">&lt;x-navbar /&gt;</text>
+            <rect x="485" y="105" width="215" height="34" rx="6" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <text x="495" y="127" font-size="14" class="mono" fill="#64748B">{{ $titulo }}</text>
+            <rect x="485" y="150" width="440" height="235" rx="8" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <text x="915" y="375" text-anchor="end" font-size="14" class="mono" fill="#64748B">{{ $slot }}</text>
+            <text x="705" y="410" text-anchor="middle" font-size="13" fill="#6B7280">CIFP Carlos III</text>
+          </g>
+          <!-- 2 · el componente navbar -->
+          <g class="fragment" data-fragment-index="2">
+            <rect x="20" y="145" width="400" height="60" rx="10" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+            <text x="35" y="166" font-size="13" font-weight="700" class="mono" fill="#B45309">components/navbar.blade.php</text>
+            <circle cx="400" cy="163" r="12" fill="#D97706"/><text x="400" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+            <text x="35" y="192" font-size="13" class="mono" fill="#92400E">&lt;nav&gt; logo · route(…) · routeIs(…) &lt;/nav&gt;</text>
+            <path d="M420 175 C 446 175, 444 74, 466 74" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#p-fl-ambar)"/>
+            <rect x="471" y="52" width="468" height="44" fill="#FFFFFF" stroke="#E5E7EB"/>
+            <circle cx="496" cy="74" r="14" fill="#0EA5E9"/><text x="496" y="79" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">mp</text>
+            <text x="525" y="79" font-size="15" font-weight="700" fill="#1D4ED8">Proyectos</text>
+            <text x="615" y="79" font-size="15" font-weight="700" fill="#4B5563">Mi perfil</text>
+          </g>
+          <!-- 3 · la vista: el título -->
+          <g class="fragment" data-fragment-index="3">
+            <rect x="20" y="215" width="400" height="130" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="2"/>
+            <text x="35" y="235" font-size="13" font-weight="700" class="mono" fill="#9D174D">proyectos/index.blade.php</text>
+            <circle cx="400" cy="233" r="12" fill="#DB2777"/><text x="400" y="238" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+            <text x="35" y="258" font-size="13" class="mono" fill="#831843">&lt;x-layout titulo="Listado proyectos"&gt;</text>
+            <text x="35" y="338" font-size="13" class="mono" fill="#831843">&lt;/x-layout&gt;</text>
+            <path d="M420 253 C 452 253, 452 122, 479 122" fill="none" stroke="#DB2777" stroke-width="3" marker-end="url(#p-fl-rosa)"/>
+            <rect x="483" y="103" width="219" height="38" fill="#F3F4F6"/>
+            <text x="487" y="131" font-size="22" font-weight="700" fill="#111827">Listado proyectos</text>
+          </g>
+          <!-- 4 · lo de dentro de x-layout, al $slot -->
+          <g class="fragment" data-fragment-index="4">
+            <circle cx="795" cy="370" r="12" fill="#DB2777"/><text x="795" y="375" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+          </g>
+          <g class="fragment" data-fragment-index="3">
+            <g class="fragment custom mover" data-fragment-index="4" style="--dx:465px; --dy:-101px">
+              <rect x="35" y="266" width="370" height="52" rx="6" fill="#FCE7F3" stroke="#DB2777"/>
+              <text x="47" y="287" font-size="13" class="mono" fill="#831843">&lt;ul <tspan>class</tspan>="grid gap-4 sm:grid-cols-2"&gt;</text>
+              <text x="47" y="309" font-size="13" class="mono" fill="#831843">@forelse … &lt;x-tarjeta-proyecto … /&gt;</text>
+            </g>
+          </g>
+          <!-- 5 · cada tarjeta, su componente -->
+          <g class="fragment" data-fragment-index="5">
+            <rect x="20" y="355" width="400" height="70" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+            <text x="35" y="376" font-size="13" font-weight="700" class="mono" fill="#065F46">components/tarjeta-proyecto.blade.php</text>
+            <circle cx="400" cy="373" r="12" fill="#059669"/><text x="400" y="378" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+            <text x="35" y="404" font-size="13" class="mono" fill="#064E3B">&lt;li&gt; nombre · fechas · @class(nota) &lt;/li&gt;</text>
+            <path d="M420 390 C 456 390, 456 302, 489 302" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#p-fl-verde)"/>
+            <rect x="492" y="158" width="426" height="197" fill="#F3F4F6"/>
+            <rect x="495" y="160" width="210" height="88" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+            <text x="505" y="182" font-size="12" font-weight="700" fill="#111827">Tecnologías de la Información</text>
+            <text x="505" y="200" font-size="11" fill="#6B7280">2023-01-15 – 2023-05-30</text>
+            <text x="505" y="222" font-size="14" font-weight="700" fill="#15803D">9.5</text>
+            <text x="505" y="240" font-size="11" fill="#1D4ED8">Más información</text>
+            <rect x="715" y="160" width="210" height="88" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+            <text x="725" y="182" font-size="12" font-weight="700" fill="#111827">Diseño Gráfico</text>
+            <text x="725" y="200" font-size="11" fill="#6B7280">2023-02-10 – 2023-06-20</text>
+            <text x="725" y="222" font-size="14" font-weight="700" fill="#B91C1C">4.0</text>
+            <text x="725" y="240" font-size="11" fill="#1D4ED8">Más información</text>
+            <rect x="495" y="258" width="210" height="88" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+            <text x="505" y="280" font-size="12" font-weight="700" fill="#111827">Electrónica</text>
+            <text x="505" y="298" font-size="11" fill="#6B7280">2023-03-05 – 2023-07-15</text>
+            <text x="505" y="320" font-size="14" font-weight="700" fill="#15803D">9.2</text>
+            <text x="505" y="338" font-size="11" fill="#1D4ED8">Más información</text>
+          </g>
+
+          <!-- Animación del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#3B82F6"><animateMotion dur="1.2s" repeatCount="indefinite" path="M420 40 L 466 40"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#D97706"><animateMotion dur="1.4s" repeatCount="indefinite" path="M420 175 C 446 175, 444 74, 468 74"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#DB2777"><animateMotion dur="1.4s" repeatCount="indefinite" path="M420 253 C 452 253, 452 122, 481 122"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="5"><circle r="7" fill="#059669"><animateMotion dur="1.4s" repeatCount="indefinite" path="M420 390 C 456 390, 456 302, 491 302"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1">El <em>layout</em> pone el esqueleto: <code>@vite</code>, la barra, el título, el hueco <code>{{ $slot }}</code> y el pie</li>
+          <li class="fragment" data-fragment-index="2"><code>&lt;x-navbar /&gt;</code> se sustituye por el componente <code>navbar</code></li>
+          <li class="fragment" data-fragment-index="3">La vista usa <code>&lt;x-layout titulo="…"&gt;</code>: el atributo llega como <code>$titulo</code></li>
+          <li class="fragment" data-fragment-index="4">Lo que va entre <code>&lt;x-layout&gt;</code> y <code>&lt;/x-layout&gt;</code> ocupa el <code>{{ $slot }}</code></li>
+          <li class="fragment" data-fragment-index="5">Cada <code>&lt;x-tarjeta-proyecto /&gt;</code> se sustituye por su componente</li>
+        </ol>
+        <aside class="notes">
+          Paso 4: el bloque viaja de verdad desde la vista hasta el hueco $slot del layout. Es la idea clave: la vista solo escribe su contenido.
+          Paso 5: el código del bloque se convierte en tres tarjetas, una por proyecto, cada una dibujada por el componente.
+        </aside>
+      </section>
+
+      <!-- 15 · La barra de navegación -->
+      <section>
+        <h2>La barra de navegación</h2>
+        <pre class="compacto"><code class="language-html" data-trim data-line-numbers="2|4|5-6">
+&lt;nav class="bg-white shadow"&gt;
+    &lt;a href="{{ url('/') }}"&gt;&lt;img src="{{ asset('images/mp-logo.png') }}" …&gt;&lt;/a&gt;
+
+    &lt;a href="{{ route('proyectos.index') }}" @class([
+        'text-blue-700' =&gt; request()-&gt;routeIs('proyectos.*'),
+        'text-gray-600' =&gt; ! request()-&gt;routeIs('proyectos.*'),
+    ])&gt;Proyectos&lt;/a&gt;
+    …
+&lt;/nav&gt;
+        </code></pre>
+        <p class="small-text fragment">Enlaces con <code>route()</code> (5.3). <code>routeIs('proyectos.*')</code>: listado, detalle, alta y edición.</p>
+      </section>
+
+      <!-- 16 · Componentes para piezas repetidas -->
+      <section>
+        <h2>Componentes para piezas repetidas</h2>
+        <p class="small-text"><code>components/tarjeta-proyecto.blade.php</code></p>
+        <pre class="compacto"><code class="language-html" data-trim data-line-numbers="1|3-5">
+@props(['proyecto', 'id'])
+
+&lt;li class="rounded-lg bg-white p-4 shadow"&gt;
+    &lt;h2 class="text-lg font-semibold"&gt;{{ $proyecto['nombre'] }}&lt;/h2&gt;
+    …
+    &lt;a href="{{ route('proyectos.show', $id) }}"&gt;Más información&lt;/a&gt;
+&lt;/li&gt;
+        </code></pre>
+        <p class="label fragment">Se usa así; los dos puntos, porque los valores son variables:</p>
+        <pre class="compacto fragment"><code class="language-html" data-trim>
+&lt;x-tarjeta-proyecto :proyecto="$proyecto" :id="$id" /&gt;
+        </code></pre>
+      </section>
+
+      <!-- 17 · Entorno -->
+      <section>
+        <h2>El entorno</h2>
+        <p class="small-text">Proyecto <code>marcapersonalfp</code>, con las rutas de 5.3 y el terminal de <code>workspace</code> como <code>laradock</code>. Rama nueva, en la VM:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+git switch main
+git pull upstream main
+git switch -c RA5_4
+        </code></pre>
+      </section>
+
+      <!-- 18 · Ejercicios 1-2 -->
+      <section>
+        <h2>Ejercicios (1/3)</h2>
+        <ol class="pasos compacta">
+          <li><strong>Los estilos.</strong> <code>npm install</code> y <code>npm run build -- --watch</code> en un 2.º terminal. El logo, a <code>public/images/</code> con <code>curl</code>.</li>
+        </ol>
+        <p class="small-text muted">El <code>curl</code> completo, en el ejercicio 1 del apartado.</p>
+        <ol class="pasos compacta" start="2">
+          <li><strong>El <em>layout</em> y la barra.</strong> <code>components/layout.blade.php</code> y <code>components/navbar.blade.php</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 19 · Ejercicio 3: las vistas del sitio -->
+      <section>
+        <h2>Ejercicios (2/3): las vistas</h2>
+        <table>
+          <thead><tr><th>Ruta y vista</th><th>Datos que recibe</th></tr></thead>
+          <tbody>
+            <tr><th><code>/</code> → <code>home</code></th><td><code>centro</code> (configuración de 5.2)</td></tr>
+            <tr><th><code>proyectos.index</code></th><td><code>proyectos</code> (ejercicio 4)</td></tr>
+            <tr><th><code>proyectos.show</code><br><code>proyectos.edit</code></th><td><code>id</code></td></tr>
+            <tr><th><code>proyectos.create</code></th><td>—</td></tr>
+            <tr><th><code>perfil</code></th><td><code>id</code> o <code>null</code> (<code>@isset</code>)</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text" style="margin-top:0.6em">Todas con <code>&lt;x-layout&gt;</code>; el texto de 5.3, como <code>titulo</code> (en <code>perfil</code>, "Perfil").</p>
+      </section>
+
+      <!-- 20 · Ejercicios 4-6 -->
+      <section>
+        <h2>Ejercicios (3/3)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong>El listado.</strong> Los tres primeros proyectos de <code>array_proyectos.php</code>, con <code>tarjeta-proyecto</code> en una rejilla y <code>@forelse</code>. El índice es el <code>id</code>.</li>
+          <li><strong>El escapado.</strong> En <code>perfil</code>, <code>{{ '&lt;script&gt;alert(1)&lt;/script&gt;' }}</code>. ¿Se ejecuta? Mira el código fuente. Prueba con <code>{!! !!}</code> y deshazlo.</li>
+          <li><strong>Investiga.</strong> ¿Qué hay en <code>storage/framework/views/</code>? ¿Y si usas una clase nueva sin <code>--watch</code>?</li>
+        </ol>
+      </section>
+
+      <!-- 21 · Puente -->
+      <section>
+        <h2>Puente</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>En <em>v0</em></h3>
+            <p class="small-text">Cada página repetía su estructura y mezclaba el <code>foreach</code> con el HTML y el <code>e()</code> de cada dato.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En <em>Laravel</em></h3>
+            <p class="small-text">Las vistas solo presentan; el <em>layout</em> se escribe una vez; <code>{{ }}</code> escapa sin acordarse.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+      </section>
+
+      <!-- 22 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA5_4_VistasTest.php</code> a <code>tests/Feature/</code></li>
+          <li>En el terminal de <code>workspace</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan test --filter=RA5_4_VistasTest
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 a 4</strong>, incluido <code>public/build/manifest.json</code>.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">Tests: 7 passed (36 assertions)</code></p>
+        <p class="small-text muted">Los tests de 5.1 y 5.3 siguen pasando, pero ahora necesitan los estilos compilados.</p>
+      </section>
+
+      <!-- 23 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>5.5. Controladores</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>

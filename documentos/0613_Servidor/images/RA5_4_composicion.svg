@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="960" height="440" role="img" aria-label="La página /proyectos se compone por piezas: el layout pone el esqueleto con la barra, el título, el hueco $slot y el pie; el componente navbar rellena la barra; la vista proyectos.index pasa el título y lo que escribe entre x-layout y /x-layout ocupa el $slot; cada x-tarjeta-proyecto se sustituye por su componente" font-family="'Source Sans Pro', Helvetica, Arial, sans-serif">
+  <title>La página /proyectos se compone por piezas: el layout pone el esqueleto con la barra, el título, el hueco $slot y el pie; el componente navbar rellena la barra; la vista proyectos.index pasa el título y lo que escribe entre x-layout y /x-layout ocupa el $slot; cada x-tarjeta-proyecto se sustituye por su componente</title>
+  <defs>
+    <marker id="p-fl-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#3B82F6"/></marker>
+    <marker id="p-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+    <marker id="p-fl-rosa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#DB2777"/></marker>
+    <marker id="p-fl-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+  </defs>
+  <rect x="0" y="0" width="960" height="440" rx="14" fill="#F8FAFC"/>
+
+  <!-- La página, en el navegador -->
+  <rect x="470" y="15" width="470" height="410" rx="10" fill="#F3F4F6" stroke="#94A3B8" stroke-width="2"/>
+  <rect x="471" y="16" width="468" height="31" rx="9" fill="#E2E8F0"/>
+  <rect x="471" y="36" width="468" height="11" fill="#E2E8F0"/>
+  <circle cx="489" cy="31" r="5" fill="#EF4444"/><circle cx="505" cy="31" r="5" fill="#F59E0B"/><circle cx="521" cy="31" r="5" fill="#10B981"/>
+  <rect x="540" y="22" width="380" height="18" rx="9" fill="#FFFFFF"/>
+  <text x="552" y="36" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#475569">marcapersonalfp.test/proyectos</text>
+
+  <!-- 1 · el layout: el esqueleto -->
+  <g>
+    <rect x="20" y="15" width="400" height="120" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+    <text x="35" y="36" font-size="13" font-weight="700" font-family="'Source Code Pro', Consolas, monospace" fill="#1E40AF">components/layout.blade.php</text>
+    <circle cx="400" cy="33" r="12" fill="#3B82F6"/><text x="400" y="38" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+    <text x="35" y="60" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1E3A8A">&lt;head&gt; … @vite([…]) &lt;/head&gt;</text>
+    <text x="35" y="82" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1E3A8A">&lt;x-navbar /&gt;</text>
+    <text x="35" y="104" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1E3A8A">&lt;main&gt; &lt;h1&gt;{{ $titulo }}&lt;/h1&gt; {{ $slot }} &lt;/main&gt;</text>
+    <text x="35" y="126" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1E3A8A">&lt;footer&gt; {{ config('…centro') }} &lt;/footer&gt;</text>
+    <path d="M420 40 L 464 40" fill="none" stroke="#3B82F6" stroke-width="3" marker-end="url(#p-fl-azul)"/>
+    <rect x="480" y="55" width="450" height="40" rx="6" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="495" y="80" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#64748B">&lt;x-navbar /&gt;</text>
+    <rect x="485" y="105" width="215" height="34" rx="6" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="495" y="127" font-size="14" font-family="'Source Code Pro', Consolas, monospace" fill="#64748B">{{ $titulo }}</text>
+    <rect x="485" y="150" width="440" height="235" rx="8" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="915" y="375" text-anchor="end" font-size="14" font-family="'Source Code Pro', Consolas, monospace" fill="#64748B">{{ $slot }}</text>
+    <text x="705" y="410" text-anchor="middle" font-size="13" fill="#6B7280">CIFP Carlos III</text>
+  </g>
+  <!-- 2 · el componente navbar -->
+  <g>
+    <rect x="20" y="145" width="400" height="60" rx="10" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+    <text x="35" y="166" font-size="13" font-weight="700" font-family="'Source Code Pro', Consolas, monospace" fill="#B45309">components/navbar.blade.php</text>
+    <circle cx="400" cy="163" r="12" fill="#D97706"/><text x="400" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+    <text x="35" y="192" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#92400E">&lt;nav&gt; logo · route(…) · routeIs(…) &lt;/nav&gt;</text>
+    <path d="M420 175 C 446 175, 444 74, 466 74" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#p-fl-ambar)"/>
+    <rect x="471" y="52" width="468" height="44" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <circle cx="496" cy="74" r="14" fill="#0EA5E9"/><text x="496" y="79" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">mp</text>
+    <text x="525" y="79" font-size="15" font-weight="700" fill="#1D4ED8">Proyectos</text>
+    <text x="615" y="79" font-size="15" font-weight="700" fill="#4B5563">Mi perfil</text>
+  </g>
+  <!-- 3 · la vista: el título -->
+  <g>
+    <rect x="20" y="215" width="400" height="130" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="2"/>
+    <text x="35" y="235" font-size="13" font-weight="700" font-family="'Source Code Pro', Consolas, monospace" fill="#9D174D">proyectos/index.blade.php</text>
+    <circle cx="400" cy="233" r="12" fill="#DB2777"/><text x="400" y="238" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+    <text x="35" y="258" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">&lt;x-layout titulo="Listado proyectos"&gt;</text>
+    <text x="35" y="338" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">&lt;/x-layout&gt;</text>
+    <path d="M420 253 C 452 253, 452 122, 479 122" fill="none" stroke="#DB2777" stroke-width="3" marker-end="url(#p-fl-rosa)"/>
+    <rect x="483" y="103" width="219" height="38" fill="#F3F4F6"/>
+    <text x="487" y="131" font-size="22" font-weight="700" fill="#111827">Listado proyectos</text>
+  </g>
+  <!-- 4 · lo de dentro de x-layout, al $slot -->
+  <g>
+    <circle cx="795" cy="370" r="12" fill="#DB2777"/><text x="795" y="375" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+  </g>
+  <g>
+    <g transform="translate(465 -101)">
+      <rect x="35" y="266" width="370" height="52" rx="6" fill="#FCE7F3" stroke="#DB2777"/>
+      <text x="47" y="287" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">&lt;ul <tspan>class</tspan>="grid gap-4 sm:grid-cols-2"&gt;</text>
+      <text x="47" y="309" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">@forelse … &lt;x-tarjeta-proyecto … /&gt;</text>
+    </g>
+  </g>
+  <!-- 5 · cada tarjeta, su componente -->
+  <g>
+    <rect x="20" y="355" width="400" height="70" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+    <text x="35" y="376" font-size="13" font-weight="700" font-family="'Source Code Pro', Consolas, monospace" fill="#065F46">components/tarjeta-proyecto.blade.php</text>
+    <circle cx="400" cy="373" r="12" fill="#059669"/><text x="400" y="378" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+    <text x="35" y="404" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#064E3B">&lt;li&gt; nombre · fechas · @class(nota) &lt;/li&gt;</text>
+    <path d="M420 390 C 456 390, 456 302, 489 302" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#p-fl-verde)"/>
+    <rect x="492" y="158" width="426" height="197" fill="#F3F4F6"/>
+    <rect x="495" y="160" width="210" height="88" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <text x="505" y="182" font-size="12" font-weight="700" fill="#111827">Tecnologías de la Información</text>
+    <text x="505" y="200" font-size="11" fill="#6B7280">2023-01-15 – 2023-05-30</text>
+    <text x="505" y="222" font-size="14" font-weight="700" fill="#15803D">9.5</text>
+    <text x="505" y="240" font-size="11" fill="#1D4ED8">Más información</text>
+    <rect x="715" y="160" width="210" height="88" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <text x="725" y="182" font-size="12" font-weight="700" fill="#111827">Diseño Gráfico</text>
+    <text x="725" y="200" font-size="11" fill="#6B7280">2023-02-10 – 2023-06-20</text>
+    <text x="725" y="222" font-size="14" font-weight="700" fill="#B91C1C">4.0</text>
+    <text x="725" y="240" font-size="11" fill="#1D4ED8">Más información</text>
+    <rect x="495" y="258" width="210" height="88" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <text x="505" y="280" font-size="12" font-weight="700" fill="#111827">Electrónica</text>
+    <text x="505" y="298" font-size="11" fill="#6B7280">2023-03-05 – 2023-07-15</text>
+    <text x="505" y="320" font-size="14" font-weight="700" fill="#15803D">9.2</text>
+    <text x="505" y="338" font-size="11" fill="#1D4ED8">Más información</text>
+  </g>
+
+</svg>

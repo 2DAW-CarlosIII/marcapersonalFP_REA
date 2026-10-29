@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-label="La primera vez que se pide la vista proyectos.index, Blade compila index.blade.php a un fichero PHP de storage/framework/views: las dobles llaves pasan a echo e() y @foreach a foreach. PHP ejecuta ese fichero y genera el HTML. Las siguientes peticiones usan directamente la versión compilada, hasta que cambie el .blade.php" font-family="'Source Sans Pro', Helvetica, Arial, sans-serif">
+  <title>La primera vez que se pide la vista proyectos.index, Blade compila index.blade.php a un fichero PHP de storage/framework/views: las dobles llaves pasan a echo e() y @foreach a foreach. PHP ejecuta ese fichero y genera el HTML. Las siguientes peticiones usan directamente la versión compilada, hasta que cambie el .blade.php</title>
+  <defs>
+    <marker id="c-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+    <marker id="c-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+    <marker id="c-fl-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+  </defs>
+  <rect x="0" y="0" width="960" height="400" rx="14" fill="#F8FAFC"/>
+
+  <!-- La vista Blade -->
+  <rect x="20" y="108" width="390" height="150" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="2"/>
+  <text x="35" y="132" font-size="13" font-weight="700" font-family="'Source Code Pro', Consolas, monospace" fill="#9D174D">resources/views/proyectos/index.blade.php</text>
+  <text x="35" y="165" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">&lt;p&gt;{{ count($proyectos) }} proyectos&lt;/p&gt;</text>
+  <text x="35" y="190" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">@foreach ($proyectos as $proyecto)</text>
+  <text x="66" y="215" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">&lt;li&gt;{{ $proyecto['nombre'] }}&lt;/li&gt;</text>
+  <text x="35" y="240" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">@endforeach</text>
+
+  <!-- 1 · se pide la vista -->
+  <g>
+    <rect x="20" y="20" width="390" height="56" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+    <text x="35" y="40" font-size="12" fill="#5B21B6">La ruta o el controlador pide</text>
+    <text x="395" y="40" text-anchor="end" font-size="12" font-weight="700" fill="#5B21B6">1.ª petición</text>
+    <text x="35" y="64" font-size="16" font-family="'Source Code Pro', Consolas, monospace" fill="#4C1D95">view('proyectos.index')</text>
+    <path d="M215 76 L 215 102" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#c-fl-gris)"/>
+    <circle cx="240" cy="91" r="13" fill="#7C3AED"/><text x="240" y="96" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">1</text>
+  </g>
+  <!-- 2 · Blade compila: equivalencias -->
+  <g>
+    <rect x="28" y="150" width="374" height="22" rx="4" fill="#DBEAFE"/>
+    <rect x="28" y="175" width="374" height="22" rx="4" fill="#FEF3C7"/>
+    <rect x="28" y="200" width="374" height="22" rx="4" fill="#DBEAFE"/>
+    <rect x="28" y="225" width="374" height="22" rx="4" fill="#FEF3C7"/>
+    <text x="35" y="165" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">&lt;p&gt;{{ count($proyectos) }} proyectos&lt;/p&gt;</text>
+    <text x="35" y="190" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">@foreach ($proyectos as $proyecto)</text>
+    <text x="66" y="215" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">&lt;li&gt;{{ $proyecto['nombre'] }}&lt;/li&gt;</text>
+    <text x="35" y="240" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#831843">@endforeach</text>
+    <path d="M410 183 L 514 183" fill="none" stroke="#D97706" stroke-width="3" marker-end="url(#c-fl-ambar)"/>
+    <text x="463" y="172" text-anchor="middle" font-size="14" font-weight="700" fill="#B45309">compila</text>
+    <circle cx="463" cy="207" r="13" fill="#D97706"/><text x="463" y="212" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">2</text>
+    <rect x="520" y="108" width="420" height="150" rx="10" fill="#F1F5F9" stroke="#64748B" stroke-width="2"/>
+    <text x="535" y="132" font-size="13" font-weight="700" font-family="'Source Code Pro', Consolas, monospace" fill="#334155">storage/framework/views/3f9a1c….php</text>
+    <rect x="528" y="150" width="404" height="22" rx="4" fill="#DBEAFE"/>
+    <rect x="528" y="175" width="404" height="22" rx="4" fill="#FEF3C7"/>
+    <rect x="528" y="200" width="404" height="22" rx="4" fill="#DBEAFE"/>
+    <rect x="528" y="225" width="404" height="22" rx="4" fill="#FEF3C7"/>
+    <text x="535" y="165" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1F2937">&lt;p&gt;&lt;?php echo e(count($proyectos)); ?&gt; proyectos&lt;/p&gt;</text>
+    <text x="535" y="190" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1F2937">&lt;?php foreach ($proyectos as $proyecto): ?&gt;</text>
+    <text x="566" y="215" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1F2937">&lt;li&gt;&lt;?php echo e($proyecto['nombre']); ?&gt;&lt;/li&gt;</text>
+    <text x="535" y="240" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1F2937">&lt;?php endforeach; ?&gt;</text>
+  </g>
+  <!-- 3 · PHP ejecuta la versión compilada -->
+  <g>
+    <path d="M730 258 L 730 294" fill="none" stroke="#4B5563" stroke-width="3" marker-end="url(#c-fl-gris)"/>
+    <text x="748" y="282" font-size="14" fill="#374151">PHP la ejecuta</text>
+    <circle cx="710" cy="277" r="13" fill="#3B82F6"/><text x="710" y="282" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">3</text>
+    <rect x="520" y="300" width="420" height="85" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+    <text x="535" y="322" font-size="13" fill="#1E40AF">HTML que recibe el navegador</text>
+    <text x="535" y="347" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1E3A8A">&lt;p&gt;3 proyectos&lt;/p&gt;</text>
+    <text x="535" y="370" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1E3A8A">&lt;li&gt;Tecnologías de la Información&lt;/li&gt;&lt;li&gt;…</text>
+  </g>
+  <!-- 4 · las siguientes peticiones, directas a la compilada -->
+  <g>
+    <path d="M410 48 L 730 48 L 730 102" fill="none" stroke="#059669" stroke-width="3" stroke-dasharray="8 5" marker-end="url(#c-fl-verde)"/>
+    <text x="440" y="38" font-size="13" fill="#065F46">2.ª petición y siguientes: ya está compilada</text>
+    <circle cx="755" cy="78" r="13" fill="#059669"/><text x="755" y="83" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">4</text>
+    <rect x="20" y="300" width="390" height="85" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+    <text x="35" y="330" font-size="15" font-weight="700" fill="#065F46">¿Has cambiado el .blade.php?</text>
+    <text x="35" y="356" font-size="14" fill="#065F46">Blade lo nota por la fecha del fichero</text>
+    <text x="35" y="376" font-size="14" fill="#065F46">y vuelve a compilarlo.</text>
+  </g>
+
+</svg>
