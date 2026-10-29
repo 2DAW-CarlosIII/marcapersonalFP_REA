@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>5.6. Formularios · marcapersonalFP</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 5 · RA5</p>
+        <h1 class="titulo">5.6. Formularios</h1>
+        <p class="muted">Datos de entrada, validación y redirecciones</p>
+        <p class="small-text muted">Lo que en <em>v0</em> hicimos a mano, en tres herramientas</p>
+        <aside class="notes">
+          Retomamos el alta de 3.8 y el POST/Redirect/GET de 4.1. Al cerrar aquellos apartados anotamos cómo lo hace Laravel: aquí lo hacemos.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · Lo que ya sabemos hacer a mano -->
+      <section>
+        <h2>Lo que ya sabemos hacer a mano</h2>
+        <ol class="pasos">
+          <li class="fragment"><strong>Leer los datos</strong> de <code>$_POST</code>, con <code>?? ''</code> (3.6).</li>
+          <li class="fragment"><strong>Validarlos</strong> con <code>ValidadorCurriculo</code> y, si fallan, volver a rellenar cada <code>value</code> (3.8).</li>
+          <li class="fragment"><strong>Redirigir</strong> con un mensaje en la sesión: POST/Redirect/GET (4.1).</li>
+        </ol>
+      </section>
+
+      <!-- 3 · De v0 a Laravel (1) -->
+      <section>
+        <h2>De <em>v0</em> a <em>Laravel</em> (1/2)</h2>
+        <table>
+          <thead><tr><th>En <em>v0</em> (a mano)</th><th>En <em>Laravel</em></th></tr></thead>
+          <tbody>
+            <tr class="fragment"><td><code>$_POST['nombre'] ?? ''</code></td><td><code>$request-&gt;input('nombre', '')</code></td></tr>
+            <tr class="fragment"><td><code>ValidadorCurriculo::validar()</code></td><td><code>$request-&gt;validate([...])</code> o un <em>Form Request</em></td></tr>
+            <tr class="fragment"><td><code>value="&lt;?= e($datos['alumno'] ?? '') ?&gt;"</code></td><td><code>value="{{ old('alumno') }}"</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 3b · De v0 a Laravel (2) -->
+      <section>
+        <h2>De <em>v0</em> a <em>Laravel</em> (2/2)</h2>
+        <table>
+          <thead><tr><th>En <em>v0</em> (a mano)</th><th>En <em>Laravel</em></th></tr></thead>
+          <tbody>
+            <tr class="fragment"><td><code>$_SESSION['mensaje']</code> + <code>header('Location: …')</code></td><td><code>redirect()-&gt;route(…)-&gt;with('mensaje', '…')</code></td></tr>
+            <tr class="fragment"><td>Mostrar el mensaje y <code>unset()</code></td><td><code>@session('mensaje')</code>: se borra solo</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 4 · El objeto Request -->
+      <section>
+        <h2>El objeto <code>Request</code></h2>
+        <p class="small-text">Ni <code>$_GET</code> ni <code>$_POST</code>: toda la petición, en un objeto. Se declara como parámetro:</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3">
+use Illuminate\Http\Request;
+
+public function store(Request $request)
+{
+    $nombre = $request-&gt;input('nombre');
+    // ...
+}
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment">Nadie lo pasa: <em>Laravel</em> ve el tipo y entrega la petición. <strong>Inyección de dependencias</strong> (5.8).</li>
+          <li class="fragment">Los parámetros de la ruta, <strong>después</strong>: <code>update(Request $request, int $id)</code>.</li>
+        </ul>
+      </section>
+
+      <!-- 5 · Leer los datos -->
+      <section>
+        <h2>Leer los datos</h2>
+        <p class="small-text">Del formulario, de la dirección (<code>?ciclo=DAW</code>) o de un JSON:</p>
+        <table>
+          <tbody>
+            <tr><th><code>input('nombre')</code></th><td>El valor, o <code>null</code> si no llegó</td></tr>
+            <tr><th><code>input('nombre', 'Sin nombre')</code></th><td>Con valor por defecto</td></tr>
+            <tr><th><code>has('nombre')</code><br><code>filled('nombre')</code></th><td>Si llegó<br>Si llegó <strong>y</strong> no está vacío</td></tr>
+            <tr><th><code>only([...])</code><br><code>all()</code></th><td>Array con esos campos<br>Array con todos</td></tr>
+            <tr><th><code>method()</code></th><td><code>GET</code>, <code>POST</code>…</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted" style="margin-top:0.6em">Todos son métodos de <code>$request</code>.</p>
+      </section>
+
+      <!-- 6 · Formularios: las rutas -->
+      <section>
+        <h2>Formularios: la dirección de envío</h2>
+        <pre class="ancho"><code class="language-php" data-trim>
+// routes/proyectos.php, dentro del grupo de 5.5
+Route::post('/', 'store')-&gt;name('store');
+Route::put('edit/{id}', 'update')-&gt;whereNumber('id')-&gt;name('update');
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment"><code>POST /proyectos</code> → <code>store</code>: guarda uno nuevo.</li>
+          <li class="fragment"><code>PUT /proyectos/edit/{id}</code> → <code>update</code>: guarda los cambios.</li>
+          <li class="fragment">En el formulario, con <code>route()</code>: <code>action="{{ route('proyectos.store') }}"</code></li>
+        </ul>
+      </section>
+
+      <!-- 7 · @csrf -->
+      <section>
+        <h2>El <em>token</em> CSRF: <code>@csrf</code></h2>
+        <pre class="compacto"><code class="language-html" data-trim data-line-numbers="2">
+&lt;form action="{{ route('proyectos.store') }}" method="POST"&gt;
+    @csrf
+    ...
+&lt;/form&gt;
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment">Un campo oculto con un <em>token</em> guardado en la <strong>sesión</strong>.</li>
+          <li class="fragment">Un <em>middleware</em> lo comprueba en cada <code>POST</code>, <code>PUT</code> o <code>DELETE</code>. Una página ajena no lo conoce.</li>
+          <li class="fragment">Sin <code>@csrf</code>: error <strong>419</strong> (<em>Page Expired</em>). En 4.1 solo teníamos <code>SameSite</code>.</li>
+        </ul>
+      </section>
+
+      <!-- 8 · @method -->
+      <section>
+        <h2><code>PUT</code>, <code>PATCH</code> y <code>DELETE</code></h2>
+        <p class="small-text">HTML solo envía <code>GET</code> y <code>POST</code> (5.3). El resto, por <code>POST</code> con <code>@method</code>:</p>
+        <pre class="compacto"><code class="language-html" data-trim data-line-numbers="3">
+&lt;form action="{{ route('proyectos.update', $id) }}" method="POST"&gt;
+    @csrf
+    @method('PUT')
+    ...
+&lt;/form&gt;
+        </code></pre>
+        <p class="small-text fragment">Añade un campo oculto <code>_method</code>: <em>Laravel</em> lo trata como <code>PUT</code> y llega a <code>Route::put()</code>.</p>
+      </section>
+
+      <!-- 9 · validate() -->
+      <section>
+        <h2>Validación: <code>validate()</code></h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="2-9|11">
+public function store(Request $request)
+{
+    $datos = $request-&gt;validate([
+        'docente_id' =&gt; ['required', 'integer', 'min:1'],
+        'nombre' =&gt; ['required', 'string', 'max:100'],
+        'dominio' =&gt; ['required', 'alpha_dash', 'max:60'],
+        'fecha_inicio' =&gt; ['required', 'date'],
+        'fecha_fin' =&gt; ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+        'calificacion' =&gt; ['nullable', 'numeric', 'between:0,10'],
+    ]);
+
+    // Aquí, $datos solo contiene los campos validados.
+}
+        </code></pre>
+      </section>
+
+      <!-- 10 · Reglas -->
+      <section>
+        <h2>Las reglas</h2>
+        <table>
+          <tbody>
+            <tr><th><code>required</code></th><td>Que llegue y no esté vacío</td></tr>
+            <tr><th><code>nullable</code></th><td>Puede estar vacío; si tiene valor, se comprueba el resto</td></tr>
+            <tr><th><code>string</code>, <code>integer</code>,<br><code>numeric</code>, <code>date</code></th><td>El tipo de dato</td></tr>
+            <tr><th><code>min:1</code>, <code>max:100</code>,<br><code>between:0,10</code></th><td>Mínimo o máximo; en los textos, la longitud</td></tr>
+            <tr><th><code>alpha_dash</code></th><td>Letras, números, guiones y guiones bajos</td></tr>
+            <tr><th><code>after_or_equal:fecha_inicio</code></th><td>Igual o posterior a otra fecha</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 11 · Si no son válidos -->
+      <section>
+        <h2>¿Y si algo no es válido?</h2>
+        <p class="small-text"><code>validate()</code> <strong>no deja continuar</strong>:</p>
+        <ol class="pasos compacta">
+          <li class="fragment">guarda en la sesión los <strong>errores</strong> de cada campo;</li>
+          <li class="fragment">guarda lo que había escrito el usuario (<em>old input</em>);</li>
+          <li class="fragment"><strong>redirige</strong> de vuelta al formulario.</li>
+        </ol>
+        <p class="small-text fragment">Si son válidos, devuelve <strong>solo los campos validados</strong>: un campo añadido con F12 (el truco de 4.4) se queda fuera.</p>
+      </section>
+
+      <!-- 12 · El viaje de un formulario (SVG animado) -->
+      <section>
+        <style>
+          .reveal svg.anim { display: block; margin: 0 auto; width: 100%; height: auto; }
+          .reveal svg.anim text { font-family: var(--r-main-font); }
+          .reveal svg.anim .mono { font-family: var(--r-code-font); }
+          .reveal ol.leyenda { columns: 2; column-gap: 40px; font-size: 0.5em; max-width: 920px; margin: 8px auto 0; padding-left: 1.4em; text-align: left; }
+          .reveal ol.leyenda li { margin: 2px 0; break-inside: avoid; }
+          @media (prefers-reduced-motion: reduce) { .reveal svg .punto { display: none; } }
+        </style>
+        <h2>El viaje de un formulario</h2>
+        <svg class="anim" viewBox="0 0 960 470" style="max-height:430px" role="img" aria-label="El navegador pide el formulario de alta. Lo envía con el nombre vacío: el Form Request falla, guarda en la sesión los errores y lo escrito, y redirige de vuelta al formulario, que llega relleno y con los mensajes. Lo envía con datos válidos: el controlador deja un mensaje flash en la sesión y redirige al listado, que muestra el mensaje una vez">
+          <defs>
+            <marker id="f-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+            <marker id="f-fl-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#2563EB"/></marker>
+            <marker id="f-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+            <marker id="f-fl-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="470" rx="14" fill="#F8FAFC"/>
+
+          <!-- Participantes y líneas de vida -->
+          <rect x="45" y="12" width="190" height="44" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+          <text x="140" y="40" text-anchor="middle" font-size="17" font-weight="700" fill="#1E3A8A">Navegador</text>
+          <rect x="360" y="12" width="280" height="44" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+          <text x="500" y="31" text-anchor="middle" font-size="17" font-weight="700" fill="#5B21B6">Laravel</text>
+          <text x="500" y="49" text-anchor="middle" font-size="12" class="mono" fill="#5B21B6">ProyectosController · ProyectoRequest</text>
+          <rect x="745" y="12" width="190" height="44" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+          <text x="840" y="31" text-anchor="middle" font-size="17" font-weight="700" fill="#065F46">Sesión</text>
+          <text x="840" y="49" text-anchor="middle" font-size="12" fill="#065F46">en el servidor</text>
+          <path d="M140 56 L 140 462" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+          <path d="M500 56 L 500 462" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+          <path d="M840 56 L 840 462" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+
+          <!-- 1 · GET el formulario -->
+          <g class="fragment" data-fragment-index="1">
+            <circle cx="24" cy="80" r="12" fill="#2563EB"/><text x="24" y="85" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+            <text x="320" y="74" text-anchor="middle" font-size="13" class="mono" fill="#374151">GET /proyectos/create</text>
+            <path d="M140 80 L 496 80" stroke="#4B5563" stroke-width="2.5" marker-end="url(#f-fl-gris)"/>
+            <text x="320" y="100" text-anchor="middle" font-size="13" class="mono" fill="#1E40AF">200 · formulario con @csrf</text>
+            <path d="M500 106 L 144 106" stroke="#2563EB" stroke-width="2.5" marker-end="url(#f-fl-azul)"/>
+          </g>
+          <!-- 2 · POST no válido: errores y old input, y vuelta atrás -->
+          <g class="fragment" data-fragment-index="2">
+            <circle cx="24" cy="140" r="12" fill="#DC2626"/><text x="24" y="145" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+            <text x="320" y="134" text-anchor="middle" font-size="13" class="mono" fill="#B91C1C">POST /proyectos · nombre vacío</text>
+            <path d="M140 140 L 496 140" stroke="#4B5563" stroke-width="2.5" marker-end="url(#f-fl-gris)"/>
+            <text x="512" y="145" font-size="13" font-weight="700" fill="#B91C1C">ProyectoRequest ✗</text>
+            <text x="670" y="160" text-anchor="middle" font-size="13" fill="#065F46">errores + <tspan font-style="italic">old input</tspan></text>
+            <path d="M500 166 L 836 166" stroke="#059669" stroke-width="2.5" marker-end="url(#f-fl-verde)"/>
+            <text x="320" y="186" text-anchor="middle" font-size="13" class="mono" fill="#B45309">302 · Location: /proyectos/create</text>
+            <path d="M500 192 L 144 192" stroke="#D97706" stroke-width="2.5" marker-end="url(#f-fl-ambar)"/>
+          </g>
+          <!-- 3 · el formulario, relleno y con mensajes -->
+          <g class="fragment" data-fragment-index="3">
+            <circle cx="24" cy="226" r="12" fill="#2563EB"/><text x="24" y="231" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+            <text x="320" y="220" text-anchor="middle" font-size="13" class="mono" fill="#374151">GET /proyectos/create</text>
+            <path d="M140 226 L 496 226" stroke="#4B5563" stroke-width="2.5" marker-end="url(#f-fl-gris)"/>
+            <text x="670" y="246" text-anchor="middle" font-size="13" fill="#065F46">old() y $errors · y se borran</text>
+            <path d="M840 252 L 504 252" stroke="#059669" stroke-width="2.5" marker-end="url(#f-fl-verde)"/>
+            <text x="320" y="272" text-anchor="middle" font-size="13" class="mono" fill="#1E40AF">200 · formulario relleno + @error</text>
+            <path d="M500 278 L 144 278" stroke="#2563EB" stroke-width="2.5" marker-end="url(#f-fl-azul)"/>
+          </g>
+          <!-- 4 · POST válido: mensaje flash y redirección -->
+          <g class="fragment" data-fragment-index="4">
+            <circle cx="24" cy="312" r="12" fill="#059669"/><text x="24" y="317" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+            <text x="320" y="306" text-anchor="middle" font-size="13" class="mono" fill="#047857">POST /proyectos · datos válidos</text>
+            <path d="M140 312 L 496 312" stroke="#4B5563" stroke-width="2.5" marker-end="url(#f-fl-gris)"/>
+            <text x="512" y="317" font-size="13" font-weight="700" fill="#047857">ProyectoRequest ✓</text>
+            <text x="670" y="332" text-anchor="middle" font-size="13" class="mono" fill="#065F46">with('mensaje', …)</text>
+            <path d="M500 338 L 836 338" stroke="#059669" stroke-width="2.5" marker-end="url(#f-fl-verde)"/>
+            <text x="320" y="358" text-anchor="middle" font-size="13" class="mono" fill="#B45309">302 · Location: /proyectos</text>
+            <path d="M500 364 L 144 364" stroke="#D97706" stroke-width="2.5" marker-end="url(#f-fl-ambar)"/>
+          </g>
+          <!-- 5 · GET el listado, con el mensaje una vez -->
+          <g class="fragment" data-fragment-index="5">
+            <circle cx="24" cy="398" r="12" fill="#2563EB"/><text x="24" y="403" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+            <text x="320" y="392" text-anchor="middle" font-size="13" class="mono" fill="#374151">GET /proyectos</text>
+            <path d="M140 398 L 496 398" stroke="#4B5563" stroke-width="2.5" marker-end="url(#f-fl-gris)"/>
+            <text x="670" y="418" text-anchor="middle" font-size="13" fill="#065F46">@session('mensaje') · y se borra</text>
+            <path d="M840 424 L 504 424" stroke="#059669" stroke-width="2.5" marker-end="url(#f-fl-verde)"/>
+            <text x="320" y="444" text-anchor="middle" font-size="13" class="mono" fill="#1E40AF">200 · listado con «Proyecto … creado.»</text>
+            <path d="M500 450 L 144 450" stroke="#2563EB" stroke-width="2.5" marker-end="url(#f-fl-azul)"/>
+          </g>
+
+          <!-- Animación del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#1D4ED8"><animateMotion dur="2.4s" repeatCount="indefinite" path="M140 80 L 500 80 L 500 106 L 140 106"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#DC2626"><animateMotion dur="3.6s" repeatCount="indefinite" path="M140 140 L 500 140 L 500 166 L 840 166 L 500 166 L 500 192 L 140 192"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#1D4ED8"><animateMotion dur="3.6s" repeatCount="indefinite" path="M140 226 L 500 226 L 840 226 L 840 252 L 500 252 L 500 278 L 140 278"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="4"><circle r="7" fill="#059669"><animateMotion dur="3.6s" repeatCount="indefinite" path="M140 312 L 500 312 L 500 338 L 840 338 L 500 338 L 500 364 L 140 364"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="5"><circle r="7" fill="#1D4ED8"><animateMotion dur="3.6s" repeatCount="indefinite" path="M140 398 L 500 398 L 840 398 L 840 424 L 500 424 L 500 450 L 140 450"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1"><code>GET</code>: el formulario, con su <em>token</em> <code>@csrf</code></li>
+          <li class="fragment" data-fragment-index="2"><code>POST</code> no válido: errores y lo escrito, a la sesión; vuelta atrás con un <strong>302</strong></li>
+          <li class="fragment" data-fragment-index="3">El formulario vuelve <strong>relleno</strong>: <code>old()</code> y <code>@error</code>, una sola vez</li>
+          <li class="fragment" data-fragment-index="4"><code>POST</code> válido: mensaje <em>flash</em> con <code>with()</code> y <strong>302</strong> al listado</li>
+          <li class="fragment" data-fragment-index="5"><code>GET</code>: el listado muestra el mensaje con <code>@session</code>, y se borra</li>
+        </ol>
+        <aside class="notes">
+          Es el POST/Redirect/GET de 4.1, ahora sin escribir nada de sesión a mano. Tras el paso 5, F5 solo repite el GET: no se envía otra vez el formulario.
+          Pasos 2 y 3: lo que en 3.8 hacíamos con ValidadorCurriculo y cada value. La sesión guarda los errores solo hasta la petición siguiente.
+        </aside>
+      </section>
+
+      <!-- 13 · old() y $errors -->
+      <section>
+        <h2><code>old()</code> y <code>$errors</code></h2>
+        <pre class="ancho"><code class="language-html" data-trim data-line-numbers="3|4|5-7">
+&lt;label for="nombre" class="block font-semibold"&gt;Nombre&lt;/label&gt;
+&lt;input type="text" name="nombre" id="nombre" value="{{ old('nombre') }}"
+       @class(['mt-1 w-full rounded border p-2', 'border-red-500' =&gt; $errors-&gt;has('nombre')])&gt;
+@error('nombre')
+    &lt;p class="mt-1 text-sm text-red-700"&gt;{{ $message }}&lt;/p&gt;
+@enderror
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment"><code>old('nombre', $proyecto['nombre'])</code>: en la edición, el valor del proyecto si no hay nada anterior.</li>
+          <li class="fragment"><code>$errors</code> llega a <strong>todas</strong> las vistas. Un resumen: <code>$errors-&gt;any()</code>, <code>$errors-&gt;all()</code>.</li>
+        </ul>
+      </section>
+
+      <!-- 14 · Mensajes en español -->
+      <section>
+        <h2>Los mensajes, en español</h2>
+        <p class="small-text">Aun con <code>APP_LOCALE=es</code>: "<em>The nombre field is required.</em>"</p>
+        <ul class="small-text">
+          <li class="fragment">Las traducciones de la comunidad: en el <strong>Bloque 8</strong> (internacionalización).</li>
+          <li class="fragment">Nuestros propios mensajes: <strong>ahora</strong>, en un <em>Form Request</em>.</li>
+        </ul>
+      </section>
+
+      <!-- 15 · Form Request -->
+      <section>
+        <h2><em>Form Requests</em></h2>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan make:request ProyectoRequest
+        </code></pre>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3-4|6-9|11-14|16">
+class ProyectoRequest extends FormRequest
+{
+    /** ¿Puede hacer esta petición? La autorización, en el Bloque 7. */
+    public function authorize(): bool { return true; }
+
+    public function rules(): array
+    {
+        return ['nombre' =&gt; ['required', 'string', 'max:100'], /* ... */];
+    }
+
+    public function messages(): array
+    {
+        return ['nombre.required' =&gt; 'El nombre del proyecto es obligatorio.'];
+    }
+
+    public function attributes(): array { return ['fecha_fin' =&gt; 'fecha de fin']; }
+}
+        </code></pre>
+        <p class="small-text muted fragment">En <code>app/Http/Requests/</code>. Lo mismo que <code>ValidadorCurriculo</code> en 3.8.</p>
+      </section>
+
+      <!-- 16 · Usar el Form Request -->
+      <section>
+        <h2>El <em>Form Request</em>, en la acción</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3|5">
+use App\Http\Requests\ProyectoRequest;
+
+public function store(ProyectoRequest $request)
+{
+    $datos = $request-&gt;validated();
+    // ...
+}
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment">Valida <strong>antes</strong> de que empiece <code>store()</code>: si falla, la acción no se ejecuta.</li>
+          <li class="fragment"><code>validated()</code>: solo los campos validados.</li>
+        </ul>
+      </section>
+
+      <!-- 17 · Redirecciones -->
+      <section>
+        <h2>Redirecciones</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>redirect()-&gt;route('proyectos.show', $id)</code></th><td>Una ruta con nombre</td></tr>
+            <tr class="fragment"><th><code>to_route('proyectos.index')</code></th><td>Lo mismo, más breve</td></tr>
+            <tr class="fragment"><th><code>redirect('/proyectos')</code></th><td>Una dirección a mano</td></tr>
+            <tr class="fragment"><th><code>back()</code></th><td>La página anterior</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text fragment" style="margin-top:0.8em"><strong>302</strong> + <code>Location</code>, como <code>header('Location: …')</code> en 4.1. POST/Redirect/GET: F5 no reenvía el formulario.</p>
+      </section>
+
+      <!-- 18 · Mensajes flash -->
+      <section>
+        <h2>Mensajes <em>flash</em></h2>
+        <p class="small-text">En la sesión, durante <strong>una sola petición</strong>: la siguiente.</p>
+        <pre class="compacto"><code class="language-php" data-trim>
+return redirect()-&gt;route('proyectos.index')
+    -&gt;with('mensaje', "Proyecto «{$datos['nombre']}» creado.");
+        </code></pre>
+        <p class="label fragment">En el <em>layout</em>, encima de <code>{{ $slot }}</code>:</p>
+        <pre class="compacto fragment"><code class="language-html" data-trim>
+@session('mensaje')
+    &lt;div class="mb-6 rounded border border-green-300 bg-green-50 p-4 text-green-800"&gt;
+        {{ $value }}
+    &lt;/div&gt;
+@endsession
+        </code></pre>
+        <p class="small-text muted fragment">En 4.1, leer de <code>$_SESSION</code> y <code>unset()</code>. Aquí se borra solo.</p>
+      </section>
+
+      <!-- 19 · ¿Dónde se guarda? -->
+      <section>
+        <h2>¿Dónde se guarda el proyecto?</h2>
+        <p class="small-text">En ningún sitio, todavía: los proyectos son un array del controlador y cada petición empieza de cero (2.4).</p>
+        <ul class="small-text">
+          <li class="fragment"><code>store</code> y <code>update</code> <strong>validan y redirigen con un mensaje</strong>.</li>
+          <li class="fragment">En el <strong>Bloque 6</strong>, a la base de datos.</li>
+          <li class="fragment">¿Ficheros? <code>enctype="multipart/form-data"</code> y <code>$request-&gt;file('foto')</code>. Todo, en el Bloque 7.</li>
+        </ul>
+      </section>
+
+      <!-- 20 · Entorno -->
+      <section>
+        <h2>El entorno</h2>
+        <p class="small-text">El controlador de 5.5 y los estilos compilándose. Rama nueva, en la VM:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+git switch main
+git pull upstream main
+git switch -c RA5_6
+        </code></pre>
+      </section>
+
+      <!-- 21 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/3)</h2>
+        <ol class="pasos compacta">
+          <li><strong>Las rutas.</strong> <code>proyectos.store</code> (<code>POST /proyectos</code>) y <code>proyectos.update</code> (<code>PUT /proyectos/edit/{id}</code>), con sus acciones.</li>
+          <li><strong>El mensaje <em>flash</em>.</strong> El bloque <code>@session('mensaje')</code>, en el <em>layout</em>.</li>
+          <li><strong>El <em>Form Request</em>.</strong> <code>ProyectoRequest</code>, con las reglas de la tabla "Las reglas" y mensajes en español para cada <code>required</code>. El de <code>nombre</code>, exactamente: <code>El nombre del proyecto es obligatorio.</code></li>
+        </ol>
+      </section>
+
+      <!-- 22 · Ejercicio 4 -->
+      <section>
+        <h2>Ejercicios (2/3): el alta</h2>
+        <table>
+          <thead><tr><th>Etiqueta</th><th><code>name</code></th><th>Tipo</th></tr></thead>
+          <tbody>
+            <tr><td>Docente</td><td><code>docente_id</code></td><td><code>number</code></td></tr>
+            <tr><td>Nombre</td><td><code>nombre</code></td><td><code>text</code></td></tr>
+            <tr><td>Dominio</td><td><code>dominio</code></td><td><code>text</code> (*)</td></tr>
+            <tr><td>Fecha de inicio<br>Fecha de fin</td><td><code>fecha_inicio</code><br><code>fecha_fin</code></td><td><code>date</code></td></tr>
+            <tr><td>Calificación</td><td><code>calificacion</code></td><td><code>number</code>, <code>step="0.1"</code></td></tr>
+          </tbody>
+        </table>
+        <p class="small-text" style="margin:0.4em 0 0">(*) Tras <code>github.com/2DAW-CarlosIII/</code>. Con <code>old()</code> y <code>@error</code>; botón "Añadir proyecto"; al listado con <code>Proyecto «nombre» creado.</code></p>
+      </section>
+
+      <!-- 23 · Ejercicios 5-6 -->
+      <section>
+        <h2>Ejercicios (3/3)</h2>
+        <ol class="pasos compacta" start="5">
+          <li><strong>La edición.</strong> El mismo formulario con <code>@method('PUT')</code>, los valores del proyecto y "Modificar proyecto". <code>update</code>: 404 si no existe; si no, al detalle con <code>Proyecto «nombre» actualizado.</code> ¿Un componente para los dos?</li>
+          <li><strong>Investiga.</strong> Sin <code>@csrf</code>; un alta no válida (¿dónde están los errores?); un campo <code>admin</code> añadido con F12, con <code>all()</code> frente a <code>validated()</code>.</li>
+        </ol>
+        <p class="small-text muted fragment">Opcional: los formularios de reconocimientos o actividades de 5.5.</p>
+      </section>
+
+      <!-- 24 · Puente -->
+      <section>
+        <h2>Puente</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>En <em>v0</em></h3>
+            <p class="small-text"><code>$_POST</code> campo a campo, una clase validadora, cada <code>value</code> a mano y el mensaje guardado y borrado de la sesión.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En <em>Laravel</em></h3>
+            <p class="small-text">El <em>Form Request</em> valida antes de la acción, <code>old()</code> y <code>$errors</code> rellenan el formulario, y <code>with()</code> deja un mensaje que se borra solo.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+      </section>
+
+      <!-- 25 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA5_6_FormulariosTest.php</code> a <code>tests/Feature/</code></li>
+          <li>En el terminal de <code>workspace</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan test --filter=RA5_6_FormulariosTest
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1 a 5</strong>.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">Tests: 7 passed (33 assertions)</code></p>
+      </section>
+
+      <!-- 26 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>5.7. <em>Middleware</em> y control de usuarios con <em>Breeze</em></h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>

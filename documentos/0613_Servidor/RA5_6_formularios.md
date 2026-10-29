@@ -1,6 +1,8 @@
 # 5.6. Formularios, datos de entrada, validación y redirecciones
 <!-- {% raw %} -->
 
+**Presentación de apoyo** (_RevealJS_): [RA5_6_formularios_slides.html](./materiales/slides/RA5_6_formularios_slides.html)
+
 ## Lo que ya sabemos hacer a mano
 
 En _v0_ resolvimos un formulario completo, el alta de un currículo, en tres pasos:
@@ -127,7 +129,9 @@ La [documentación de _Laravel_](https://laravel.com/docs/validation#available-v
 
 Todo eso es lo que en 3.8 hacíamos a mano. Si los datos son válidos, `validate()` devuelve un array **solo con los campos validados**: cualquier otro campo que alguien añada al formulario con las herramientas de desarrollo (como el truco de 4.4) se queda fuera.
 
-<!-- DIAGRAMA: el viaje de un formulario: GET create → formulario; POST store → validate(); si falla, redirect back con errores y old input → formulario relleno con mensajes; si pasa, redirect a index con mensaje flash → @session -->
+![El navegador pide el formulario de alta. Lo envía con el nombre vacío: el Form Request falla, guarda en la sesión los errores y lo escrito, y redirige de vuelta al formulario, que llega relleno y con los mensajes. Lo envía con datos válidos: el controlador deja un mensaje flash en la sesión y redirige al listado, que muestra el mensaje una vez](./images/RA5_6_viajeFormulario.svg)
+
+El diagrama sigue el viaje completo de un formulario de alta. Los pasos 2 y 3 son el envío no válido: los errores y lo escrito pasan por la sesión y vuelven al formulario. Los pasos 4 y 5 son el envío válido: el mensaje _flash_ pasa por la sesión y aparece una sola vez en el listado. Las dos redirecciones son el patrón POST/Redirect/GET, del que hablamos más abajo.
 
 ### Mostrar los errores y recuperar lo escrito
 
