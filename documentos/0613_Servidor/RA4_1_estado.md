@@ -125,6 +125,10 @@ $mensaje = $_SESSION['mensaje'] ?? null;
 unset($_SESSION['mensaje']);
 ```
 
+![El navegador envía el alta por POST; el script la valida, guarda el currículo y un mensaje en la sesión y responde 303 con la cabecera Location, sin HTML. El navegador pide el listado con GET; el script lee el mensaje de la sesión, lo borra y lo muestra. Si el usuario pulsa F5, solo se repite el GET: el formulario no se reenvía y el mensaje ya no aparece](./images/RA4_1_prg.svg)
+
+El diagrama sigue el patrón completo. La respuesta al `POST` (paso 2) no lleva HTML, solo la redirección, así que la página que el usuario tiene delante es la del `GET` (paso 3). Por eso F5 (paso 4) repite ese `GET`, que no cambia nada, y el mensaje ya no sale porque se borró al mostrarlo.
+
 ## El alta de _v0_, ahora con memoria
 
 Con todo esto, el alta de 3.8 se convierte en dos páginas que comparten la sesión:

@@ -469,7 +469,94 @@ unset($_SESSION['mensaje']);
         <p class="small-text muted fragment">Se muestra una sola vez: al pulsar F5 en el listado, ni reaparece el mensaje ni se reenvía el formulario.</p>
       </section>
 
-      <!-- 16 · El alta de v0, con memoria -->
+      <!-- 16 · POST/Redirect/GET, paso a paso (SVG animado) -->
+      <section>
+        <style>
+          .reveal svg.anim { display: block; margin: 0 auto; width: 100%; height: auto; }
+          .reveal svg.anim text { font-family: var(--r-main-font); }
+          .reveal svg.anim .mono { font-family: var(--r-code-font); }
+          .reveal ol.leyenda { columns: 2; column-gap: 40px; font-size: 0.5em; max-width: 920px; margin: 8px auto 0; padding-left: 1.4em; text-align: left; }
+          .reveal ol.leyenda li { margin: 2px 0; break-inside: avoid; }
+          @media (prefers-reduced-motion: reduce) { .reveal svg .punto { display: none; } }
+        </style>
+        <h2>PRG, paso a paso</h2>
+        <svg class="anim" viewBox="0 0 960 340" role="img" aria-label="El navegador envía el alta por POST; el script la valida, guarda el currículo y un mensaje en la sesión y responde 303 con la cabecera Location, sin HTML. El navegador pide el listado con GET; el script lee el mensaje de la sesión, lo borra y lo muestra. Si el usuario pulsa F5, solo se repite el GET: el formulario no se reenvía y el mensaje ya no aparece">
+          <defs>
+            <marker id="p41-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+            <marker id="p41-fl-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#2563EB"/></marker>
+            <marker id="p41-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+            <marker id="p41-fl-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="340" rx="14" fill="#F8FAFC"/>
+
+          <!-- Participantes y líneas de vida -->
+          <rect x="45" y="12" width="190" height="44" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+          <text x="140" y="40" text-anchor="middle" font-size="17" font-weight="700" fill="#1E3A8A">Navegador</text>
+          <rect x="330" y="12" width="340" height="44" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+          <text x="500" y="31" text-anchor="middle" font-size="17" font-weight="700" fill="#5B21B6">Servidor</text>
+          <text x="500" y="49" text-anchor="middle" font-size="12" class="mono" fill="#5B21B6">RA4_altaCurriculo.php · RA4_curriculos.php</text>
+          <rect x="745" y="12" width="190" height="44" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+          <text x="840" y="40" text-anchor="middle" font-size="17" font-weight="700" fill="#065F46" class="mono">$_SESSION</text>
+          <path d="M140 56 L 140 332" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+          <path d="M500 56 L 500 332" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+          <path d="M840 56 L 840 332" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+
+          <!-- 1 · POST: el alta, válida, a la sesión -->
+          <g class="fragment" data-fragment-index="1">
+            <circle cx="24" cy="82" r="12" fill="#7C3AED"/><text x="24" y="87" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+            <text x="320" y="76" text-anchor="middle" font-size="13" class="mono" fill="#374151">POST RA4_altaCurriculo.php</text>
+            <path d="M140 82 L 496 82" stroke="#4B5563" stroke-width="2.5" marker-end="url(#p41-fl-gris)"/>
+            <text x="512" y="87" font-size="13" font-weight="700" fill="#047857">válido ✓</text>
+            <text x="670" y="102" text-anchor="middle" font-size="12" class="mono" fill="#065F46">curriculos[] + mensaje</text>
+            <path d="M500 108 L 836 108" stroke="#059669" stroke-width="2.5" marker-end="url(#p41-fl-verde)"/>
+          </g>
+          <!-- 2 · 303 sin HTML -->
+          <g class="fragment" data-fragment-index="2">
+            <circle cx="24" cy="134" r="12" fill="#D97706"/><text x="24" y="139" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+            <text x="320" y="128" text-anchor="middle" font-size="13" class="mono" fill="#B45309">303 · Location: RA4_curriculos.php</text>
+            <path d="M500 134 L 144 134" stroke="#D97706" stroke-width="2.5" marker-end="url(#p41-fl-ambar)"/>
+            <text x="512" y="139" font-size="12" class="mono" fill="#92400E">exit: sin HTML</text>
+          </g>
+          <!-- 3 · GET: el listado lee el mensaje y lo borra -->
+          <g class="fragment" data-fragment-index="3">
+            <circle cx="24" cy="172" r="12" fill="#2563EB"/><text x="24" y="177" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+            <text x="320" y="166" text-anchor="middle" font-size="13" class="mono" fill="#374151">GET RA4_curriculos.php</text>
+            <path d="M140 172 L 496 172" stroke="#4B5563" stroke-width="2.5" marker-end="url(#p41-fl-gris)"/>
+            <text x="670" y="192" text-anchor="middle" font-size="12" class="mono" fill="#065F46">mensaje · y unset()</text>
+            <path d="M840 198 L 504 198" stroke="#059669" stroke-width="2.5" marker-end="url(#p41-fl-verde)"/>
+            <text x="320" y="218" text-anchor="middle" font-size="13" class="mono" fill="#1E40AF">200 · listado con el mensaje</text>
+            <path d="M500 224 L 144 224" stroke="#2563EB" stroke-width="2.5" marker-end="url(#p41-fl-azul)"/>
+          </g>
+          <!-- 4 · F5: solo se repite el GET -->
+          <g class="fragment" data-fragment-index="4">
+            <circle cx="24" cy="262" r="12" fill="#64748B"/><text x="24" y="267" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+            <text x="320" y="256" text-anchor="middle" font-size="13" class="mono" fill="#374151">F5 · GET RA4_curriculos.php</text>
+            <path d="M140 262 L 496 262" stroke="#4B5563" stroke-width="2.5" marker-end="url(#p41-fl-gris)"/>
+            <text x="670" y="282" text-anchor="middle" font-size="12" fill="#065F46">ya no hay mensaje</text>
+            <path d="M840 288 L 504 288" stroke="#059669" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#p41-fl-verde)"/>
+            <text x="320" y="308" text-anchor="middle" font-size="13" class="mono" fill="#1E40AF">200 · listado, sin mensaje</text>
+            <path d="M500 314 L 144 314" stroke="#2563EB" stroke-width="2.5" marker-end="url(#p41-fl-azul)"/>
+          </g>
+
+          <!-- Animación del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#7C3AED"><animateMotion dur="2.4s" repeatCount="indefinite" path="M140 82 L 500 82 L 500 108 L 840 108"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#D97706"><animateMotion dur="1.6s" repeatCount="indefinite" path="M500 134 L 140 134"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#1D4ED8"><animateMotion dur="3.6s" repeatCount="indefinite" path="M140 172 L 500 172 L 840 172 L 840 198 L 500 198 L 500 224 L 140 224"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="4"><circle r="7" fill="#64748B"><animateMotion dur="3.6s" repeatCount="indefinite" path="M140 262 L 500 262 L 840 262 L 840 288 L 500 288 L 500 314 L 140 314"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1"><code>POST</code> válido: el currículo y el mensaje, a la sesión</li>
+          <li class="fragment" data-fragment-index="2"><strong>303</strong> con <code>Location</code>, y <code>exit</code>: ni una línea de HTML</li>
+          <li class="fragment" data-fragment-index="3"><code>GET</code> el listado: lee el mensaje, lo <strong>borra</strong> y lo muestra</li>
+          <li class="fragment" data-fragment-index="4">F5 repite <strong>solo el <code>GET</code></strong>: ni alta duplicada ni mensaje repetido</li>
+        </ol>
+        <aside class="notes">
+          Sin PRG (3.6), la respuesta al POST era la propia página: F5 volvía a enviar el formulario y el navegador avisaba de que reenviaría los datos.
+          En Laravel (5.6) será igual, pero con redirect()->with() y @session, sin tocar $_SESSION.
+        </aside>
+      </section>
+
+      <!-- 17 · El alta de v0, con memoria -->
       <section>
         <h2>El alta de <em>v0</em>, ahora con memoria</h2>
         <div class="cols">
@@ -485,7 +572,7 @@ unset($_SESSION['mensaje']);
         <p class="small-text muted fragment" style="margin-top:1em">Catálogo común en <code>src/RA4_comun.php</code>. El id de cada currículo: su posición en la lista + 1.</p>
       </section>
 
-      <!-- 17 · Entorno -->
+      <!-- 18 · Entorno -->
       <section>
         <h2>Seguimos en <code>vanilla_php</code></h2>
         <p class="small-text">Mismo proyecto, con las clases de 3.5 y 3.8. Al terminar:</p>
@@ -501,7 +588,7 @@ vanilla_php/
         </code></pre>
       </section>
 
-      <!-- 18 · Ejercicios 1-3 -->
+      <!-- 19 · Ejercicios 1-3 -->
       <section>
         <h2>Ejercicios (1/2)</h2>
         <ol class="pasos compacta">
@@ -511,7 +598,7 @@ vanilla_php/
         </ol>
       </section>
 
-      <!-- 19 · Ejercicios 4-5 -->
+      <!-- 20 · Ejercicios 4-5 -->
       <section>
         <h2>Ejercicios (2/2)</h2>
         <ol class="pasos compacta" start="4">
@@ -520,7 +607,7 @@ vanilla_php/
         </ol>
       </section>
 
-      <!-- 20 · Puente al Bloque 5 -->
+      <!-- 21 · Puente al Bloque 5 -->
       <section>
         <h2>Puente al Bloque 5</h2>
         <table class="sin-salto">
@@ -535,7 +622,7 @@ vanilla_php/
         <p class="small-text muted fragment" style="margin-top:1em">Esto que hicimos a mano, el framework lo automatiza así.</p>
       </section>
 
-      <!-- 21 · Autocorrección -->
+      <!-- 22 · Autocorrección -->
       <section>
         <h2>Comprueba tu solución (opcional)</h2>
         <ol class="pasos">
@@ -550,7 +637,7 @@ docker compose exec --workdir /var/www/vanilla_php workspace \
         <p class="small-text">Si todo está bien: <code class="nw">OK (7 tests, 18 assertions)</code></p>
       </section>
 
-      <!-- 22 · Siguiente -->
+      <!-- 23 · Siguiente -->
       <section>
         <p class="small-text muted">Siguiente</p>
         <h2>4.2. Autenticación de usuarios: <em>login</em> básico</h2>
