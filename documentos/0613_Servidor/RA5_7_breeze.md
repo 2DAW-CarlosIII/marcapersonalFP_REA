@@ -1,6 +1,8 @@
 # 5.7. _Middleware_ y control de usuarios con _Breeze_
 <!-- {% raw %} -->
 
+**Presentación de apoyo** (_RevealJS_): [RA5_7_breeze_slides.html](./materiales/slides/RA5_7_breeze_slides.html)
+
 ## De `exigirLogin()` al _middleware_
 
 En 4.2, cada página privada de _v0_ empezaba igual:
@@ -38,7 +40,9 @@ Con una petición, un _middleware_ puede hacer tres cosas:
 | Desviarla a otra página | `return redirect()->route('login');` |
 | Cortarla con un error | `abort(403);` |
 
-<!-- DIAGRAMA: la petición atraviesa las capas de middleware (sesión, CSRF, auth) hasta el controlador y la respuesta vuelve por ellas; con auth sin sesión, la capa auth devuelve una redirección a /login sin llegar al controlador -->
+![Con sesión, GET /proyectos/edit/3 atraviesa StartSession, PreventRequestForgery y auth, llega al controlador y la respuesta vuelve por las mismas capas; StartSession guarda la sesión. Sin sesión, la capa auth no encuentra usuario y responde con una redirección a /login: la petición no llega al controlador](./images/RA5_7_capasMiddleware.svg)
+
+En el diagrama, la misma petición llega dos veces. Con sesión (pasos 1 y 2), atraviesa las capas hasta el controlador y la respuesta vuelve por ellas. Sin sesión (pasos 3 y 4), la capa `auth` decide **desviarla**: responde ella misma con una redirección y el controlador no llega a ejecutarse.
 
 ### _Middleware_ antes o después de la petición
 
@@ -279,6 +283,10 @@ Route::controller(ProyectosController::class)->prefix('proyectos')->name('proyec
 ```
 
 Si alguien sin sesión pide una de esas rutas, `auth` lo redirige a `/login`. Es lo que hacía `exigirLogin()`, pero declarado en un único sitio.
+
+![Sin sesión, GET /proyectos/edit/3: el middleware auth guarda en la sesión la dirección pedida y redirige a /login. El navegador pide el formulario de login. Lo envía: Auth::attempt comprueba el hash de la contraseña y la sesión se regenera con un identificador nuevo. El método intended lee la dirección guardada y redirige a /proyectos/edit/3, que ahora auth deja pasar](./images/RA5_7_loginBreeze.svg)
+
+Es el _login_ de 4.2, paso a paso, con las piezas de _Breeze_: `Auth::attempt()` hace el `password_verify()` y `regenerate()`, el `session_regenerate_id()`. Lo nuevo es `url.intended`: `auth` guarda en la sesión la página que pedías, y `redirect()->intended()` te devuelve a ella después de entrar.
 
 ## El usuario en las vistas
 

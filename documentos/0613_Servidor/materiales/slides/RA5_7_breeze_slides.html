@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>5.7. Middleware y Breeze · marcapersonalFP</title>
+
+  <!--
+    reveal.js 6.0.2 cargado desde CDN con la versión fijada.
+
+    IMPORTANTE (cambio de la v5 a la v6): ya no existe la carpeta plugin/ en la raíz
+    del paquete. Todo cuelga de dist/:
+        dist/reveal.js · dist/reveal.css · dist/reset.css · dist/theme/*.css
+        dist/plugin/notes.js · dist/plugin/highlight.js · dist/plugin/highlight/monokai.css
+
+    Para trabajar SIN Internet: descarga el paquete (npm pack reveal.js@6.0.2),
+    copia su carpeta dist/ junto a este fichero y sustituye
+    "https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/" por "./reveal.js/".
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/black.css">
+  <!-- Tema del código resaltado -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+  <style>
+    /* ═══════════ Estilo base: el de tus presentaciones anteriores ═══════════ */
+    .reveal section img { background:none; border:none; box-shadow:none; }
+    .reveal h1, .reveal h2, .reveal h3 { color: #13DAEC; }
+    .reveal ul { list-style-type: none; }
+    .reveal ul li { margin: 10px 0; }
+    .small-text { font-size: 0.7em; }
+
+    /* Tooltips: mismo mecanismo que en las otras presentaciones.
+       Las clases .file-type / .access-type / .db-type eran idénticas y aquí se unifican en .has-tip */
+    .has-tip {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .has-tip:hover { color: #13DAEC; }
+
+    .tooltip {
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      width: 400px;
+      background-color: rgba(0,0,0,0.9);
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.6em;
+      font-weight: normal;
+      left: 90%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid rgba(19,218,236,0.45);   /* añadido: sobre fondo oscuro, sin borde casi no se distingue */
+    }
+    .has-tip:hover .tooltip { visibility: visible; }
+    .tooltip::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent rgba(0,0,0,0.9) transparent transparent;
+    }
+
+    /* Logo del centro */
+    .bg-logo {
+      position: fixed;
+      top: 10px;
+      right: 100px;
+      width: 100px;
+      height: 100px;
+      z-index: 1000;
+    }
+    /* El <text> del SVG no define fill (negro por defecto) y sobre fondo oscuro no se veía */
+    .bg-logo svg text { fill: #fff; }
+
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    .muted { color: #9aa7ad; }
+
+    /* Portada */
+    .reveal h1.titulo { font-size: 1.9em; margin: 0.35em 0 0.3em; }
+
+    /* Columnas y paneles con filo de color (el color indica quién es quién) */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; text-align: left; align-items: start; }
+    .cols > * { min-width: 0; }
+    .panel { border-left: 4px solid #13DAEC; padding: 2px 0 2px 22px; }
+    .panel h3 { font-size: 0.95em; margin: 0 0 10px; }
+    .panel p { margin: 8px 0; }
+    .panel ul { margin: 0; display: block; }
+    .panel.nginx { border-color: #10B981; }   /* mismos colores que en los diagramas */
+    .panel.fpm   { border-color: #8B5CF6; }
+    .panel.client{ border-color: #3B82F6; }
+
+    /* Diagramas SVG del repositorio (llevan su propio fondo claro) */
+    .reveal img.flow { display: block; width: 880px; max-width: 100%; height: auto; margin: 6px auto 14px; }
+
+    /* Idea clave */
+    .statement { font-size: 1.3em; line-height: 1.3; text-align: left; border-left: 6px solid #13DAEC; padding: 6px 0 6px 30px; margin: 0 30px; }
+
+    /* Código */
+    .reveal :not(pre) > code { background: rgba(255,255,255,0.09); border-radius: 4px; padding: 0 0.2em; }
+    .reveal code.nw { white-space: nowrap; }          /* símbolos cortos (?>) que no deben partirse entre líneas */
+    .reveal pre { width: 100%; }
+    .reveal pre.mediano  { font-size: 0.62em; }
+    .reveal pre.compacto { font-size: 0.5em; }        /* líneas de ~70 caracteres */
+    .reveal pre.ancho    { font-size: 0.45em; }       /* línea de 75 caracteres + numeración */
+    .label { font-size: 0.6em; margin: 14px 0 6px; text-align: left; }
+
+    /* Teclas */
+    .reveal kbd {
+      font-family: var(--r-code-font); font-size: 0.8em;
+      background: #2b2b2b; border: 1px solid #555; border-bottom-width: 3px;
+      border-radius: 6px; padding: 0 0.4em;
+    }
+
+    /* Listas: ancho acotado para que el texto no llegue hasta el logo */
+    .reveal ul, .reveal ol.pasos { max-width: 860px; }
+    .reveal ol.pasos { margin: 0; display: block; text-align: left; padding-left: 1.3em; }
+    .reveal ol.pasos li { margin: 14px 0; }
+    .reveal ol.pasos.compacta { font-size: 0.88em; }
+    .cols.una { grid-template-columns: 1fr; gap: 14px; }
+
+    /* ── Reutilizado de 2.2: tabla y ventana de navegador ── */
+    .reveal pre { width: 92%; }                       /* un poco más estrecho: en ventanas 16:9 pequeñas el logo se mete en el margen */
+    .cols pre { width: 100%; }                        /* dentro de una columna, a todo el ancho de la columna */
+    .reveal pre.medio { font-size: 0.56em; }          /* código de ~55-60 caracteres por línea */
+
+    /* El párrafo que sigue al título no llega hasta la zona del logo */
+    .reveal section > h2 + p { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+    /* Tabla comparativa echo / print */
+    .reveal table { margin: 0 auto; font-size: 0.72em; border-collapse: separate; border-spacing: 0; }   /* separate: las rayas de cada fila aparecen con su fragmento */
+    .reveal table th, .reveal table td { padding: 0.5em 0.9em; border-bottom: 1px solid rgba(255,255,255,0.22); vertical-align: top; }
+    .reveal table thead th { color: #13DAEC; font-size: 1.1em; border-bottom: 2px solid #13DAEC; }
+    .reveal table tbody th { color: #9aa7ad; white-space: nowrap; }
+
+    /* Ventana de navegador: mismo lenguaje visual que los diagramas del REA (panel claro con tres puntos) */
+    .browser { background: #F8FAFC; color: #1f2937; border-radius: 14px; padding: 14px 26px 20px; margin: 10px auto 18px; max-width: 860px; text-align: left; }
+    .browser .bar { display: flex; gap: 7px; margin-bottom: 10px; }
+    .browser .bar i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .browser .bar i:nth-child(1) { background: #EF4444; }
+    .browser .bar i:nth-child(2) { background: #F59E0B; }
+    .browser .bar i:nth-child(3) { background: #10B981; }
+    .browser p { margin: 0; color: #1f2937; font-size: 0.85em; }
+
+    /* ── Solo en 2.5: lista y título dentro de la ventana de navegador ── */
+    .browser h1 { font-size: 1em; margin: 0 0 0.4em; color: #1f2937; text-transform: none; }
+    .browser ul { list-style: disc; margin: 0 0 0 1.2em; display: block; }
+    .browser li { margin: 4px 0; font-size: 0.85em; }
+    .browser a { color: #2563EB; }
+
+    /* ═══════════ Añadidos para esta presentación ═══════════ */
+    /* Tablas comparativas cortas: celdas en una sola línea */
+    .reveal table.sin-salto td { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+    <div class="bg-logo">
+      <svg
+         version="1.1"
+         id="svg18"
+         width="200"
+         height="200"
+         viewBox="0 0 200 200"
+         sodipodi:docname="c3_logo"
+         inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         xmlns="http://www.w3.org/2000/svg"
+         xmlns:svg="http://www.w3.org/2000/svg">
+        <defs
+           id="defs22" />
+        <sodipodi:namedview
+           id="namedview20"
+           pagecolor="#ffffff"
+           bordercolor="#666666"
+           borderopacity="1.0"
+           inkscape:showpageshadow="2"
+           inkscape:pageopacity="0.0"
+           inkscape:pagecheckerboard="0"
+           inkscape:deskcolor="#d1d1d1"
+           showgrid="false"
+           showguides="true"
+           inkscape:zoom="4.065"
+           inkscape:cx="114.88315"
+           inkscape:cy="100"
+           inkscape:window-width="1850"
+           inkscape:window-height="1016"
+           inkscape:window-x="363"
+           inkscape:window-y="1467"
+           inkscape:window-maximized="1"
+           inkscape:current-layer="g24">
+          <sodipodi:guide
+             position="115.44994,191"
+             orientation="0,-1"
+             id="guide1222"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="23,159.16359"
+             orientation="1,0"
+             id="guide1243"
+             inkscape:locked="false" />
+          <sodipodi:guide
+             position="117.02658,36.55078"
+             orientation="0,-1"
+             id="guide1245"
+             inkscape:locked="false" />
+        </sodipodi:namedview>
+        <g
+           inkscape:groupmode="layer"
+           inkscape:label="Image"
+           id="g24">
+          <rect
+             style="opacity:1;fill:#000000;fill-opacity:0.99702;stroke:none;stroke-width:1;stroke-dasharray:none"
+             id="rect1299"
+             width="155"
+             height="155"
+             x="23"
+             y="9" />
+          <path
+             style="fill:none"
+             d="M 23.666667,163.33333 23,162.66667 V 85.833333 9 h 46.224972 46.224968 l -7.45639,7.506491 -7.45639,7.50649 15.46932,15.49351 L 131.4758,55 116,70.5 100.5242,86 116,101.5 131.4758,117 116.2379,132.26173 101,147.52346 v 0.96475 0.96476 l 7.22497,7.27351 L 115.44994,164 H 69.891639 24.333333 Z"
+             id="path345" />
+          <g
+             id="g1241"
+             style="mix-blend-mode:normal;fill:#ffffff;fill-opacity:1;stroke:none;opacity:1"
+             transform="translate(-0.14725,0.06445)">
+            <path
+               id="rect557"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 88.718423,-32.506196 -0.0014,65.687734 H 154.40616 V 10.554121 h -43.0617 l 0.001,-43.060317 z"
+               transform="rotate(45)" />
+            <path
+               id="path1118"
+               style="opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.31377"
+               d="m 117.17383,9.5917969 -16,16.0000001 30.44922,30.447265 -14.44922,14.449219 -16,16 16,15.999999 14.44922,14.44727 -30.44922,30.44922 16,16 46.44922,-46.44922 -30.44922,-30.447269 30.44922,-30.449219 z" />
+          </g>
+          <text
+             xml:space="preserve"
+             style="font-size:22.2045px;line-height:1.25;font-family:sans-serif;stroke-width:0.925188"
+             x="25.699196"
+             y="168.92"
+             id="text1355"
+             transform="scale(0.87462907,1.1433418)"><tspan
+               sodipodi:role="line"
+               id="tspan1353"
+               x="25.699196"
+               y="168.92"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6717px;font-family:'URW Gothic';-inkscape-font-specification:'URW Gothic, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.925188">CIFP CARLOS III</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+  <div class="reveal">
+    <div class="slides">
+      <!-- 1 · Portada -->
+      <section>
+        <p class="small-text muted">Desarrollo Web en Entorno Servidor · Bloque 5 · RA5</p>
+        <h1 class="titulo">5.7. <em>Middleware</em> y <em>Breeze</em></h1>
+        <p class="muted">Control de usuarios</p>
+        <p class="small-text muted">De <code>exigirLogin()</code> en cada página a una capa alrededor de todas</p>
+        <aside class="notes">
+          Cuarta fila del plan del bloque: el login de 4.2, ahora con middleware y con Breeze como caja negra.
+          Tecla S: vista del ponente. Tecla O: vista general.
+        </aside>
+      </section>
+
+      <!-- 2 · De exigirLogin() al middleware -->
+      <section>
+        <h2>De <code>exigirLogin()</code> al <em>middleware</em></h2>
+        <pre class="compacto"><code class="language-php" data-trim>
+$usuario = exigirLogin();    // al principio de cada página privada de v0 (4.2)
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment">Dependía de que <strong>cada página</strong> se acordara. Una que lo olvidara quedaba abierta, y nada avisaba.</li>
+          <li class="fragment"><em>Laravel</em> pone la comprobación <strong>alrededor</strong> de las páginas: en un <strong><em>middleware</em></strong>.</li>
+          <li class="fragment">Las rutas declaran qué las protege; <code>route:list -v</code> lo muestra de un vistazo.</li>
+        </ul>
+      </section>
+
+      <!-- 3 · Qué es un middleware -->
+      <section>
+        <h2>Qué es un <em>middleware</em></h2>
+        <p class="small-text">Las capas que la petición cruza antes del controlador, y la respuesta de vuelta (5.2).</p>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="1|4">
+public function handle(Request $request, Closure $next): Response
+{
+    // ...
+    return $next($request);
+}
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment"><code>$next</code>: "lo que viene después", el siguiente <em>middleware</em> y, al final, el controlador.</li>
+          <li class="fragment">Ya los usábamos: la sesión, el <em>token</em> CSRF (5.6), <code>$errors</code> en las vistas.</li>
+        </ul>
+      </section>
+
+      <!-- 4 · Tres decisiones -->
+      <section>
+        <h2>Tres decisiones</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th>Dejarla pasar</th><td><code>return $next($request);</code></td></tr>
+            <tr class="fragment"><th>Desviarla a otra página</th><td><code>return redirect()-&gt;route('login');</code></td></tr>
+            <tr class="fragment"><th>Cortarla con un error</th><td><code>abort(403);</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 5 · Las capas de middleware (SVG animado) -->
+      <section>
+        <style>
+          .reveal svg.anim { display: block; margin: 0 auto; width: 100%; height: auto; }
+          .reveal svg.anim text { font-family: var(--r-main-font); }
+          .reveal svg.anim .mono { font-family: var(--r-code-font); }
+          .reveal ol.leyenda { columns: 2; column-gap: 40px; font-size: 0.5em; max-width: 920px; margin: 8px auto 0; padding-left: 1.4em; text-align: left; }
+          .reveal ol.leyenda li { margin: 2px 0; break-inside: avoid; }
+          @media (prefers-reduced-motion: reduce) { .reveal svg .punto { display: none; } }
+        </style>
+        <h2>Las capas de <em>middleware</em></h2>
+        <svg class="anim" viewBox="0 0 960 400" role="img" aria-label="Con sesión, GET /proyectos/edit/3 atraviesa StartSession, PreventRequestForgery y auth, llega al controlador y la respuesta vuelve por las mismas capas; StartSession guarda la sesión. Sin sesión, la capa auth no encuentra usuario y responde con una redirección a /login: la petición no llega al controlador">
+          <defs>
+            <marker id="m7-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+            <marker id="m7-fl-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#2563EB"/></marker>
+            <marker id="m7-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="400" rx="14" fill="#F8FAFC"/>
+
+          <!-- Navegador -->
+          <rect x="15" y="45" width="160" height="340" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+          <text x="95" y="72" text-anchor="middle" font-size="17" font-weight="700" fill="#1E3A8A">Navegador</text>
+
+          <!-- Las capas -->
+          <text x="312" y="27" text-anchor="middle" font-size="12" font-weight="700" fill="#B45309">grupo web</text>
+          <path d="M205 37 L 205 32 L 420 32 L 420 37" fill="none" stroke="#D97706" stroke-width="1.5"/>
+          <text x="500" y="27" text-anchor="middle" font-size="11" class="mono" fill="#9F1239">-&gt;middleware('auth')</text>
+          <rect x="205" y="45" width="100" height="340" rx="10" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+          <text x="255" y="68" text-anchor="middle" font-size="11" class="mono" font-weight="700" fill="#B45309">StartSession</text>
+          <rect x="320" y="45" width="100" height="340" rx="10" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+          <text x="370" y="64" text-anchor="middle" font-size="11" class="mono" font-weight="700" fill="#B45309">PreventRequest</text>
+          <text x="370" y="78" text-anchor="middle" font-size="11" class="mono" font-weight="700" fill="#B45309">Forgery</text>
+          <rect x="450" y="45" width="100" height="340" rx="10" fill="#FFF1F2" stroke="#E11D48" stroke-width="2"/>
+          <text x="500" y="68" text-anchor="middle" font-size="13" class="mono" font-weight="700" fill="#9F1239">auth</text>
+
+          <!-- Controlador -->
+          <rect x="630" y="110" width="310" height="105" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+          <text x="785" y="150" text-anchor="middle" font-size="17" font-weight="700" fill="#5B21B6">ProyectosController</text>
+          <text x="785" y="178" text-anchor="middle" font-size="13" class="mono" fill="#4C1D95">edit(3) → vista de edición</text>
+
+          <!-- 1 · con sesión: la petición atraviesa las capas -->
+          <g class="fragment" data-fragment-index="1">
+            <circle cx="30" cy="112" r="12" fill="#2563EB"/><text x="30" y="117" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+            <text x="102" y="117" text-anchor="middle" font-size="12" fill="#1E40AF">Ana, con sesión</text>
+            <text x="95" y="140" text-anchor="middle" font-size="11" class="mono" fill="#1E3A8A">GET /proyectos/edit/3</text>
+            <path d="M175 150 L 626 150" stroke="#4B5563" stroke-width="3" marker-end="url(#m7-fl-gris)"/>
+            <text x="255" y="140" text-anchor="middle" font-size="12" fill="#92400E">abre la sesión</text>
+            <text x="370" y="140" text-anchor="middle" font-size="12" fill="#92400E">GET: pasa</text>
+            <text x="500" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">Ana ✓</text>
+          </g>
+          <!-- 2 · la respuesta vuelve por las capas -->
+          <g class="fragment" data-fragment-index="2">
+            <circle cx="30" cy="195" r="12" fill="#2563EB"/><text x="30" y="200" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+            <path d="M630 195 L 179 195" stroke="#2563EB" stroke-width="3" marker-end="url(#m7-fl-azul)"/>
+            <text x="170" y="216" text-anchor="end" font-size="12" class="mono" font-weight="700" fill="#1E40AF">200 · edición</text>
+            <text x="255" y="214" text-anchor="middle" font-size="12" fill="#92400E">guarda la sesión</text>
+          </g>
+          <!-- 3 · sin sesión: auth no deja pasar -->
+          <g class="fragment" data-fragment-index="3">
+            <circle cx="30" cy="262" r="12" fill="#E11D48"/><text x="30" y="267" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+            <text x="102" y="267" text-anchor="middle" font-size="12" fill="#9F1239">Sin sesión</text>
+            <text x="95" y="290" text-anchor="middle" font-size="11" class="mono" fill="#1E3A8A">GET /proyectos/edit/3</text>
+            <path d="M175 300 L 494 300" stroke="#4B5563" stroke-width="3" marker-end="url(#m7-fl-gris)"/>
+            <text x="255" y="290" text-anchor="middle" font-size="12" fill="#92400E">abre la sesión</text>
+            <text x="370" y="290" text-anchor="middle" font-size="12" fill="#92400E">GET: pasa</text>
+            <circle cx="512" cy="300" r="13" fill="#E11D48"/><text x="512" y="305" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">✗</text>
+            <text x="500" y="280" text-anchor="middle" font-size="12" font-weight="700" fill="#9F1239">sin usuario</text>
+          </g>
+          <!-- 4 · auth redirige al login: el controlador no se ejecuta -->
+          <g class="fragment" data-fragment-index="4">
+            <path d="M500 345 L 179 345" stroke="#D97706" stroke-width="3" marker-end="url(#m7-fl-ambar)"/>
+            <text x="500" y="368" text-anchor="middle" font-size="12" font-weight="700" fill="#9F1239">redirige</text>
+            <text x="170" y="366" text-anchor="end" font-size="12" class="mono" font-weight="700" fill="#B45309">302 → /login</text>
+            <text x="255" y="364" text-anchor="middle" font-size="12" fill="#92400E">guarda la sesión</text>
+            <rect x="630" y="265" width="310" height="90" rx="10" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 5"/>
+            <text x="785" y="306" text-anchor="middle" font-size="15" font-style="italic" fill="#64748B">La petición no llega</text>
+            <text x="785" y="328" text-anchor="middle" font-size="15" font-style="italic" fill="#64748B">al controlador</text>
+            <circle cx="30" cy="345" r="12" fill="#D97706"/><text x="30" y="350" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+          </g>
+
+          <!-- Animación del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#1D4ED8"><animateMotion dur="2.4s" repeatCount="indefinite" path="M175 150 L 628 150"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#2563EB"><animateMotion dur="2.4s" repeatCount="indefinite" path="M630 195 L 177 195"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#E11D48"><animateMotion dur="1.8s" repeatCount="indefinite" path="M175 300 L 496 300"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="4"><circle r="7" fill="#D97706"><animateMotion dur="1.8s" repeatCount="indefinite" path="M500 345 L 177 345"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1">Con sesión: cada capa actúa <strong>antes</strong> de <code>$next()</code> y la petición llega al controlador</li>
+          <li class="fragment" data-fragment-index="2">La respuesta vuelve por las capas (<strong>después</strong> de <code>$next()</code>): <code>StartSession</code> guarda la sesión</li>
+          <li class="fragment" data-fragment-index="3">Sin sesión: <code>auth</code> no encuentra usuario…</li>
+          <li class="fragment" data-fragment-index="4">…y responde con una redirección a <code>/login</code>: el controlador <strong>no se ejecuta</strong></li>
+        </ol>
+        <aside class="notes">
+          Las dos primeras capas son del grupo web y se aplican a todas las rutas; auth solo a las rutas que lo declaran.
+          En un GET, PreventRequestForgery no tiene token que comprobar: solo actúa en POST, PUT, PATCH y DELETE.
+          Paso 4: es lo que hacía exigirLogin() en 4.2, pero fuera de la página.
+        </aside>
+      </section>
+
+      <!-- 6 · Antes o después -->
+      <section>
+        <h2>¿Antes o después de <code>$next</code>?</h2>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="3|5|7">
+public function handle(Request $request, Closure $next): Response
+{
+    // Antes: se puede examinar la petición y decidir si continúa.
+
+    $response = $next($request);
+
+    // Después: se puede examinar o modificar la respuesta.
+
+    return $response;
+}
+        </code></pre>
+        <p class="small-text fragment"><code>exigirLogin()</code> actuaba antes. <code>StartSession</code>, en los dos: abre la sesión y la guarda.</p>
+      </section>
+
+      <!-- 7 · Un middleware propio -->
+      <section>
+        <h2>Un <em>middleware</em> propio</h2>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan make:middleware CabeceraCentro
+        </code></pre>
+        <pre class="compacto"><code class="language-php" data-trim data-line-numbers="5|7">
+class CabeceraCentro
+{
+    public function handle(Request $request, Closure $next): Response
+    {
+        $response = $next($request);
+
+        $response-&gt;headers-&gt;set('X-Centro', config('marcapersonalfp.centro'));
+
+        return $response;
+    }
+}
+        </code></pre>
+        <p class="small-text muted fragment">Actúa <strong>después</strong>: una cabecera HTTP con el centro de 5.2.</p>
+      </section>
+
+      <!-- 8 · Dónde se aplica -->
+      <section>
+        <h2>Dónde se aplica</h2>
+        <ol class="pasos compacta">
+          <li class="fragment"><strong>A todas las peticiones</strong> (global), en <code>bootstrap/app.php</code>.</li>
+          <li class="fragment"><strong>A un grupo</strong>: las rutas de <code>web.php</code>, y lo que incluye, son del grupo <code>web</code>.</li>
+        </ol>
+        <pre class="compacto fragment"><code class="language-php" data-trim>
+// bootstrap/app.php
+-&gt;withMiddleware(function (Middleware $middleware): void {
+    $middleware-&gt;web(append: [CabeceraCentro::class]);
+})
+        </code></pre>
+        <ol class="pasos compacta fragment" start="3">
+          <li><strong>A rutas concretas</strong>: <code>-&gt;middleware(CabeceraCentro::class)</code>, en una ruta o un grupo.</li>
+        </ol>
+      </section>
+
+      <!-- 9 · El grupo web -->
+      <section>
+        <h2>El grupo <code>web</code>, en orden</h2>
+        <table>
+          <tbody>
+            <tr><th><code>EncryptCookies</code></th><td>Cifra las <em>cookies</em> (<code>APP_KEY</code>, 5.1)</td></tr>
+            <tr><th><code>AddQueuedCookiesToResponse</code></th><td>Añade las <em>cookies</em> pendientes</td></tr>
+            <tr><th><code>StartSession</code></th><td>Abre la sesión y la guarda (5.2)</td></tr>
+            <tr><th><code>ShareErrorsFromSession</code></th><td>Pasa <code>$errors</code> a las vistas (5.6)</td></tr>
+            <tr><th><code>PreventRequestForgery</code></th><td>El <em>token</em> CSRF (5.6). Antes, <code>ValidateCsrfToken</code></td></tr>
+            <tr><th><code>SubstituteBindings</code></th><td>Prepara los parámetros de las rutas</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 10 · Alias -->
+      <section>
+        <h2>Alias</h2>
+        <table>
+          <tbody>
+            <tr class="fragment"><th><code>auth</code></th><td>Que haya un usuario identificado; si no, al <em>login</em></td></tr>
+            <tr class="fragment"><th><code>guest</code></th><td>Que <strong>no</strong> lo haya: <em>login</em> y registro</td></tr>
+            <tr class="fragment"><th><code>verified</code></th><td>Que haya verificado su correo</td></tr>
+            <tr class="fragment"><th><code>can</code></th><td>Que tenga permiso para algo (Bloque 7)</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text fragment" style="margin-top:0.8em">Con parámetros, tras dos puntos: <code>-&gt;middleware('can:update,proyecto')</code></p>
+      </section>
+
+      <!-- 11 · Breeze -->
+      <section>
+        <h2><em>Breeze</em>: el control de usuarios, hecho</h2>
+        <p class="small-text">En 4.2: array de usuarios, <code>password_hash()</code>, <code>Autenticador</code>, <code>session_regenerate_id()</code>, <em>logout</em> por <code>POST</code>…</p>
+        <p class="small-text fragment">…y faltaba registrarse, recuperar la contraseña, verificar el correo, limitar intentos.</p>
+        <ul class="small-text">
+          <li class="fragment"><strong><em>Laravel Breeze</em></strong>: rutas, controladores, vistas y tests, con <em>Blade</em> y <em>Tailwind</em>.</li>
+          <li class="fragment">Una <strong>caja negra</strong>: lo instalamos y aprendemos dónde está cada pieza.</li>
+          <li class="fragment">Los usuarios, en la tabla <code>users</code>, que ya existe desde 5.1.</li>
+        </ul>
+      </section>
+
+      <!-- 12 · Instalación -->
+      <section>
+        <h2>Instalación</h2>
+        <p class="small-text"><strong>Antes, un <em>commit</em></strong>: <code>breeze:install</code> sobrescribe <code>routes/web.php</code>, <code>app.css</code> y <em>Vite</em>.</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+composer require laravel/breeze:^2.4 --dev
+php artisan breeze:install
+        </code></pre>
+        <table class="fragment">
+          <tbody>
+            <tr><th>Stack</th><td><em>Blade with Alpine</em></td></tr>
+            <tr><th>Dark mode</th><td><em>No</em></td></tr>
+            <tr><th>Testing framework</th><td><em>PHPUnit</em></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 13 · Después de instalar -->
+      <section>
+        <h2>Después de instalar</h2>
+        <pre class="compacto"><code class="language-bash" data-trim>
+npm install
+npm run build
+php artisan migrate
+        </code></pre>
+        <ul class="small-text">
+          <li class="fragment"><code>migrate</code> no debería crear nada: <code>users</code> ya existía.</li>
+          <li class="fragment">¿<code>npm run build -- --watch</code> en otro terminal? Párala y vuelve a lanzarla: <em>Breeze</em> cambia la configuración de <em>Tailwind</em>.</li>
+        </ul>
+      </section>
+
+      <!-- 14 · Recuperar nuestras rutas -->
+      <section>
+        <h2>Recuperar nuestras rutas</h2>
+        <p class="small-text"><code>git diff routes/web.php</code>: en rojo, lo nuestro; en verde, lo de <em>Breeze</em>.</p>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="1-4|6-9|11-13|15">
+// Nuestras rutas (5.3 a 5.6)
+Route::get('/', HomeController::class);
+// ... /hola, /centro, perfil ...
+require __DIR__ . '/proyectos.php';
+
+// Las rutas de Breeze, salvo su ruta /
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})-&gt;middleware(['auth', 'verified'])-&gt;name('dashboard');
+
+Route::middleware('auth')-&gt;group(function () {
+    // GET, PATCH y DELETE /profile, con ProfileController
+});
+
+require __DIR__ . '/auth.php';      // login, registro, logout…
+        </code></pre>
+      </section>
+
+      <!-- 15 · Qué ha añadido Breeze -->
+      <section>
+        <h2>Qué ha añadido <em>Breeze</em></h2>
+        <table>
+          <tbody>
+            <tr><th>Rutas</th><td><code>routes/auth.php</code></td></tr>
+            <tr><th>Controladores</th><td><code>Http/Controllers/Auth/</code>, <code>ProfileController</code></td></tr>
+            <tr><th><em>Form Requests</em></th><td><code>LoginRequest</code>, <code>ProfileUpdateRequest</code></td></tr>
+            <tr><th>Vistas</th><td><code>views/auth/</code>, <code>profile/</code>, <code>dashboard</code></td></tr>
+            <tr><th><em>Layouts</em></th><td><code>views/layouts/</code> y componentes</td></tr>
+            <tr><th>Tests</th><td><code>tests/Feature/Auth/</code>, <code>ProfileTest</code></td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted" style="margin-top:0.6em"><code>&lt;x-app-layout&gt;</code> y <code>&lt;x-guest-layout&gt;</code>: como nuestro <code>&lt;x-layout&gt;</code> de 5.4.</p>
+      </section>
+
+      <!-- 16 · El logo -->
+      <section>
+        <h2>Nuestro logo en <em>Breeze</em></h2>
+        <p class="small-text"><code>resources/views/components/application-logo.blade.php</code>:</p>
+        <pre class="compacto"><code class="language-html" data-trim>
+&lt;img src="{{ asset('images/mp-logo.png') }}" alt="marcapersonalFP" {{ $attributes }}&gt;
+        </code></pre>
+        <p class="small-text muted fragment"><code>$attributes</code>: las clases que le pasen las vistas de <em>Breeze</em>.</p>
+      </section>
+
+      <!-- 17 · Lo que Breeze automatiza (1) -->
+      <section>
+        <h2>De 4.2 a <em>Breeze</em> (1/2)</h2>
+        <table>
+          <thead><tr><th>En <em>v0</em></th><th>Con <em>Breeze</em></th></tr></thead>
+          <tbody>
+            <tr class="fragment"><td>El array de usuarios</td><td>Tabla <code>users</code> y modelo <code>User</code></td></tr>
+            <tr class="fragment"><td><code>password_hash()</code></td><td><code>Hash::make()</code>, al registrarse</td></tr>
+            <tr class="fragment"><td><code>Autenticador::autenticar()</code></td><td><code>Auth::attempt()</code>, en <code>LoginRequest</code></td></tr>
+            <tr class="fragment"><td><code>session_regenerate_id()</code></td><td><code>$request-&gt;session()-&gt;regenerate()</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 18 · Lo que Breeze automatiza (2) -->
+      <section>
+        <h2>De 4.2 a <em>Breeze</em> (2/2)</h2>
+        <table>
+          <thead><tr><th>En <em>v0</em></th><th>Con <em>Breeze</em></th></tr></thead>
+          <tbody>
+            <tr class="fragment"><td><code>usuarioActual()</code></td><td><code>Auth::user()</code> o <code>$request-&gt;user()</code></td></tr>
+            <tr class="fragment"><td><em>Logout</em> por <code>POST</code></td><td><code>Auth::guard('web')-&gt;logout()</code> e invalidar la sesión</td></tr>
+            <tr class="fragment"><td><code>exigirLogin()</code></td><td>El <em>middleware</em> <code>auth</code>, en las rutas</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted fragment" style="margin-top:0.8em">El <em>login</em> y el <em>logout</em>, en <code>AuthenticatedSessionController</code>.</p>
+      </section>
+
+      <!-- 19 · Lo que v0 no hacía -->
+      <section>
+        <h2>Y lo que <em>v0</em> no hacía</h2>
+        <ul class="small-text">
+          <li class="fragment"><strong>Registro</strong> y <strong>recuperación de la contraseña</strong> por correo.</li>
+          <li class="fragment"><strong>Límite de intentos</strong>: cinco fallos seguidos, un minuto bloqueado.</li>
+          <li class="fragment"><strong>Recordarme</strong>: una <em>cookie</em> que mantiene la sesión abierta.</li>
+          <li class="fragment"><strong>Volver a donde ibas</strong>: <code>redirect()-&gt;intended()</code>.</li>
+        </ul>
+        <p class="small-text muted fragment">Roles y propiedad de los datos (<code>exigirRol()</code>): <strong>autorización</strong>, Bloque 7. Campos propios de <code>users</code>: Bloque 6.</p>
+      </section>
+
+      <!-- 20 · Proteger rutas con auth -->
+      <section>
+        <h2>Proteger rutas con <code>auth</code></h2>
+        <pre class="ancho"><code class="language-php" data-trim data-line-numbers="3-5|7-13">
+Route::controller(ProyectosController::class)-&gt;prefix('proyectos')-&gt;name('proyectos.')
+-&gt;group(function () {
+    // Públicas
+    Route::get('/', 'index')-&gt;name('index');
+    Route::get('show/{id}', 'show')-&gt;whereNumber('id')-&gt;name('show');
+
+    // Solo para usuarios identificados
+    Route::middleware('auth')-&gt;group(function () {
+        Route::get('create', 'create')-&gt;name('create');
+        Route::post('/', 'store')-&gt;name('store');
+        Route::get('edit/{id}', 'edit')-&gt;whereNumber('id')-&gt;name('edit');
+        Route::put('edit/{id}', 'update')-&gt;whereNumber('id')-&gt;name('update');
+    });
+});
+        </code></pre>
+        <p class="small-text fragment">Sin sesión, <code>auth</code> redirige a <code>/login</code>: <code>exigirLogin()</code>, declarado en un solo sitio.</p>
+      </section>
+
+      <!-- 21 · El login con Breeze, paso a paso (SVG animado) -->
+      <section>
+        <h2>El <em>login</em>, con <em>Breeze</em></h2>
+        <svg class="anim" viewBox="0 0 960 400" style="max-height:400px" role="img" aria-label="Sin sesión, GET /proyectos/edit/3: el middleware auth guarda en la sesión la dirección pedida y redirige a /login. El navegador pide el formulario de login. Lo envía: Auth::attempt comprueba el hash de la contraseña y la sesión se regenera con un identificador nuevo. El método intended lee la dirección guardada y redirige a /proyectos/edit/3, que ahora auth deja pasar">
+          <defs>
+            <marker id="l7-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+            <marker id="l7-fl-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#2563EB"/></marker>
+            <marker id="l7-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+            <marker id="l7-fl-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+          </defs>
+          <rect x="0" y="0" width="960" height="400" rx="14" fill="#F8FAFC"/>
+
+          <!-- Participantes y líneas de vida -->
+          <rect x="45" y="12" width="190" height="44" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+          <text x="140" y="40" text-anchor="middle" font-size="17" font-weight="700" fill="#1E3A8A">Navegador</text>
+          <rect x="360" y="12" width="280" height="44" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+          <text x="500" y="31" text-anchor="middle" font-size="17" font-weight="700" fill="#5B21B6">Laravel</text>
+          <text x="500" y="49" text-anchor="middle" font-size="12" class="mono" fill="#5B21B6">auth · AuthenticatedSessionController</text>
+          <rect x="745" y="12" width="190" height="44" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+          <text x="840" y="31" text-anchor="middle" font-size="17" font-weight="700" fill="#065F46">Sesión</text>
+          <text x="840" y="49" text-anchor="middle" font-size="12" fill="#065F46">en el servidor</text>
+          <path d="M140 56 L 140 392" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+          <path d="M500 56 L 500 392" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+          <path d="M840 56 L 840 392" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+
+          <!-- 1 · sin sesión: auth guarda a dónde ibas y redirige -->
+          <g class="fragment" data-fragment-index="1">
+            <circle cx="24" cy="80" r="12" fill="#E11D48"/><text x="24" y="85" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+            <text x="320" y="74" text-anchor="middle" font-size="13" class="mono" fill="#374151">GET /proyectos/edit/3</text>
+            <path d="M140 80 L 496 80" stroke="#4B5563" stroke-width="2.5" marker-end="url(#l7-fl-gris)"/>
+            <text x="512" y="85" font-size="13" font-weight="700" fill="#9F1239">auth ✗</text>
+            <text x="670" y="100" text-anchor="middle" font-size="12" class="mono" fill="#065F46">url.intended = /proyectos/edit/3</text>
+            <path d="M500 106 L 836 106" stroke="#059669" stroke-width="2.5" marker-end="url(#l7-fl-verde)"/>
+            <text x="320" y="126" text-anchor="middle" font-size="13" class="mono" fill="#B45309">302 · Location: /login</text>
+            <path d="M500 132 L 144 132" stroke="#D97706" stroke-width="2.5" marker-end="url(#l7-fl-ambar)"/>
+          </g>
+          <!-- 2 · el formulario de login -->
+          <g class="fragment" data-fragment-index="2">
+            <circle cx="24" cy="166" r="12" fill="#2563EB"/><text x="24" y="171" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+            <text x="320" y="160" text-anchor="middle" font-size="13" class="mono" fill="#374151">GET /login</text>
+            <path d="M140 166 L 496 166" stroke="#4B5563" stroke-width="2.5" marker-end="url(#l7-fl-gris)"/>
+            <text x="512" y="171" font-size="13" font-weight="700" fill="#047857">guest ✓</text>
+            <text x="320" y="186" text-anchor="middle" font-size="13" class="mono" fill="#1E40AF">200 · formulario con @csrf</text>
+            <path d="M500 192 L 144 192" stroke="#2563EB" stroke-width="2.5" marker-end="url(#l7-fl-azul)"/>
+          </g>
+          <!-- 3 · Auth::attempt() y regenerate() -->
+          <g class="fragment" data-fragment-index="3">
+            <circle cx="24" cy="226" r="12" fill="#059669"/><text x="24" y="231" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+            <text x="320" y="220" text-anchor="middle" font-size="13" class="mono" fill="#374151">POST /login · email + contraseña</text>
+            <path d="M140 226 L 496 226" stroke="#4B5563" stroke-width="2.5" marker-end="url(#l7-fl-gris)"/>
+            <text x="512" y="231" font-size="13" font-weight="700" class="mono" fill="#047857">Auth::attempt() ✓</text>
+            <text x="670" y="246" text-anchor="middle" font-size="12" class="mono" fill="#065F46">regenerate(): id nuevo</text>
+            <path d="M500 252 L 836 252" stroke="#059669" stroke-width="2.5" marker-end="url(#l7-fl-verde)"/>
+          </g>
+          <!-- 4 · redirect()->intended(): de vuelta a donde ibas -->
+          <g class="fragment" data-fragment-index="4">
+            <circle cx="24" cy="286" r="12" fill="#D97706"/><text x="24" y="291" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+            <text x="670" y="280" text-anchor="middle" font-size="12" class="mono" fill="#065F46">url.intended</text>
+            <path d="M840 286 L 504 286" stroke="#059669" stroke-width="2.5" marker-end="url(#l7-fl-verde)"/>
+            <text x="512" y="305" font-size="12" class="mono" font-weight="700" fill="#B45309">redirect()-&gt;intended()</text>
+            <text x="320" y="306" text-anchor="middle" font-size="13" class="mono" fill="#B45309">302 · Location: /proyectos/edit/3</text>
+            <path d="M500 312 L 144 312" stroke="#D97706" stroke-width="2.5" marker-end="url(#l7-fl-ambar)"/>
+          </g>
+          <!-- 5 · ahora auth deja pasar -->
+          <g class="fragment" data-fragment-index="5">
+            <circle cx="24" cy="346" r="12" fill="#2563EB"/><text x="24" y="351" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+            <text x="320" y="340" text-anchor="middle" font-size="13" class="mono" fill="#374151">GET /proyectos/edit/3</text>
+            <path d="M140 346 L 496 346" stroke="#4B5563" stroke-width="2.5" marker-end="url(#l7-fl-gris)"/>
+            <text x="512" y="351" font-size="13" font-weight="700" fill="#047857">auth ✓ Ana</text>
+            <text x="320" y="366" text-anchor="middle" font-size="13" class="mono" fill="#1E40AF">200 · formulario de edición</text>
+            <path d="M500 372 L 144 372" stroke="#2563EB" stroke-width="2.5" marker-end="url(#l7-fl-azul)"/>
+          </g>
+
+          <!-- Animación del paso actual -->
+          <g class="fragment fade-in-then-out punto" data-fragment-index="1"><circle r="7" fill="#E11D48"><animateMotion dur="3.6s" repeatCount="indefinite" path="M140 80 L 500 80 L 500 106 L 840 106 L 500 106 L 500 132 L 140 132"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="2"><circle r="7" fill="#1D4ED8"><animateMotion dur="2.4s" repeatCount="indefinite" path="M140 166 L 500 166 L 500 192 L 140 192"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="3"><circle r="7" fill="#059669"><animateMotion dur="2.4s" repeatCount="indefinite" path="M140 226 L 500 226 L 500 252 L 840 252"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="4"><circle r="7" fill="#D97706"><animateMotion dur="2.4s" repeatCount="indefinite" path="M840 286 L 500 286 L 500 312 L 140 312"/></circle></g>
+          <g class="fragment fade-in-then-out punto" data-fragment-index="5"><circle r="7" fill="#1D4ED8"><animateMotion dur="2.4s" repeatCount="indefinite" path="M140 346 L 500 346 L 500 372 L 140 372"/></circle></g>
+        </svg>
+        <ol class="leyenda">
+          <li class="fragment" data-fragment-index="1">Sin sesión, <code>auth</code> guarda a dónde ibas y redirige a <code>/login</code></li>
+          <li class="fragment" data-fragment-index="2"><code>GET /login</code>: el formulario, en una ruta con <code>guest</code></li>
+          <li class="fragment" data-fragment-index="3"><code>Auth::attempt()</code> comprueba el <em>hash</em>; <code>regenerate()</code> cambia el id de la sesión</li>
+          <li class="fragment" data-fragment-index="4"><code>redirect()-&gt;intended()</code>: de vuelta a la página que pedías</li>
+          <li class="fragment" data-fragment-index="5">Ahora <code>auth</code> deja pasar: el formulario de edición</li>
+        </ol>
+        <aside class="notes">
+          Es el login de 4.2 (diapositiva "El login, paso a paso"), ahora sin escribir nada: Auth::attempt hace el password_verify, regenerate hace el session_regenerate_id.
+          Lo nuevo frente a v0: url.intended. En v0, tras el login, siempre íbamos a la misma página.
+          Paso 3: la respuesta del POST es la redirección del paso 4, con la cookie del id nuevo.
+        </aside>
+      </section>
+
+      <!-- 22 · El usuario en las vistas -->
+      <section>
+        <h2>El usuario en las vistas</h2>
+        <pre class="compacto"><code class="language-html" data-trim data-line-numbers="1-7|9-12">
+@auth
+    &lt;span&gt;{{ auth()-&gt;user()-&gt;name }}&lt;/span&gt;
+    &lt;form method="POST" action="{{ route('logout') }}"&gt;
+        @csrf
+        &lt;button type="submit"&gt;Salir&lt;/button&gt;
+    &lt;/form&gt;
+@endauth
+
+@guest
+    &lt;a href="{{ route('login') }}"&gt;Entrar&lt;/a&gt;
+    &lt;a href="{{ route('register') }}"&gt;Registrarse&lt;/a&gt;
+@endguest
+        </code></pre>
+        <p class="small-text fragment">El <em>logout</em>, por <code>POST</code> con <code>@csrf</code>, como en 4.2: un enlace <code>GET</code> lo dispararía cualquiera.</p>
+      </section>
+
+      <!-- 23 · Entorno -->
+      <section>
+        <h2>El entorno</h2>
+        <p class="small-text">Los formularios de 5.6. Rama nueva, en la VM:</p>
+        <pre class="compacto"><code class="language-bash" data-trim>
+git switch main
+git pull upstream main
+git switch -c RA5_7
+        </code></pre>
+      </section>
+
+      <!-- 24 · Ejercicios 1-3 -->
+      <section>
+        <h2>Ejercicios (1/2)</h2>
+        <ol class="pasos compacta">
+          <li><strong>Un <em>middleware</em> propio.</strong> <code>CabeceraCentro</code>, en el grupo <code>web</code>. Mira <code>X-Centro</code> en la pestaña <strong>Red</strong>.</li>
+          <li><strong>Instala <em>Breeze</em>.</strong> <em>Commit</em> antes; recupera tus rutas y cambia el logo. ¿Existen <code>/login</code> y <code>/register</code>?</li>
+          <li><strong>Ana López se registra</strong>: <code>ana.lopez@marcapersonalfp.test</code> / <code>ana-secreta</code>. En <code>tinker</code>, <code>App\Models\User::first()-&gt;password</code>: ¿empieza como los <em>hashes</em> de 4.2?</li>
+        </ol>
+      </section>
+
+      <!-- 25 · Ejercicios 4-6 -->
+      <section>
+        <h2>Ejercicios (2/2)</h2>
+        <ol class="pasos compacta" start="4">
+          <li><strong>Protege altas y ediciones</strong> con <code>auth</code>. Listado y detalle, públicos.</li>
+          <li><strong>La barra.</strong> A la derecha (<code>ml-auto</code>): "Entrar" y "Registrarse", o el nombre y "Salir".</li>
+          <li><strong>Investiga.</strong> <code>/proyectos/edit/3</code> sin sesión, y después de entrar; seis contraseñas mal; <code>route:list -v --path=proyectos</code>.</li>
+        </ol>
+      </section>
+
+      <!-- 26 · Puente -->
+      <section>
+        <h2>Puente</h2>
+        <div class="cols">
+          <div class="panel">
+            <h3>En <em>v0</em></h3>
+            <p class="small-text">Cada página privada debía llamar a <code>exigirLogin()</code>; el <em>login</em>, el <em>hash</em> y la regeneración, a mano.</p>
+          </div>
+          <div class="panel fpm fragment">
+            <h3>En <em>Laravel</em></h3>
+            <p class="small-text"><code>auth</code> protege grupos de rutas desde un sitio, y <em>Breeze</em> trae registro, recuperación y límite de intentos.</p>
+          </div>
+        </div>
+        <p class="small-text muted fragment" style="margin-top:0.8em">Esto que hicimos a mano, el framework lo automatiza así.</p>
+      </section>
+
+      <!-- 27 · Autocorrección -->
+      <section>
+        <h2>Comprueba tu solución (opcional)</h2>
+        <ol class="pasos">
+          <li>Copia <code>RA5_7_BreezeTest.php</code> a <code>tests/Feature/</code></li>
+          <li>En el terminal de <code>workspace</code>, ejecuta ese test:</li>
+        </ol>
+        <pre class="compacto"><code class="language-bash" data-trim>
+php artisan test --filter=RA5_7_BreezeTest
+        </code></pre>
+        <p class="small-text">Cubre los ejercicios <strong>1, 2, 4 y 5</strong>.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">Tests: 6 passed (20 assertions)</code></p>
+        <p class="small-text muted">Los tests de 5.3 a 5.6 entran como usuario identificado: siguen pasando.</p>
+      </section>
+
+      <!-- 28 · Siguiente -->
+      <section>
+        <p class="small-text muted">Siguiente</p>
+        <h2>5.8. <em>Proyecto:</em> <em>marcapersonalFP</em> en <em>Laravel</em></h2>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      // Al exportar a PDF (añadir ?print-pdf a la URL): una página por diapositiva, con todos los fragmentos visibles
+      pdfSeparateFragments: false,
+      plugins: [ RevealHighlight, RevealNotes ]
+    });
+  </script>
+</body>
+</html>

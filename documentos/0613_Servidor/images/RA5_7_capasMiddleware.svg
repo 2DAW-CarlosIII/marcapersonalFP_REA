@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-label="Con sesión, GET /proyectos/edit/3 atraviesa StartSession, PreventRequestForgery y auth, llega al controlador y la respuesta vuelve por las mismas capas; StartSession guarda la sesión. Sin sesión, la capa auth no encuentra usuario y responde con una redirección a /login: la petición no llega al controlador" font-family="'Source Sans Pro', Helvetica, Arial, sans-serif">
+  <title>Con sesión, GET /proyectos/edit/3 atraviesa StartSession, PreventRequestForgery y auth, llega al controlador y la respuesta vuelve por las mismas capas; StartSession guarda la sesión. Sin sesión, la capa auth no encuentra usuario y responde con una redirección a /login: la petición no llega al controlador</title>
+  <defs>
+    <marker id="m7-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+    <marker id="m7-fl-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#2563EB"/></marker>
+    <marker id="m7-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+  </defs>
+  <rect x="0" y="0" width="960" height="400" rx="14" fill="#F8FAFC"/>
+
+  <!-- Navegador -->
+  <rect x="15" y="45" width="160" height="340" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+  <text x="95" y="72" text-anchor="middle" font-size="17" font-weight="700" fill="#1E3A8A">Navegador</text>
+
+  <!-- Las capas -->
+  <text x="312" y="27" text-anchor="middle" font-size="12" font-weight="700" fill="#B45309">grupo web</text>
+  <path d="M205 37 L 205 32 L 420 32 L 420 37" fill="none" stroke="#D97706" stroke-width="1.5"/>
+  <text x="500" y="27" text-anchor="middle" font-size="11" font-family="'Source Code Pro', Consolas, monospace" fill="#9F1239">-&gt;middleware('auth')</text>
+  <rect x="205" y="45" width="100" height="340" rx="10" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+  <text x="255" y="68" text-anchor="middle" font-size="11" font-family="'Source Code Pro', Consolas, monospace" font-weight="700" fill="#B45309">StartSession</text>
+  <rect x="320" y="45" width="100" height="340" rx="10" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+  <text x="370" y="64" text-anchor="middle" font-size="11" font-family="'Source Code Pro', Consolas, monospace" font-weight="700" fill="#B45309">PreventRequest</text>
+  <text x="370" y="78" text-anchor="middle" font-size="11" font-family="'Source Code Pro', Consolas, monospace" font-weight="700" fill="#B45309">Forgery</text>
+  <rect x="450" y="45" width="100" height="340" rx="10" fill="#FFF1F2" stroke="#E11D48" stroke-width="2"/>
+  <text x="500" y="68" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" font-weight="700" fill="#9F1239">auth</text>
+
+  <!-- Controlador -->
+  <rect x="630" y="110" width="310" height="105" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+  <text x="785" y="150" text-anchor="middle" font-size="17" font-weight="700" fill="#5B21B6">ProyectosController</text>
+  <text x="785" y="178" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#4C1D95">edit(3) → vista de edición</text>
+
+  <!-- 1 · con sesión: la petición atraviesa las capas -->
+  <g>
+    <circle cx="30" cy="112" r="12" fill="#2563EB"/><text x="30" y="117" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+    <text x="102" y="117" text-anchor="middle" font-size="12" fill="#1E40AF">Ana, con sesión</text>
+    <text x="95" y="140" text-anchor="middle" font-size="11" font-family="'Source Code Pro', Consolas, monospace" fill="#1E3A8A">GET /proyectos/edit/3</text>
+    <path d="M175 150 L 626 150" stroke="#4B5563" stroke-width="3" marker-end="url(#m7-fl-gris)"/>
+    <text x="255" y="140" text-anchor="middle" font-size="12" fill="#92400E">abre la sesión</text>
+    <text x="370" y="140" text-anchor="middle" font-size="12" fill="#92400E">GET: pasa</text>
+    <text x="500" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">Ana ✓</text>
+  </g>
+  <!-- 2 · la respuesta vuelve por las capas -->
+  <g>
+    <circle cx="30" cy="195" r="12" fill="#2563EB"/><text x="30" y="200" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+    <path d="M630 195 L 179 195" stroke="#2563EB" stroke-width="3" marker-end="url(#m7-fl-azul)"/>
+    <text x="170" y="216" text-anchor="end" font-size="12" font-family="'Source Code Pro', Consolas, monospace" font-weight="700" fill="#1E40AF">200 · edición</text>
+    <text x="255" y="214" text-anchor="middle" font-size="12" fill="#92400E">guarda la sesión</text>
+  </g>
+  <!-- 3 · sin sesión: auth no deja pasar -->
+  <g>
+    <circle cx="30" cy="262" r="12" fill="#E11D48"/><text x="30" y="267" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+    <text x="102" y="267" text-anchor="middle" font-size="12" fill="#9F1239">Sin sesión</text>
+    <text x="95" y="290" text-anchor="middle" font-size="11" font-family="'Source Code Pro', Consolas, monospace" fill="#1E3A8A">GET /proyectos/edit/3</text>
+    <path d="M175 300 L 494 300" stroke="#4B5563" stroke-width="3" marker-end="url(#m7-fl-gris)"/>
+    <text x="255" y="290" text-anchor="middle" font-size="12" fill="#92400E">abre la sesión</text>
+    <text x="370" y="290" text-anchor="middle" font-size="12" fill="#92400E">GET: pasa</text>
+    <circle cx="512" cy="300" r="13" fill="#E11D48"/><text x="512" y="305" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">✗</text>
+    <text x="500" y="280" text-anchor="middle" font-size="12" font-weight="700" fill="#9F1239">sin usuario</text>
+  </g>
+  <!-- 4 · auth redirige al login: el controlador no se ejecuta -->
+  <g>
+    <path d="M500 345 L 179 345" stroke="#D97706" stroke-width="3" marker-end="url(#m7-fl-ambar)"/>
+    <text x="500" y="368" text-anchor="middle" font-size="12" font-weight="700" fill="#9F1239">redirige</text>
+    <text x="170" y="366" text-anchor="end" font-size="12" font-family="'Source Code Pro', Consolas, monospace" font-weight="700" fill="#B45309">302 → /login</text>
+    <text x="255" y="364" text-anchor="middle" font-size="12" fill="#92400E">guarda la sesión</text>
+    <rect x="630" y="265" width="310" height="90" rx="10" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="7 5"/>
+    <text x="785" y="306" text-anchor="middle" font-size="15" font-style="italic" fill="#64748B">La petición no llega</text>
+    <text x="785" y="328" text-anchor="middle" font-size="15" font-style="italic" fill="#64748B">al controlador</text>
+    <circle cx="30" cy="345" r="12" fill="#D97706"/><text x="30" y="350" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+  </g>
+
+</svg>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-label="Sin sesión, GET /proyectos/edit/3: el middleware auth guarda en la sesión la dirección pedida y redirige a /login. El navegador pide el formulario de login. Lo envía: Auth::attempt comprueba el hash de la contraseña y la sesión se regenera con un identificador nuevo. El método intended lee la dirección guardada y redirige a /proyectos/edit/3, que ahora auth deja pasar" font-family="'Source Sans Pro', Helvetica, Arial, sans-serif">
+  <title>Sin sesión, GET /proyectos/edit/3: el middleware auth guarda en la sesión la dirección pedida y redirige a /login. El navegador pide el formulario de login. Lo envía: Auth::attempt comprueba el hash de la contraseña y la sesión se regenera con un identificador nuevo. El método intended lee la dirección guardada y redirige a /proyectos/edit/3, que ahora auth deja pasar</title>
+  <defs>
+    <marker id="l7-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
+    <marker id="l7-fl-azul" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#2563EB"/></marker>
+    <marker id="l7-fl-ambar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#D97706"/></marker>
+    <marker id="l7-fl-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#059669"/></marker>
+  </defs>
+  <rect x="0" y="0" width="960" height="400" rx="14" fill="#F8FAFC"/>
+
+  <!-- Participantes y líneas de vida -->
+  <rect x="45" y="12" width="190" height="44" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+  <text x="140" y="40" text-anchor="middle" font-size="17" font-weight="700" fill="#1E3A8A">Navegador</text>
+  <rect x="360" y="12" width="280" height="44" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+  <text x="500" y="31" text-anchor="middle" font-size="17" font-weight="700" fill="#5B21B6">Laravel</text>
+  <text x="500" y="49" text-anchor="middle" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#5B21B6">auth · AuthenticatedSessionController</text>
+  <rect x="745" y="12" width="190" height="44" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+  <text x="840" y="31" text-anchor="middle" font-size="17" font-weight="700" fill="#065F46">Sesión</text>
+  <text x="840" y="49" text-anchor="middle" font-size="12" fill="#065F46">en el servidor</text>
+  <path d="M140 56 L 140 392" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+  <path d="M500 56 L 500 392" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+  <path d="M840 56 L 840 392" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 5"/>
+
+  <!-- 1 · sin sesión: auth guarda a dónde ibas y redirige -->
+  <g>
+    <circle cx="24" cy="80" r="12" fill="#E11D48"/><text x="24" y="85" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+    <text x="320" y="74" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#374151">GET /proyectos/edit/3</text>
+    <path d="M140 80 L 496 80" stroke="#4B5563" stroke-width="2.5" marker-end="url(#l7-fl-gris)"/>
+    <text x="512" y="85" font-size="13" font-weight="700" fill="#9F1239">auth ✗</text>
+    <text x="670" y="100" text-anchor="middle" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#065F46">url.intended = /proyectos/edit/3</text>
+    <path d="M500 106 L 836 106" stroke="#059669" stroke-width="2.5" marker-end="url(#l7-fl-verde)"/>
+    <text x="320" y="126" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#B45309">302 · Location: /login</text>
+    <path d="M500 132 L 144 132" stroke="#D97706" stroke-width="2.5" marker-end="url(#l7-fl-ambar)"/>
+  </g>
+  <!-- 2 · el formulario de login -->
+  <g>
+    <circle cx="24" cy="166" r="12" fill="#2563EB"/><text x="24" y="171" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+    <text x="320" y="160" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#374151">GET /login</text>
+    <path d="M140 166 L 496 166" stroke="#4B5563" stroke-width="2.5" marker-end="url(#l7-fl-gris)"/>
+    <text x="512" y="171" font-size="13" font-weight="700" fill="#047857">guest ✓</text>
+    <text x="320" y="186" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1E40AF">200 · formulario con @csrf</text>
+    <path d="M500 192 L 144 192" stroke="#2563EB" stroke-width="2.5" marker-end="url(#l7-fl-azul)"/>
+  </g>
+  <!-- 3 · Auth::attempt() y regenerate() -->
+  <g>
+    <circle cx="24" cy="226" r="12" fill="#059669"/><text x="24" y="231" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+    <text x="320" y="220" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#374151">POST /login · email + contraseña</text>
+    <path d="M140 226 L 496 226" stroke="#4B5563" stroke-width="2.5" marker-end="url(#l7-fl-gris)"/>
+    <text x="512" y="231" font-size="13" font-weight="700" font-family="'Source Code Pro', Consolas, monospace" fill="#047857">Auth::attempt() ✓</text>
+    <text x="670" y="246" text-anchor="middle" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#065F46">regenerate(): id nuevo</text>
+    <path d="M500 252 L 836 252" stroke="#059669" stroke-width="2.5" marker-end="url(#l7-fl-verde)"/>
+  </g>
+  <!-- 4 · redirect()->intended(): de vuelta a donde ibas -->
+  <g>
+    <circle cx="24" cy="286" r="12" fill="#D97706"/><text x="24" y="291" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+    <text x="670" y="280" text-anchor="middle" font-size="12" font-family="'Source Code Pro', Consolas, monospace" fill="#065F46">url.intended</text>
+    <path d="M840 286 L 504 286" stroke="#059669" stroke-width="2.5" marker-end="url(#l7-fl-verde)"/>
+    <text x="512" y="305" font-size="12" font-family="'Source Code Pro', Consolas, monospace" font-weight="700" fill="#B45309">redirect()-&gt;intended()</text>
+    <text x="320" y="306" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#B45309">302 · Location: /proyectos/edit/3</text>
+    <path d="M500 312 L 144 312" stroke="#D97706" stroke-width="2.5" marker-end="url(#l7-fl-ambar)"/>
+  </g>
+  <!-- 5 · ahora auth deja pasar -->
+  <g>
+    <circle cx="24" cy="346" r="12" fill="#2563EB"/><text x="24" y="351" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+    <text x="320" y="340" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#374151">GET /proyectos/edit/3</text>
+    <path d="M140 346 L 496 346" stroke="#4B5563" stroke-width="2.5" marker-end="url(#l7-fl-gris)"/>
+    <text x="512" y="351" font-size="13" font-weight="700" fill="#047857">auth ✓ Ana</text>
+    <text x="320" y="366" text-anchor="middle" font-size="13" font-family="'Source Code Pro', Consolas, monospace" fill="#1E40AF">200 · formulario de edición</text>
+    <path d="M500 372 L 144 372" stroke="#2563EB" stroke-width="2.5" marker-end="url(#l7-fl-azul)"/>
+  </g>
+
+</svg>
