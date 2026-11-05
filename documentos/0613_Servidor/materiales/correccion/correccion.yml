@@ -5,16 +5,18 @@
 # pull request y guarda el resultado (JUnit XML + metadatos) como artefacto. El script
 # recoger_notas.py reúne esos artefactos en un CSV de calificaciones.
 #
-# Seguridad: pull_request_target ejecuta ESTE fichero tal y como está en la rama base, así
-# que un alumno no puede modificarlo en su pull request. A cambio, el código del alumno se
-# ejecuta con un token de solo lectura (permissions), sin secretos y sin caché compartida.
-# Los datos del pull request (como el nombre de la rama) solo se usan a través de variables
-# de entorno, nunca dentro de los run:, para que no se puedan inyectar órdenes.
+# Seguridad: el evento pull_request ejecuta el código del alumno con un token de solo
+# lectura y sin acceso a los secretos del repositorio, que es lo que GitHub recomienda para
+# los pull requests que llegan desde un fork. A cambio, la versión de este fichero que se
+# ejecuta es la del pull request: si un alumno lo modificara, recoger_notas.py lo marca en la
+# columna revisar. Los datos del pull request (como el nombre de la rama) solo se usan a
+# través de variables de entorno, nunca dentro de los run:, para que no se puedan inyectar
+# órdenes.
 
 name: Corrección
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, reopened]
 
 permissions:
@@ -35,14 +37,12 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: app
 
     steps:
       - name: Repositorio base (phpunit.xml y TestCase de confianza)
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.base.sha }}
           path: base
           persist-credentials: false
 
@@ -54,6 +54,7 @@ jobs:
           persist-credentials: false
 
       - name: Restaurar la configuración de los tests
+        working-directory: app
         run: |
           cp ../base/phpunit.xml phpunit.xml
           cp ../base/tests/TestCase.php tests/TestCase.php
@@ -71,12 +72,14 @@ jobs:
           node-version: '22'
 
       - name: Dependencias y estilos
+        working-directory: app
         run: |
           composer install --no-interaction --no-progress --prefer-dist
           npm ci || npm install
           npm run build
 
       - name: Entorno de la aplicación
+        working-directory: app
         run: |
           cp .env.example .env
           php artisan key:generate
@@ -93,6 +96,7 @@ jobs:
           echo "n=$n" >> "$GITHUB_OUTPUT"
 
       - name: Tests oficiales del REA (hasta el apartado del pull request)
+        working-directory: app
         env:
           N: ${{ steps.apartado.outputs.n }}
         run: |
@@ -107,9 +111,22 @@ jobs:
           ls tests/Feature
 
       - name: Ejecutar los tests
+        working-directory: app
         run: |
           mkdir -p ../resultados
-          php artisan test --filter=RA5_ --exclude-group=entorno --log-junit ../resultados/resultados.xml
+          set +e
+          php artisan test --filter=RA5_ --exclude-group=entorno --log-junit ../resultados/resultados.xml 2>&1 | tee ../salida_tests.txt
+          codigo=${PIPESTATUS[0]}
+          set -e
+          # En 5.1 todo el test es del grupo entorno: no hay nada que ejecutar, y no es un fallo.
+          # Solo cuenta como tal si PHPUnit dice "No tests found"; un error fatal sigue siendo un fallo.
+          casos=$(python3 -c "import sys, xml.etree.ElementTree as E; print(sum(1 for _ in E.parse(sys.argv[1]).iter('testcase')))" ../resultados/resultados.xml 2>/dev/null || echo 0)
+          if [ "$casos" = "0" ] && grep -q "No tests found" ../salida_tests.txt; then
+            touch ../resultados/sin_tests
+            echo "::notice::Este apartado no tiene tests automáticos: sus comprobaciones (grupo entorno) se hacen en la máquina de cada alumno."
+            exit 0
+          fi
+          exit $codigo
 
       - name: Metadatos
         if: always()
@@ -120,16 +137,19 @@ jobs:
           SHA: ${{ github.event.pull_request.head.sha }}
           N: ${{ steps.apartado.outputs.n }}
         run: |
-          mkdir -p ../resultados
+          mkdir -p resultados
           jq -n --arg pr "$PR" --arg autor "$AUTOR" --arg rama "$RAMA" --arg sha "$SHA" --arg apartado "RA5_$N" \
-            '{pr: ($pr | tonumber), autor: $autor, rama: $rama, sha: $sha, apartado: $apartado}' > ../resultados/meta.json
+            '{pr: ($pr | tonumber), autor: $autor, rama: $rama, sha: $sha, apartado: $apartado}' > resultados/meta.json
 
       - name: Resumen para el alumno
         if: always()
         run: |
           python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import os, xml.etree.ElementTree as ET
-          ruta = '../resultados/resultados.xml'
+          ruta = 'resultados/resultados.xml'
+          if os.path.exists('resultados/sin_tests'):
+              print('Este apartado no tiene tests automáticos: sus comprobaciones (grupo entorno) se hacen en la máquina de cada alumno.')
+              raise SystemExit
           if not os.path.exists(ruta):
               print('No se han podido ejecutar los tests: revisa los pasos anteriores.')
               raise SystemExit
