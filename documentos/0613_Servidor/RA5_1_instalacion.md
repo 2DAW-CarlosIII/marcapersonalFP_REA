@@ -198,40 +198,35 @@ En `main` solo entra lo que ya se ha revisado en el repositorio base. Cada apart
     git pull upstream main
     git push origin main
     ```
+
 ### Probar un _pull request_ localmente
 
-1. Bajo el nombre del repositorio, haz click **<svg version="1.1" width="16" height="16" viewBox="0 0 16 16" class="octicon octicon-git-pull-request" aria-label="git-pull-request" role="img"><path d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354ZM3.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm0 9.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm8.25.75a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Z"></path></svg> Pull requests**.
+Antes de aceptar el _pull request_ de un compañero, conviene probarlo en tu máquina. Para eso, trae su rama a tu clon local:
 
-2. En el listado del **Pull Requests** haz click en el aquel que quieras probar.
+1. En el repositorio base, en _GitHub_, abre la pestaña **Pull requests** y elige el que quieras probar.
+2. Busca su **número**: aparece tras el título, precedido de `#`.
 
-3. Encuentra el número **ID** del _pull request_. Verás una secuencia de números tras el título del _pull request_.
+    ![Título de un pull request en GitHub, con su número rodeado en naranja](https://docs.github.com/assets/images/help/pull_requests/pull-request-id-number.png)
 
-   ![Captura del título de un _pull request_. El número **ID** del _pull request_ está rodeado en naranja.](https://docs.github.com/assets/images/help/pull_requests/pull-request-id-number.png)
+3. En el terminal de la máquina virtual, trae el _pull request_ a una rama nueva. Cambia `ID` por su número y `NOMBRE_RAMA` por el nombre que quieras darle:
 
-4. Abre un terminal.
+    ```bash
+    git fetch upstream pull/ID/head:NOMBRE_RAMA
+    ```
 
-5. Realiza un `fetch` basándote en el número **ID** del _pull request_. Se creará una nueva rama.
+4. Cambia a esa rama:
 
-   ```shell
-   git fetch upstream pull/ID/head:NOMBRE_RAMA
-   ```
+    ```bash
+    git switch NOMBRE_RAMA
+    ```
 
-6. Cambia a la rama recién creada:
+5. Ejecuta los tests o haz las pruebas que se propongan.
+6. Al terminar, vuelve a `main` y borra la rama. Hace falta `-D`, con mayúscula, porque la rama no está fusionada en tu `main`:
 
-   ```shell
-   [main] $ git switch NOMBRE_RAMA
-   > Switched to a new branch 'NOMBRE_RAMA'
-   ```
-
-7. Ejecuta los tests o realiza las pruebas que se propongan.
-
-8. Tras ejecutar las pruebas, puedes volver a la rama `main` y borrar la rama recién creada:
-
-   ```shell
-   [NOMBRE_RAMA] $ git switch main
-   > Switched to a new branch 'main'
-   [main] $ git branch -D NOMBRE_RAMA
-   ```
+    ```bash
+    git switch main
+    git branch -D NOMBRE_RAMA
+    ```
 
 ## Preparación del entorno de trabajo
 
