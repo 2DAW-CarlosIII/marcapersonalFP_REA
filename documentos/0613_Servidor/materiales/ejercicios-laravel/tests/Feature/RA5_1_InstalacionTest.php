@@ -4,8 +4,12 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Http;
 use PDO;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\TestCase;
 
+// Grupo 'entorno': comprueba la VM de cada alumno (remotos de git, .env, base SQLite, nginx).
+// La corrección automática de los pull requests lo excluye con --exclude-group entorno.
+#[Group('entorno')]
 class RA5_1_InstalacionTest extends TestCase
 {
     // Repositorio base del curso: "upstream" apunta a él; "origin", a tu fork.

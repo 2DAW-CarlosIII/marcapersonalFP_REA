@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Artisan;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\TestCase;
 
 class RA5_2_EstructuraTest extends TestCase
@@ -10,6 +11,8 @@ class RA5_2_EstructuraTest extends TestCase
     private const CENTRO  = 'CIFP Carlos III';
     private const COMANDO = 'marcapersonalfp:centro';
 
+    // Grupo 'entorno': APP_LOCALE y APP_FAKER_LOCALE solo están en el .env de cada alumno.
+    #[Group('entorno')]
     public function test_configuracion_regional(): void
     {
         $this->assertSame('es', config('app.locale'), 'APP_LOCALE debe ser es.');
