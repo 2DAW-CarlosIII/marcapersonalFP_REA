@@ -298,9 +298,57 @@ Cada ejercicio de los Bloques 2 a 4 tiene su test correspondiente en [`materiale
 
 > **¿Y el proyecto _Laravel_?** `vanilla_php/composer.json` y `phpunit.xml` son específicos de la etapa PHP vanilla. En el Bloque 5, el proyecto _Laravel_ de _marcapersonalFP_ se crea en su propia subcarpeta (`marcapersonalfp`) y recibe **su propio sitio** de _nginx_ (`http://marcapersonalfp.test`, configurado en [5.1](./RA5_1_instalacion.md#paso-5-el-sitio-de-nginx)), así que este `default.conf` sigue sirviendo `vanilla_php` y los dos proyectos conviven. Allí los tests se lanzan con `php artisan test` en lugar de `vendor/bin/phpunit`.
 
-## 12. Limpiar la MV si se va a exportar
+## 12. GitHub CLI (`gh`)
+
+**_GitHub CLI_** (`gh`) es el cliente oficial de _GitHub_ para la línea de comandos. Permite hacer desde el terminal lo que normalmente se hace en la web: listar y descargar _pull requests_, consultar las ejecuciones de _GitHub Actions_ y descargar sus resultados, crear repositorios… En el módulo, el profesorado lo usa para recoger automáticamente los resultados de los tests de los _pull requests_ de todo el grupo.
+
+Se instala **en la máquina virtual**, no en un contenedor, porque trabaja junto a `git` y a las claves SSH, que también están en la máquina virtual. _Debian_ lo incluye en sus repositorios:
+
+```bash
+sudo apt update
+sudo apt install -y gh
+```
+
+Comprueba la instalación:
+
+```bash
+gh --version
+```
+
+La versión de _Debian_ suele ir algo por detrás de la última. Si alguna vez hace falta una más reciente, _GitHub_ mantiene su [propio repositorio de _apt_](https://github.com/cli/cli/blob/trunk/docs/install_linux.md), que se añade como el de _Docker_ en el paso 2.
+
+### Identificarse en _GitHub_
+
+`gh` actúa en nombre de una cuenta de _GitHub_. Cada persona se identifica **con su propia cuenta**, una sola vez:
+
+```bash
+gh auth login
+```
+
+Responde a sus preguntas así:
+
+| Pregunta | Respuesta |
+|---|---|
+| _Where do you use GitHub?_ | _GitHub.com_ |
+| _What is your preferred protocol for Git operations on this host?_ | _SSH_, la misma clave que usas con `git` |
+| _Upload your SSH public key to your GitHub account?_ | La clave que ya tienes registrada, o _Skip_ si ya está en _GitHub_ |
+| _How would you like to authenticate GitHub CLI?_ | _Login with a web browser_ |
+
+`gh` muestra un código de un solo uso y abre el navegador en `https://github.com/login/device`, donde se pega el código y se autoriza el acceso. Si el navegador no se abre solo, entra a esa dirección a mano.
+
+Comprueba que la identificación ha funcionado:
+
+```bash
+gh auth status
+```
+
+> **Antes de exportar la máquina virtual (paso 13), cierra la sesión de `gh`** con `gh auth logout`. Su _token_ se guarda en `~/.config/gh/hosts.yml` y da acceso a tu cuenta de _GitHub_: si no lo borras, viajaría dentro de la máquina virtual a todo el que la reciba.
+
+## 13. Limpiar la MV si se va a exportar
 
 Si la intención es exportar la máquina virtual para su posterior exportación, conviene limpiar contenido que no sea útil para la exportación y que incrementaría el tamaño del archivo de exportación.
+
+Si has usado `gh` (paso 12), ejecuta antes `gh auth logout`.
 
 Para ello, genera el script `limpiar_vm.sh` con el siguiente contenido:
 
