@@ -1,0 +1,154 @@
+# Corrección automática de los pull requests del alumnado.
+#
+# Se copia al repositorio base del curso como .github/workflows/correccion.yml.
+# Ejecuta los tests OFICIALES del REA (no las copias del alumno) sobre el código de cada
+# pull request y guarda el resultado (JUnit XML + metadatos) como artefacto. El script
+# recoger_notas.py reúne esos artefactos en un CSV de calificaciones.
+#
+# Seguridad: pull_request_target ejecuta ESTE fichero tal y como está en la rama base, así
+# que un alumno no puede modificarlo en su pull request. A cambio, el código del alumno se
+# ejecuta con un token de solo lectura (permissions), sin secretos y sin caché compartida.
+# Los datos del pull request (como el nombre de la rama) solo se usan a través de variables
+# de entorno, nunca dentro de los run:, para que no se puedan inyectar órdenes.
+
+name: Corrección
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: correccion-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  # Versión del REA de la que se toman los tests oficiales. Para fijar una concreta, crea en
+  # el repositorio la variable REA_REF (Settings → Secrets and variables → Actions → Variables)
+  # con el hash de un commit; si no existe, se usa master.
+  REA_TESTS: https://raw.githubusercontent.com/2DAW-CarlosIII/marcapersonalFP_REA/${{ vars.REA_REF || 'master' }}/documentos/0613_Servidor/materiales/ejercicios-laravel/tests/Feature
+  TESTS_RA5: RA5_1_InstalacionTest RA5_2_EstructuraTest RA5_3_RutasTest RA5_4_VistasTest RA5_5_ControladoresTest RA5_6_FormulariosTest RA5_7_BreezeTest RA5_8_ProyectoTest
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - name: Repositorio base (phpunit.xml y TestCase de confianza)
+        uses: actions/checkout@v4
+        with:
+          path: base
+          persist-credentials: false
+
+      - name: Código del pull request
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: app
+          persist-credentials: false
+
+      - name: Restaurar la configuración de los tests
+        run: |
+          cp ../base/phpunit.xml phpunit.xml
+          cp ../base/tests/TestCase.php tests/TestCase.php
+
+      - name: PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, sqlite3
+          coverage: none
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Dependencias y estilos
+        run: |
+          composer install --no-interaction --no-progress --prefer-dist
+          npm ci || npm install
+          npm run build
+
+      - name: Entorno de la aplicación
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          touch database/database.sqlite
+          php artisan migrate --force
+
+      - name: Apartado del pull request
+        id: apartado
+        env:
+          RAMA: ${{ github.event.pull_request.head.ref }}
+        run: |
+          # La rama de cada apartado se llama RA5_x (5.1, paso 6). Si no lo sigue, se corrigen todos.
+          if [[ "$RAMA" =~ ^RA5_([1-8]) ]]; then n="${BASH_REMATCH[1]}"; else n=8; fi
+          echo "n=$n" >> "$GITHUB_OUTPUT"
+
+      - name: Tests oficiales del REA (hasta el apartado del pull request)
+        env:
+          N: ${{ steps.apartado.outputs.n }}
+        run: |
+          rm -f tests/Feature/RA5_*Test.php
+          i=0
+          for test in $TESTS_RA5; do
+            i=$((i + 1))
+            if [ "$i" -le "$N" ]; then
+              curl -fsSL "$REA_TESTS/$test.php" -o "tests/Feature/$test.php"
+            fi
+          done
+          ls tests/Feature
+
+      - name: Ejecutar los tests
+        run: |
+          mkdir -p ../resultados
+          php artisan test --filter=RA5_ --exclude-group=entorno --log-junit ../resultados/resultados.xml
+
+      - name: Metadatos
+        if: always()
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          AUTOR: ${{ github.event.pull_request.user.login }}
+          RAMA: ${{ github.event.pull_request.head.ref }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          N: ${{ steps.apartado.outputs.n }}
+        run: |
+          mkdir -p ../resultados
+          jq -n --arg pr "$PR" --arg autor "$AUTOR" --arg rama "$RAMA" --arg sha "$SHA" --arg apartado "RA5_$N" \
+            '{pr: ($pr | tonumber), autor: $autor, rama: $rama, sha: $sha, apartado: $apartado}' > ../resultados/meta.json
+
+      - name: Resumen para el alumno
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import os, xml.etree.ElementTree as ET
+          ruta = '../resultados/resultados.xml'
+          if not os.path.exists(ruta):
+              print('No se han podido ejecutar los tests: revisa los pasos anteriores.')
+              raise SystemExit
+          clases = {}
+          for caso in ET.parse(ruta).iter('testcase'):
+              clase = (caso.get('class') or caso.get('classname') or '').replace('.', '\\').split('\\')[-1]
+              fallo = caso.find('failure') is not None or caso.find('error') is not None
+              ok, total, fallos = clases.get(clase, (0, 0, []))
+              clases[clase] = (ok + (not fallo), total + 1, fallos + ([caso.get('name')] if fallo else []))
+          print('| Test | Aprobados | Fallidos |')
+          print('|---|---|---|')
+          for clase, (ok, total, fallos) in sorted(clases.items()):
+              print(f'| {clase} | {ok} / {total} | {", ".join(fallos) or "—"} |')
+          PY
+
+      - name: Guardar el resultado
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          path: resultados/
+          retention-days: 90

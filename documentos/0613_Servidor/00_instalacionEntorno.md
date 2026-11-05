@@ -300,7 +300,7 @@ Cada ejercicio de los Bloques 2 a 4 tiene su test correspondiente en [`materiale
 
 ## 12. GitHub CLI (`gh`)
 
-**_GitHub CLI_** (`gh`) es el cliente oficial de _GitHub_ para la línea de comandos. Permite hacer desde el terminal lo que normalmente se hace en la web: listar y descargar _pull requests_, consultar las ejecuciones de _GitHub Actions_ y descargar sus resultados, crear repositorios… En el módulo, el profesorado lo usa para recoger automáticamente los resultados de los tests de los _pull requests_ de todo el grupo.
+**_GitHub CLI_** (`gh`) es el cliente oficial de _GitHub_ para la línea de comandos. Permite hacer desde el terminal lo que normalmente se hace en la web: listar y descargar _pull requests_, consultar las ejecuciones de _GitHub Actions_ y descargar sus resultados, crear repositorios… En el módulo, el profesorado lo usa para recoger automáticamente los resultados de los tests de los _pull requests_ de todo el grupo (ver [la corrección automática](./materiales/correccion/README.md)).
 
 Se instala **en la máquina virtual**, no en un contenedor, porque trabaja junto a `git` y a las claves SSH, que también están en la máquina virtual. _Debian_ lo incluye en sus repositorios:
 
