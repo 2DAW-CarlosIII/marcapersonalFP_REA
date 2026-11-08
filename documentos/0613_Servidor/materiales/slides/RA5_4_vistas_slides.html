@@ -733,7 +733,25 @@ npm run build -- --watch     # en un 2.º terminal: recompila solo
         </code></pre>
       </section>
 
-      <!-- 17 · Entorno -->
+      <!-- 17 · Más sobre los componentes -->
+      <section>
+        <h2>Más sobre los componentes</h2>
+        <ul class="small-text">
+          <li><strong>Subcarpetas</strong>, con punto: <code class="nw">dopetrope/box.blade.php</code> → <code class="nw">&lt;x-dopetrope.box&gt;</code></li>
+          <li class="fragment"><strong>Atributos sin valor</strong>: <code class="nw">&lt;x-dopetrope.boton alt&gt;</code> recibe <code class="nw">$alt = true</code></li>
+          <li class="fragment"><strong><code>$attributes</code></strong>: lo que no está en <code>@props</code> (<code>class</code>…)</li>
+          <li class="fragment"><strong><em>Slots</em> con nombre</strong>: otro hueco además de <code>$slot</code></li>
+        </ul>
+        <pre class="compacto fragment"><code class="language-html" data-trim>
+&lt;x-dopetrope.box titulo="Mi caja" imagen="foto.jpg"&gt;
+    &lt;p&gt;Esto va a $slot.&lt;/p&gt;
+    &lt;x-slot:footer&gt;&lt;li&gt;Y esto, a $footer.&lt;/li&gt;&lt;/x-slot:footer&gt;
+&lt;/x-dopetrope.box&gt;
+        </code></pre>
+        <p class="small-text muted fragment"><em>Blade</em> procesa <code>&lt;x-…&gt;</code> aunque esté dentro de <code>&lt;!-- --&gt;</code>: comenta con <code class="nw">{{-- --}}</code>.</p>
+      </section>
+
+      <!-- 18 · Entorno -->
       <section>
         <h2>El entorno</h2>
         <p class="small-text">Proyecto <code>marcapersonalfp</code>, con las rutas de 5.3 y el terminal de <code>workspace</code> como <code>laradock</code>. Rama nueva, en la VM:</p>
@@ -744,9 +762,9 @@ git switch -c RA5_4
         </code></pre>
       </section>
 
-      <!-- 18 · Ejercicios 1-2 -->
+      <!-- 19 · Ejercicios 1-2 -->
       <section>
-        <h2>Ejercicios (1/3)</h2>
+        <h2>Ejercicios (1/5)</h2>
         <ol class="pasos compacta">
           <li><strong>Los estilos.</strong> <code>npm install</code> y <code>npm run build -- --watch</code> en un 2.º terminal. El logo, a <code>public/images/</code> con <code>curl</code>.</li>
         </ol>
@@ -756,9 +774,9 @@ git switch -c RA5_4
         </ol>
       </section>
 
-      <!-- 19 · Ejercicio 3: las vistas del sitio -->
+      <!-- 20 · Ejercicio 3: las vistas del sitio -->
       <section>
-        <h2>Ejercicios (2/3): las vistas</h2>
+        <h2>Ejercicios (2/5): las vistas</h2>
         <table>
           <thead><tr><th>Ruta y vista</th><th>Datos que recibe</th></tr></thead>
           <tbody>
@@ -772,17 +790,42 @@ git switch -c RA5_4
         <p class="small-text" style="margin-top:0.6em">Todas con <code>&lt;x-layout&gt;</code>; el texto de 5.3, como <code>titulo</code> (en <code>perfil</code>, "Perfil").</p>
       </section>
 
-      <!-- 20 · Ejercicios 4-6 -->
+      <!-- 21 · Ejercicios 4-5 -->
       <section>
-        <h2>Ejercicios (3/3)</h2>
+        <h2>Ejercicios (3/5)</h2>
         <ol class="pasos compacta" start="4">
           <li><strong>El listado.</strong> Los tres primeros proyectos de <code>array_proyectos.php</code>, con <code>tarjeta-proyecto</code> en una rejilla y <code>@forelse</code>. El índice es el <code>id</code>.</li>
+          <li><strong>El <em>layout</em> con una plantilla.</strong> Reparte <em>Dopetrope</em>, convertida a <em>Tailwind</em>, en componentes de <code>components/dopetrope/</code>, y haz que <code>&lt;x-layout&gt;</code> se apoye en ella.</li>
+        </ol>
+      </section>
+
+      <!-- 22 · Ejercicio 5: los componentes -->
+      <section>
+        <h2>Ejercicios (4/5)</h2>
+        <table>
+          <thead><tr><th>Componente</th><th>Atributos</th><th><em>Slots</em></th></tr></thead>
+          <tbody>
+            <tr><th><code>layout</code>, <code>main</code></th><td><code>titulo</code></td><td><code>$slot</code></td></tr>
+            <tr><th><code>header</code>, <code>footer</code></th><td>—</td><td>—</td></tr>
+            <tr><th><code>seccion</code></th><td><code>titulo</code></td><td><code>$slot</code></td></tr>
+            <tr><th><code>box</code></th><td><code>imagen</code>, <code>titulo</code>, <code>subtitulo</code></td><td><code>$slot</code>, <code>$footer</code></td></tr>
+            <tr><th><code>boton</code></th><td><code>href</code>, <code>alt</code>, <code>grande</code></td><td><code>$slot</code></td></tr>
+            <tr><th><code>icono</code></th><td><code>nombre</code></td><td>—</td></tr>
+          </tbody>
+        </table>
+        <p class="small-text muted">Los pasos, en el apartado 5.4.1, <em>El layout con una plantilla</em>.</p>
+      </section>
+
+      <!-- 23 · Ejercicios 6-7 -->
+      <section>
+        <h2>Ejercicios (5/5)</h2>
+        <ol class="pasos compacta" start="6">
           <li><strong>El escapado.</strong> En <code>perfil</code>, <code>{{ '&lt;script&gt;alert(1)&lt;/script&gt;' }}</code>. ¿Se ejecuta? Mira el código fuente. Prueba con <code>{!! !!}</code> y deshazlo.</li>
           <li><strong>Investiga.</strong> ¿Qué hay en <code>storage/framework/views/</code>? ¿Y si usas una clase nueva sin <code>--watch</code>?</li>
         </ol>
       </section>
 
-      <!-- 21 · Puente -->
+      <!-- 24 · Puente -->
       <section>
         <h2>Puente</h2>
         <div class="cols">
@@ -798,7 +841,7 @@ git switch -c RA5_4
         <p class="small-text muted fragment" style="margin-top:0.8em">Esto que hicimos a mano, el framework lo automatiza así.</p>
       </section>
 
-      <!-- 22 · Autocorrección -->
+      <!-- 25 · Autocorrección -->
       <section>
         <h2>Comprueba tu solución (opcional)</h2>
         <ol class="pasos">
@@ -808,12 +851,12 @@ git switch -c RA5_4
         <pre class="compacto"><code class="language-bash" data-trim>
 php artisan test --filter=RA5_4_VistasTest
         </code></pre>
-        <p class="small-text">Cubre los ejercicios <strong>1 a 4</strong>, incluido <code>public/build/manifest.json</code>.</p>
-        <p class="small-text">Si todo está bien: <code class="nw">Tests: 7 passed (36 assertions)</code></p>
+        <p class="small-text">Cubre los ejercicios <strong>1 a 5</strong>, incluidos <code>public/build/manifest.json</code> y los componentes de la plantilla.</p>
+        <p class="small-text">Si todo está bien: <code class="nw">Tests: 18 passed</code></p>
         <p class="small-text muted">Los tests de 5.1 y 5.3 siguen pasando, pero ahora necesitan los estilos compilados.</p>
       </section>
 
-      <!-- 23 · Siguiente -->
+      <!-- 26 · Siguiente -->
       <section>
         <p class="small-text muted">Siguiente</p>
         <h2>5.5. Controladores</h2>

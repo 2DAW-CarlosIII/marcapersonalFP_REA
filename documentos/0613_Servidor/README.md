@@ -72,6 +72,7 @@ Reconstruimos _marcapersonalFP_ con _Laravel_, separando la lógica de negocio d
 2. [Estructura de un proyecto, configuración y _Artisan_](./RA5_2_estructura.md)
 3. [Rutas](./RA5_3_rutas.md)
 4. [Vistas, _Blade_ y _layouts_](./RA5_4_vistas.md)
+    - Ejercicio 5: [El _layout_ con una plantilla](./RA5_4_1_plantilla.md)
 5. [Controladores](./RA5_5_controladores.md)
     - Ejercicios colaborativos opcionales: [Reconocimientos](./0363_reconocimientoController.md) · [Actividades](./0364_actividadController.md)
 6. [Formularios, datos de entrada, validación y redirecciones](./RA5_6_formularios.md)

@@ -277,6 +277,29 @@ Los componentes no son solo para el _layout_: cualquier trozo de HTML que se rep
 
 Se usa con `<x-tarjeta-proyecto :proyecto="$proyecto" :id="$id" />`. Los dos puntos son necesarios porque los valores son variables, no textos.
 
+### Más sobre los componentes
+
+En el ejercicio 5 repartiremos una plantilla completa en componentes. Para eso hacen falta cuatro posibilidades más:
+
+- **Subcarpetas.** Los componentes se pueden agrupar en subcarpetas de `components/`, que en la etiqueta se separan con un **punto**: `components/dopetrope/box.blade.php` se usa como `<x-dopetrope.box>`. Se crean con `php artisan make:component dopetrope/box --view`, donde `--view` indica que solo queremos la vista, sin clase (un componente **anónimo**, como todos los de este apartado).
+- **Atributos sin valor.** Un atributo escrito sin valor llega al componente como `true`. Con `@props(['alt' => false])`, la etiqueta `<x-boton alt>` recibe `$alt = true`, y `<x-boton>`, `$alt = false`.
+- **`$attributes`.** Los atributos que **no** están en `@props` se guardan en la variable `$attributes`, y `{{ $attributes }}` los escribe en la etiqueta que queramos. Así, `<x-icono nombre="rayo" class="size-6" />` puede pasar su `class` al `<svg>` del componente.
+- **_Slots_ con nombre.** Además de `{{ $slot }}`, un componente puede tener otros huecos. Se rellenan con `<x-slot:nombre>`, y dentro del componente son una variable más:
+
+    ```blade
+    <x-dopetrope.box titulo="Mi caja" imagen="foto.jpg">
+        <p>Esto va a $slot.</p>
+
+        <x-slot:footer>
+            <li>Y esto, a $footer.</li>
+        </x-slot:footer>
+    </x-dopetrope.box>
+    ```
+
+    Si no se pasa ese _slot_, la variable no existe: dentro del componente, `@isset($footer)` permite no pintar nada.
+
+> **Cuidado con los comentarios.** _Blade_ procesa las etiquetas `<x-…>` **aunque estén dentro de un comentario HTML** (`<!-- -->`). Un comentario como `<!-- aquí va lo de <x-layout> -->` dentro de un componente del _layout_ incluye el _layout_ dentro de sí mismo, sin fin, hasta agotar la memoria. Para comentar código _Blade_, usa `{{-- --}}`.
+
 ## Preparación del entorno de trabajo
 
 Seguimos en el proyecto `marcapersonalfp`, con las rutas de [5.3](./RA5_3_rutas.md) y el terminal de `workspace` abierto como `laradock`. Crea la rama del apartado en el terminal de la máquina virtual:
@@ -328,9 +351,11 @@ git switch -c RA5_4
 
     Fíjate en lo largo que se ha vuelto `routes/web.php`. En 5.5 sacaremos esos datos a un **controlador**.
 
-5. **Comprueba el escapado.** Pide `http://marcapersonalfp.test/perfil` y, en la vista `perfil`, cambia temporalmente "Visualizar el currículo propio" por `{{ '<script>alert(1)</script>' }}`. ¿Se ejecuta el script? Mira el código fuente de la página (<kbd>Ctrl</kbd>+<kbd>U</kbd>). Después, prueba con `{!! !!}` y deshaz el cambio.
+5. **El _layout_ con una plantilla.** Reparte la plantilla _Dopetrope_, convertida a _Tailwind_, en componentes de `components/dopetrope/`, y haz que `<x-layout>` se apoye en ella. Los pasos están en [5.4.1. El _layout_ con una plantilla](./RA5_4_1_plantilla.md).
 
-6. **Investiga.** Responde en tu _pull request_:
+6. **Comprueba el escapado.** Pide `http://marcapersonalfp.test/perfil` y, en la vista `perfil`, cambia temporalmente "Visualizar el currículo propio" por `{{ '<script>alert(1)</script>' }}`. ¿Se ejecuta el script? Mira el código fuente de la página (<kbd>Ctrl</kbd>+<kbd>U</kbd>). Después, prueba con `{!! !!}` y deshaz el cambio.
+
+7. **Investiga.** Responde en tu _pull request_:
     - Abre `storage/framework/views/`. ¿Qué contiene? Busca el fichero compilado de `perfil.blade.php` (su contenido, no su nombre, te dirá cuál es). ¿En qué se ha convertido `{{ $id }}`?
     - Detén el `npm run build -- --watch`, añade a una vista una clase de _Tailwind_ que no hayas usado antes (por ejemplo, `bg-yellow-200`) y recarga. ¿Se aplica? ¿Por qué? ¿Qué cambia tras `npm run build`?
 
@@ -338,7 +363,7 @@ git switch -c RA5_4
 
 ## Comprueba tu solución automáticamente (opcional)
 
-Para los ejercicios 1 a 4, copia el archivo [RA5_4_VistasTest.php](./materiales/ejercicios-laravel/tests/Feature/RA5_4_VistasTest.php) a la carpeta `tests/Feature/` de tu proyecto y ejecuta, en el terminal de `workspace`, ese test en concreto:
+Para los ejercicios 1 a 5, copia el archivo [RA5_4_VistasTest.php](./materiales/ejercicios-laravel/tests/Feature/RA5_4_VistasTest.php) a la carpeta `tests/Feature/` de tu proyecto y ejecuta, en el terminal de `workspace`, ese test en concreto:
 
 ```bash
 php artisan test --filter=RA5_4_VistasTest
@@ -348,9 +373,10 @@ El test comprueba:
 - que cada ruta devuelve su vista, con sus datos y su texto;
 - que las páginas comparten el _layout_: el logo y el nombre del centro en el pie;
 - que existen los tres componentes y que el _layout_ usa `{{ $slot }}` y `@vite`;
-- que has compilado los estilos (`public/build/manifest.json`).
+- que has compilado los estilos (`public/build/manifest.json`);
+- que las vistas se muestran dentro de la plantilla del ejercicio 5, con sus componentes (el detalle está en [5.4.1](./RA5_4_1_plantilla.md#comprueba-tu-solución-automáticamente-opcional)).
 
-Si todo está bien: `Tests: 7 passed (36 assertions)`.
+Si todo está bien: `Tests: 18 passed`.
 
 > Los tests de 5.1 y 5.3 siguen pasando: el texto de cada ruta aparece ahora como título de su vista. Eso sí, como el _layout_ usa `@vite`, necesitan los estilos compilados.
 

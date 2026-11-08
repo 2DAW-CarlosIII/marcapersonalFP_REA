@@ -177,6 +177,38 @@ php artisan migrate
 
 `migrate` no debería crear nada: la tabla `users` ya existía. Si dejaste `npm run build -- --watch` en otro terminal, detenlo y vuelve a lanzarlo, porque _Breeze_ ha cambiado la configuración de _Tailwind_.
 
+### Recuperar los colores de la plantilla
+
+_Breeze_ trabaja con **_Tailwind_ 3**, así que ha devuelto el proyecto a esa versión: ha sustituido `resources/css/app.css` por tres líneas `@tailwind` y ha creado `tailwind.config.js`. El bloque `@theme` con los colores y la fuente de _Dopetrope_ (5.4.1) ha desaparecido, y las clases `bg-dope-red`, `font-dopetrope`… ya no generan nada: la plantilla se ve sin colores.
+
+En _Tailwind_ 3, el tema no se define en el CSS, sino en `tailwind.config.js`. Añade la fuente y los colores dentro de `theme.extend`:
+
+```js
+theme: {
+    extend: {
+        fontFamily: {
+            sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+            dopetrope: ['"Source Sans 3"', '"Source Sans Pro"', ...defaultTheme.fontFamily.sans],
+        },
+        colors: {
+            dope: {
+                red: '#d52349',
+                'red-hover': '#e53359',
+                dark: '#252122',
+                'dark-hover': '#353132',
+                gray: '#827a7c',
+                text: '#5d5d5d',
+                light: '#f7f7f7',
+                footer: '#858484',
+                'footer-link': '#c5c4c4',
+            },
+        },
+    },
+},
+```
+
+Es el mismo tema, con otra sintaxis: el objeto `dope` con la clave `red` genera las mismas clases (`bg-dope-red`, `text-dope-red`…) que la variable `--color-dope-red` de _Tailwind_ 4. Vuelve a compilar con `npm run build` y comprueba que la plantilla recupera sus colores.
+
 ### Recuperar nuestras rutas
 
 _Breeze_ ha sustituido `routes/web.php` por el suyo. Compáralo con el que teníamos:
@@ -323,7 +355,7 @@ git switch -c RA5_7
 
 1. **Un _middleware_ propio.** Crea el _middleware_ `CabeceraCentro` de este apartado y añádelo al grupo `web` en `bootstrap/app.php`. Comprueba en la pestaña **Red** de las herramientas de desarrollo que todas las respuestas llevan la cabecera `X-Centro`.
 
-2. **Instala _Breeze_.** Haz un _commit_ con todo lo anterior, instala _Breeze_ y recupera tus rutas. Cambia el logo de `application-logo.blade.php`. Comprueba que siguen funcionando tus páginas y que existen `/login` y `/register`.
+2. **Instala _Breeze_.** Haz un _commit_ con todo lo anterior, instala _Breeze_ y recupera tus rutas y los colores de la plantilla en `tailwind.config.js`. Cambia el logo de `application-logo.blade.php`. Comprueba que siguen funcionando tus páginas y que existen `/login` y `/register`.
 
 3. **Ana López se registra.** En `http://marcapersonalfp.test/register`, registra a la alumna de 4.2: Ana López, `ana.lopez@marcapersonalfp.test`, con la contraseña `ana-secreta`. Cierra la sesión y vuelve a entrar. Después, en `php artisan tinker`, busca su contraseña guardada:
 
@@ -361,7 +393,7 @@ El test comprueba:
 
 Si todo está bien: `Tests: 6 passed (20 assertions)`.
 
-> Los tests de 5.3 a 5.6 entran a las páginas de alta y edición como un usuario identificado, así que siguen pasando con las rutas protegidas.
+> Los tests de 5.3 a 5.6 entran a las páginas de alta y edición como un usuario identificado, así que siguen pasando con las rutas protegidas. El de 5.4 busca ahora los colores de la plantilla en `tailwind.config.js`: si falla `test_el_tema_tiene_los_colores_y_la_fuente`, revisa el paso "Recuperar los colores de la plantilla".
 
 ---
 

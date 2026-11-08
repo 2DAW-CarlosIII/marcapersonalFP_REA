@@ -251,15 +251,23 @@ return redirect()->route('proyectos.index')
     ->with('mensaje', "Proyecto «{$datos['nombre']}» creado.");
 ```
 
-En la vista, la directiva **`@session`** lo muestra si existe, en la variable `$value`. Como todas las páginas pueden recibir mensajes, su sitio natural es el _layout_, justo encima de `{{ $slot }}`:
+En la vista, la directiva **`@session`** lo muestra si existe, en la variable `$value`. Como todas las páginas pueden recibir mensajes, su sitio natural es el _layout_, justo encima de `{{ $slot }}`. Desde el ejercicio 5 de 5.4, `components/layout.blade.php` solo pasa su contenido a la plantilla, así que el mensaje va dentro de `<x-dopetrope.layout>`:
 
 ```blade
-@session('mensaje')
-    <div class="mb-6 rounded border border-green-300 bg-green-50 p-4 text-green-800">
-        {{ $value }}
-    </div>
-@endsession
+@props(['titulo' => null])
+
+<x-dopetrope.layout :titulo="$titulo">
+    @session('mensaje')
+        <div class="mb-6 rounded border border-green-300 bg-green-50 p-4 text-green-800">
+            {{ $value }}
+        </div>
+    @endsession
+
+    {{ $slot }}
+</x-dopetrope.layout>
 ```
+
+El mensaje aparece así al principio del contenido de la página, debajo del _banner_ y la introducción de la plantilla. Si no lo ves al volver al listado, baja hasta el título de la sección.
 
 En 4.1 había que leer el mensaje de `$_SESSION` y hacer `unset()` para que no volviera a salir. Aquí, _Laravel_ lo borra solo después de esa petición.
 
@@ -285,7 +293,7 @@ git switch -c RA5_6
 
 1. **Las rutas.** Añade a `routes/proyectos.php` las rutas `proyectos.store` (`POST /proyectos`) y `proyectos.update` (`PUT /proyectos/edit/{id}`), con sus acciones `store` y `update` en `ProyectosController`.
 
-2. **El mensaje _flash_.** Añade al _layout_ el bloque `@session('mensaje')` de este apartado.
+2. **El mensaje _flash_.** Añade al _layout_ (`components/layout.blade.php`) el bloque `@session('mensaje')` de este apartado.
 
 3. **El _Form Request_.** Crea `ProyectoRequest` con estas reglas:
 

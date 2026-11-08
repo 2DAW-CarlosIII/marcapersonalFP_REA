@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<!--
+	Dopetrope by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+
+	Versión con Tailwind CSS 4 (sin jQuery ni Font Awesome) para el módulo de Desarrollo Web en Entorno Servidor.
+	Las imágenes son de relleno (picsum.photos). Para verla, basta con abrir este fichero en el navegador.
+-->
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Dopetrope by HTML5 UP</title>
+
+	<!-- Fuente de la plantilla -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,700;0,900;1,300&display=swap" rel="stylesheet">
+
+	<!-- Tailwind 4 desde el CDN: solo para ver este HTML sin compilar. En Laravel se compila con Vite. -->
+	<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+	<!-- Este bloque @theme es el que se copia en resources/css/app.css -->
+	<style type="text/tailwindcss">
+		@theme {
+			--font-dopetrope: "Source Sans 3", "Source Sans Pro", ui-sans-serif, system-ui, sans-serif;
+
+			--color-dope-red: #d52349;
+			--color-dope-red-hover: #e53359;
+			--color-dope-dark: #252122;
+			--color-dope-dark-hover: #353132;
+			--color-dope-gray: #827a7c;
+			--color-dope-text: #5d5d5d;
+			--color-dope-light: #f7f7f7;
+			--color-dope-footer: #858484;
+			--color-dope-footer-link: #c5c4c4;
+		}
+	</style>
+</head>
+<body class="bg-dope-dark font-dopetrope text-lg leading-[1.75] font-light text-dope-text">
+
+	<!-- Header -->
+	<section id="header" class="border-b border-[#ccc] bg-white pt-16 text-center md:pt-[4.5em]">
+
+		<!-- Logo -->
+		<h1 class="mb-[1em] text-[2.5em] leading-none font-black tracking-[-0.035em] text-dope-dark">
+			<a href="index.html">Dopetrope</a>
+		</h1>
+
+		<!-- Nav -->
+		<nav id="nav">
+			<ul class="flex flex-wrap justify-center gap-x-3 gap-y-4 px-6 italic">
+				<li>
+					<a href="index.html" class="inline-block rounded-[5px] bg-dope-red px-5 py-2.5 font-bold text-white">Home</a>
+				</li>
+				<li class="group/menu relative">
+					<a href="#" class="inline-block rounded-[5px] px-5 py-2.5 transition-colors group-hover/menu:bg-[#f3f3f3]">Dropdown</a>
+
+					<!-- Desplegable: solo CSS, con group-hover y group-focus-within (sin JavaScript) -->
+					<div class="invisible absolute top-full left-1/2 z-20 -translate-x-1/2 pt-5 opacity-0 transition group-focus-within/menu:visible group-focus-within/menu:opacity-100 group-hover/menu:visible group-hover/menu:opacity-100">
+						<ul class="relative min-w-52 rounded-[5px] bg-dope-dark/95 px-6 py-5 text-left whitespace-nowrap shadow-[0_8px_15px_0_rgb(0_0_0/0.5)] before:absolute before:-top-[9px] before:left-1/2 before:-ml-[10px] before:border-x-[10px] before:border-b-[10px] before:border-x-transparent before:border-b-dope-dark/95">
+							<li class="py-1"><a href="#" class="text-[#aaa] transition-colors hover:text-white">Lorem ipsum dolor</a></li>
+							<li class="py-1"><a href="#" class="text-[#aaa] transition-colors hover:text-white">Magna phasellus</a></li>
+							<li class="py-1"><a href="#" class="text-[#aaa] transition-colors hover:text-white">Etiam dolore nisl</a></li>
+							<li class="group/sub relative py-1">
+								<a href="#" class="text-[#aaa] transition-colors group-hover/sub:text-white">Phasellus consequat &rsaquo;</a>
+
+								<!-- Segundo nivel -->
+								<div class="invisible absolute top-0 left-full z-30 -mt-5 pl-8 opacity-0 transition group-focus-within/sub:visible group-focus-within/sub:opacity-100 group-hover/sub:visible group-hover/sub:opacity-100">
+									<ul class="min-w-52 rounded-[5px] bg-dope-dark/95 px-6 py-5 shadow-[0_8px_15px_0_rgb(0_0_0/0.5)]">
+										<li class="py-1"><a href="#" class="text-[#aaa] transition-colors hover:text-white">Magna phasellus</a></li>
+										<li class="py-1"><a href="#" class="text-[#aaa] transition-colors hover:text-white">Etiam dolore nisl</a></li>
+										<li class="py-1"><a href="#" class="text-[#aaa] transition-colors hover:text-white">Veroeros feugiat</a></li>
+										<li class="py-1"><a href="#" class="text-[#aaa] transition-colors hover:text-white">Nisl sed aliquam</a></li>
+										<li class="py-1"><a href="#" class="text-[#aaa] transition-colors hover:text-white">Dolore adipiscing</a></li>
+									</ul>
+								</div>
+							</li>
+							<li class="py-1"><a href="#" class="text-[#aaa] transition-colors hover:text-white">Veroeros feugiat</a></li>
+						</ul>
+					</div>
+				</li>
+				<li><a href="left-sidebar.html" class="inline-block rounded-[5px] px-5 py-2.5 transition-colors hover:bg-[#f3f3f3]">Left Sidebar</a></li>
+				<li><a href="right-sidebar.html" class="inline-block rounded-[5px] px-5 py-2.5 transition-colors hover:bg-[#f3f3f3]">Right Sidebar</a></li>
+				<li><a href="no-sidebar.html" class="inline-block rounded-[5px] px-5 py-2.5 transition-colors hover:bg-[#f3f3f3]">No Sidebar</a></li>
+			</ul>
+		</nav>
+
+		<!-- Banner -->
+		<section id="banner" class="mt-16 bg-[#cce8f4] bg-[url(https://picsum.photos/seed/dopetrope-banner/1600/700)] bg-cover bg-center px-4 py-20 md:py-32">
+			<header class="inline-block rounded-[5px] bg-dope-dark/95 px-8 py-8 md:px-20 md:py-10">
+				<h2 class="mb-[0.65em] text-3xl font-bold text-white md:text-5xl">Howdy. This is Dopetrope.</h2>
+				<p class="text-xl text-dope-red md:text-2xl">A responsive template by HTML5 UP</p>
+			</header>
+		</section>
+
+		<!-- Intro -->
+		<section id="intro" class="mx-auto max-w-[1200px] px-6 pb-16">
+			<div class="grid md:grid-cols-3">
+				<section class="my-4 px-6 py-10 md:my-12">
+					<span class="relative mb-[4.5em] inline-block w-36 rounded-t-[5px] bg-dope-red pt-7 pb-3 text-white after:absolute after:-bottom-[1.95em] after:left-0 after:border-x-[4.5rem] after:border-t-[2em] after:border-x-transparent after:border-t-dope-red">
+						<svg viewBox="0 0 512 512" class="mx-auto size-[4.5rem]" fill="currentColor" aria-hidden="true"><path d="M195.1 9.5C198.1-5.3 211.2-16 226.4-16l59.8 0c15.2 0 28.3 10.7 31.3 25.5L332 79.5c14.1 6 27.3 13.7 39.3 22.8l67.8-22.5c14.4-4.8 30.2 1.2 37.8 14.4l29.9 51.8c7.6 13.2 4.9 29.8-6.5 39.9L447 233.3c.9 7.4 1.3 15 1.3 22.7s-.5 15.3-1.3 22.7l53.4 47.5c11.4 10.1 14 26.8 6.5 39.9l-29.9 51.8c-7.6 13.1-23.4 19.2-37.8 14.4l-67.8-22.5c-12.1 9.1-25.3 16.7-39.3 22.8l-14.4 69.9c-3.1 14.9-16.2 25.5-31.3 25.5l-59.8 0c-15.2 0-28.3-10.7-31.3-25.5l-14.4-69.9c-14.1-6-27.2-13.7-39.3-22.8L73.5 432.3c-14.4 4.8-30.2-1.2-37.8-14.4L5.8 366.1c-7.6-13.2-4.9-29.8 6.5-39.9l53.4-47.5c-.9-7.4-1.3-15-1.3-22.7s.5-15.3 1.3-22.7L12.3 185.8c-11.4-10.1-14-26.8-6.5-39.9L35.7 94.1c7.6-13.2 23.4-19.2 37.8-14.4l67.8 22.5c12.1-9.1 25.3-16.7 39.3-22.8L195.1 9.5zM256.3 336a80 80 0 1 0 -.6-160 80 80 0 1 0 .6 160z"/></svg>
+					</span>
+					<header class="mb-6">
+						<h2 class="text-3xl text-dope-dark">Ipsum consequat</h2>
+					</header>
+					<p>Nisl amet dolor sit ipsum veroeros sed blandit consequat veroeros et magna tempus.</p>
+				</section>
+				<section class="my-4 px-6 py-10 md:my-12 md:shadow-[-24px_0_24px_-24px_rgb(0_0_0/0.25),24px_0_24px_-24px_rgb(0_0_0/0.25)]">
+					<span class="relative mb-[4.5em] inline-block w-36 rounded-t-[5px] bg-dope-dark pt-7 pb-3 text-white after:absolute after:-bottom-[1.95em] after:left-0 after:border-x-[4.5rem] after:border-t-[2em] after:border-x-transparent after:border-t-dope-dark">
+						<svg viewBox="0 0 448 512" class="mx-auto size-[4.5rem]" fill="currentColor" aria-hidden="true"><path d="M338.8-9.9c11.9 8.6 16.3 24.2 10.9 37.8L271.3 224 416 224c13.5 0 25.5 8.4 30.1 21.1s.7 26.9-9.6 35.5l-288 240c-11.3 9.4-27.4 9.9-39.3 1.3s-16.3-24.2-10.9-37.8L176.7 288 32 288c-13.5 0-25.5-8.4-30.1-21.1s-.7-26.9 9.6-35.5l288-240c11.3-9.4 27.4-9.9 39.3-1.3z"/></svg>
+					</span>
+					<header class="mb-6">
+						<h2 class="text-3xl text-dope-dark">Magna etiam dolor</h2>
+					</header>
+					<p>Nisl amet dolor sit ipsum veroeros sed blandit consequat veroeros et magna tempus.</p>
+				</section>
+				<section class="my-4 px-6 py-10 md:my-12">
+					<span class="relative mb-[4.5em] inline-block w-36 rounded-t-[5px] bg-dope-gray pt-7 pb-3 text-white after:absolute after:-bottom-[1.95em] after:left-0 after:border-x-[4.5rem] after:border-t-[2em] after:border-x-transparent after:border-t-dope-gray">
+						<svg viewBox="0 0 576 512" class="mx-auto size-[4.5rem]" fill="currentColor" aria-hidden="true"><path d="M309.5-18.9c-4.1-8-12.4-13.1-21.4-13.1s-17.3 5.1-21.4 13.1L193.1 125.3 33.2 150.7c-8.9 1.4-16.3 7.7-19.1 16.3s-.5 18 5.8 24.4l114.4 114.5-25.2 159.9c-1.4 8.9 2.3 17.9 9.6 23.2s16.9 6.1 25 2L288.1 417.6 432.4 491c8 4.1 17.7 3.3 25-2s11-14.2 9.6-23.2L441.7 305.9 556.1 191.4c6.4-6.4 8.6-15.8 5.8-24.4s-10.1-14.9-19.1-16.3L383 125.3 309.5-18.9z"/></svg>
+					</span>
+					<header class="mb-6">
+						<h2 class="text-3xl text-dope-dark">Tempus adipiscing</h2>
+					</header>
+					<p>Nisl amet dolor sit ipsum veroeros sed blandit consequat veroeros et magna tempus.</p>
+				</section>
+			</div>
+			<footer>
+				<ul class="flex flex-wrap justify-center gap-4">
+					<li><a href="#" class="inline-block min-w-[12em] rounded-[5px] bg-dope-red px-9 py-4 text-2xl font-bold text-white transition-colors hover:bg-dope-red-hover">Get Started</a></li>
+					<li><a href="#" class="inline-block min-w-[12em] rounded-[5px] bg-dope-dark px-9 py-4 text-2xl font-bold text-white transition-colors hover:bg-dope-dark-hover">Learn More</a></li>
+				</ul>
+			</footer>
+		</section>
+
+	</section>
+
+	<!-- Main -->
+	<section id="main" class="bg-dope-light py-16">
+		<div class="mx-auto max-w-[1200px] px-6">
+
+			<!-- Portfolio -->
+			<section>
+				<header class="relative mt-4 mb-12 border-t border-[#ccc] text-center">
+					<h2 class="relative -top-[0.65em] inline bg-dope-light px-4 text-3xl text-dope-dark">My Portfolio</h2>
+				</header>
+				<div class="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
+					<section class="border-b border-[#ccc] bg-white px-7 pb-11">
+						<a href="#" class="-mx-7 mb-10 block"><img src="https://picsum.photos/seed/dopetrope-02/800/450" alt="" class="w-full"></a>
+						<header class="mb-6">
+							<h3 class="text-2xl text-dope-dark">Ipsum feugiat et dolor</h3>
+						</header>
+						<p>Lorem ipsum dolor sit amet sit veroeros sed amet blandit consequat veroeros lorem blandit adipiscing et feugiat phasellus tempus dolore ipsum lorem dolore.</p>
+						<footer class="mt-9">
+							<ul class="flex flex-wrap gap-4">
+								<li><a href="#" class="inline-block rounded-[5px] bg-dope-dark px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-dark-hover">Find out more</a></li>
+							</ul>
+						</footer>
+					</section>
+					<section class="border-b border-[#ccc] bg-white px-7 pb-11">
+						<a href="#" class="-mx-7 mb-10 block"><img src="https://picsum.photos/seed/dopetrope-03/800/450" alt="" class="w-full"></a>
+						<header class="mb-6">
+							<h3 class="text-2xl text-dope-dark">Sed etiam lorem nulla</h3>
+						</header>
+						<p>Lorem ipsum dolor sit amet sit veroeros sed amet blandit consequat veroeros lorem blandit adipiscing et feugiat phasellus tempus dolore ipsum lorem dolore.</p>
+						<footer class="mt-9">
+							<ul class="flex flex-wrap gap-4">
+								<li><a href="#" class="inline-block rounded-[5px] bg-dope-dark px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-dark-hover">Find out more</a></li>
+							</ul>
+						</footer>
+					</section>
+					<section class="border-b border-[#ccc] bg-white px-7 pb-11">
+						<a href="#" class="-mx-7 mb-10 block"><img src="https://picsum.photos/seed/dopetrope-04/800/450" alt="" class="w-full"></a>
+						<header class="mb-6">
+							<h3 class="text-2xl text-dope-dark">Consequat et tempus</h3>
+						</header>
+						<p>Lorem ipsum dolor sit amet sit veroeros sed amet blandit consequat veroeros lorem blandit adipiscing et feugiat phasellus tempus dolore ipsum lorem dolore.</p>
+						<footer class="mt-9">
+							<ul class="flex flex-wrap gap-4">
+								<li><a href="#" class="inline-block rounded-[5px] bg-dope-dark px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-dark-hover">Find out more</a></li>
+							</ul>
+						</footer>
+					</section>
+					<section class="border-b border-[#ccc] bg-white px-7 pb-11">
+						<a href="#" class="-mx-7 mb-10 block"><img src="https://picsum.photos/seed/dopetrope-05/800/450" alt="" class="w-full"></a>
+						<header class="mb-6">
+							<h3 class="text-2xl text-dope-dark">Blandit sed adipiscing</h3>
+						</header>
+						<p>Lorem ipsum dolor sit amet sit veroeros sed amet blandit consequat veroeros lorem blandit adipiscing et feugiat phasellus tempus dolore ipsum lorem dolore.</p>
+						<footer class="mt-9">
+							<ul class="flex flex-wrap gap-4">
+								<li><a href="#" class="inline-block rounded-[5px] bg-dope-dark px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-dark-hover">Find out more</a></li>
+							</ul>
+						</footer>
+					</section>
+					<section class="border-b border-[#ccc] bg-white px-7 pb-11">
+						<a href="#" class="-mx-7 mb-10 block"><img src="https://picsum.photos/seed/dopetrope-06/800/450" alt="" class="w-full"></a>
+						<header class="mb-6">
+							<h3 class="text-2xl text-dope-dark">Etiam nisl consequat</h3>
+						</header>
+						<p>Lorem ipsum dolor sit amet sit veroeros sed amet blandit consequat veroeros lorem blandit adipiscing et feugiat phasellus tempus dolore ipsum lorem dolore.</p>
+						<footer class="mt-9">
+							<ul class="flex flex-wrap gap-4">
+								<li><a href="#" class="inline-block rounded-[5px] bg-dope-dark px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-dark-hover">Find out more</a></li>
+							</ul>
+						</footer>
+					</section>
+					<section class="border-b border-[#ccc] bg-white px-7 pb-11">
+						<a href="#" class="-mx-7 mb-10 block"><img src="https://picsum.photos/seed/dopetrope-07/800/450" alt="" class="w-full"></a>
+						<header class="mb-6">
+							<h3 class="text-2xl text-dope-dark">Dolore nisl feugiat</h3>
+						</header>
+						<p>Lorem ipsum dolor sit amet sit veroeros sed amet blandit consequat veroeros lorem blandit adipiscing et feugiat phasellus tempus dolore ipsum lorem dolore.</p>
+						<footer class="mt-9">
+							<ul class="flex flex-wrap gap-4">
+								<li><a href="#" class="inline-block rounded-[5px] bg-dope-dark px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-dark-hover">Find out more</a></li>
+							</ul>
+						</footer>
+					</section>
+				</div>
+			</section>
+
+			<!-- Blog -->
+			<section class="mt-16">
+				<header class="relative mt-4 mb-12 border-t border-[#ccc] text-center">
+					<h2 class="relative -top-[0.65em] inline bg-dope-light px-4 text-3xl text-dope-dark">The Blog</h2>
+				</header>
+				<div class="grid gap-12 lg:grid-cols-2">
+					<section class="border-b border-[#ccc] bg-white px-7 pb-11">
+						<a href="#" class="-mx-7 mb-10 block"><img src="https://picsum.photos/seed/dopetrope-08/1000/500" alt="" class="w-full"></a>
+						<header class="mb-6">
+							<h3 class="text-2xl text-dope-dark">Magna tempus consequat</h3>
+							<p class="mt-2 italic">Posted 45 minutes ago</p>
+						</header>
+						<p>Lorem ipsum dolor sit amet sit veroeros sed et blandit consequat sed veroeros lorem et blandit adipiscing feugiat phasellus tempus hendrerit, tortor vitae mattis tempor, sapien sem feugiat sapien, id suscipit magna felis nec elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos lorem ipsum dolor sit amet.</p>
+						<footer class="mt-9">
+							<ul class="flex flex-wrap gap-4">
+								<li><a href="#" class="inline-flex items-center gap-2 rounded-[5px] bg-dope-red px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-red-hover"><svg viewBox="0 0 384 512" class="size-4" fill="currentColor" aria-hidden="true"><path d="M0 64C0 28.7 28.7 0 64 0L213.5 0c17 0 33.3 6.7 45.3 18.7L365.3 125.3c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64zm208-5.5l0 93.5c0 13.3 10.7 24 24 24L325.5 176 208 58.5zM120 256c-13.3 0-24 10.7-24 24s10.7 24 24 24l144 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-144 0zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24l144 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-144 0z"/></svg> Continue Reading</a></li>
+								<li><a href="#" class="inline-flex items-center gap-2 rounded-[5px] bg-dope-dark px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-dark-hover"><svg viewBox="0 0 512 512" class="size-4" fill="currentColor" aria-hidden="true"><path d="M512 240c0 132.5-114.6 240-256 240-37.1 0-72.3-7.4-104.1-20.7L33.5 510.1c-9.4 4-20.2 1.7-27.1-5.8S-2 485.8 2.8 476.8l48.8-92.2C19.2 344.3 0 294.3 0 240 0 107.5 114.6 0 256 0S512 107.5 512 240z"/></svg> 33 comments</a></li>
+							</ul>
+						</footer>
+					</section>
+					<section class="border-b border-[#ccc] bg-white px-7 pb-11">
+						<a href="#" class="-mx-7 mb-10 block"><img src="https://picsum.photos/seed/dopetrope-09/1000/500" alt="" class="w-full"></a>
+						<header class="mb-6">
+							<h3 class="text-2xl text-dope-dark">Aptent veroeros aliquam</h3>
+							<p class="mt-2 italic">Posted 45 minutes ago</p>
+						</header>
+						<p>Lorem ipsum dolor sit amet sit veroeros sed et blandit consequat sed veroeros lorem et blandit adipiscing feugiat phasellus tempus hendrerit, tortor vitae mattis tempor, sapien sem feugiat sapien, id suscipit magna felis nec elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos lorem ipsum dolor sit amet.</p>
+						<footer class="mt-9">
+							<ul class="flex flex-wrap gap-4">
+								<li><a href="#" class="inline-flex items-center gap-2 rounded-[5px] bg-dope-red px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-red-hover"><svg viewBox="0 0 384 512" class="size-4" fill="currentColor" aria-hidden="true"><path d="M0 64C0 28.7 28.7 0 64 0L213.5 0c17 0 33.3 6.7 45.3 18.7L365.3 125.3c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64zm208-5.5l0 93.5c0 13.3 10.7 24 24 24L325.5 176 208 58.5zM120 256c-13.3 0-24 10.7-24 24s10.7 24 24 24l144 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-144 0zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24l144 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-144 0z"/></svg> Continue Reading</a></li>
+								<li><a href="#" class="inline-flex items-center gap-2 rounded-[5px] bg-dope-dark px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-dark-hover"><svg viewBox="0 0 512 512" class="size-4" fill="currentColor" aria-hidden="true"><path d="M512 240c0 132.5-114.6 240-256 240-37.1 0-72.3-7.4-104.1-20.7L33.5 510.1c-9.4 4-20.2 1.7-27.1-5.8S-2 485.8 2.8 476.8l48.8-92.2C19.2 344.3 0 294.3 0 240 0 107.5 114.6 0 256 0S512 107.5 512 240z"/></svg> 33 comments</a></li>
+							</ul>
+						</footer>
+					</section>
+				</div>
+			</section>
+
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<section id="footer" class="py-16 text-dope-footer">
+		<div class="mx-auto grid max-w-[1200px] gap-x-12 gap-y-16 px-6 lg:grid-cols-3">
+
+			<section class="lg:col-span-2">
+				<header class="mb-12">
+					<h2 class="text-[1.75em] text-white">Blandit nisl adipiscing</h2>
+				</header>
+				<ul>
+					<li class="group relative border-t border-white/5 py-5 pl-[6.75em] first:border-t-0 first:pt-0">
+						<span class="absolute top-5 left-0 block h-[3.5em] rounded-l-[5px] bg-dope-red pt-2 pr-3 pl-4 text-center leading-none text-white group-first:top-0 after:absolute after:-right-[1.2em] after:bottom-0 after:border-y-[1.8em] after:border-l-[1.25em] after:border-y-transparent after:border-l-dope-red">Jan <strong class="block pt-[0.15em] text-[1.75em] font-normal">27</strong></span>
+						<h3 class="text-xl"><a href="#" class="text-white">Lorem dolor sit amet veroeros</a></h3>
+						<p>Ipsum dolor sit amet veroeros consequat blandit ipsum phasellus lorem consequat etiam.</p>
+					</li>
+					<li class="group relative border-t border-white/5 py-5 pl-[6.75em] first:border-t-0 first:pt-0">
+						<span class="absolute top-5 left-0 block h-[3.5em] rounded-l-[5px] bg-dope-red pt-2 pr-3 pl-4 text-center leading-none text-white group-first:top-0 after:absolute after:-right-[1.2em] after:bottom-0 after:border-y-[1.8em] after:border-l-[1.25em] after:border-y-transparent after:border-l-dope-red">Jan <strong class="block pt-[0.15em] text-[1.75em] font-normal">23</strong></span>
+						<h3 class="text-xl"><a href="#" class="text-white">Ipsum sed blandit nisl consequat</a></h3>
+						<p>Blandit phasellus lorem ipsum dolor tempor sapien tortor hendrerit adipiscing feugiat lorem.</p>
+					</li>
+					<li class="group relative border-t border-white/5 py-5 pl-[6.75em] first:border-t-0 first:pt-0">
+						<span class="absolute top-5 left-0 block h-[3.5em] rounded-l-[5px] bg-dope-red pt-2 pr-3 pl-4 text-center leading-none text-white group-first:top-0 after:absolute after:-right-[1.2em] after:bottom-0 after:border-y-[1.8em] after:border-l-[1.25em] after:border-y-transparent after:border-l-dope-red">Jan <strong class="block pt-[0.15em] text-[1.75em] font-normal">15</strong></span>
+						<h3 class="text-xl"><a href="#" class="text-white">Magna tempus lorem feugiat</a></h3>
+						<p>Dolore consequat sed phasellus lorem sed etiam nullam dolor etiam sed amet sit consequat.</p>
+					</li>
+					<li class="group relative border-t border-white/5 py-5 pl-[6.75em] first:border-t-0 first:pt-0">
+						<span class="absolute top-5 left-0 block h-[3.5em] rounded-l-[5px] bg-dope-red pt-2 pr-3 pl-4 text-center leading-none text-white group-first:top-0 after:absolute after:-right-[1.2em] after:bottom-0 after:border-y-[1.8em] after:border-l-[1.25em] after:border-y-transparent after:border-l-dope-red">Jan <strong class="block pt-[0.15em] text-[1.75em] font-normal">12</strong></span>
+						<h3 class="text-xl"><a href="#" class="text-white">Dolore tempus ipsum feugiat nulla</a></h3>
+						<p>Feugiat lorem dolor sed nullam tempus lorem ipsum dolor sit amet nullam consequat.</p>
+					</li>
+					<li class="group relative border-t border-white/5 py-5 pl-[6.75em] first:border-t-0 first:pt-0">
+						<span class="absolute top-5 left-0 block h-[3.5em] rounded-l-[5px] bg-dope-red pt-2 pr-3 pl-4 text-center leading-none text-white group-first:top-0 after:absolute after:-right-[1.2em] after:bottom-0 after:border-y-[1.8em] after:border-l-[1.25em] after:border-y-transparent after:border-l-dope-red">Jan <strong class="block pt-[0.15em] text-[1.75em] font-normal">10</strong></span>
+						<h3 class="text-xl"><a href="#" class="text-white">Blandit tempus aliquam?</a></h3>
+						<p>Feugiat sed tempus blandit tempus adipiscing nisl lorem ipsum dolor sit amet dolore.</p>
+					</li>
+				</ul>
+			</section>
+
+			<section>
+				<header class="mb-12">
+					<h2 class="text-[1.75em] text-white">What's this all about?</h2>
+				</header>
+				<a href="#" class="mb-8 block"><img src="https://picsum.photos/seed/dopetrope-10/800/450" alt="" class="w-full rounded-[5px]"></a>
+				<p>
+					This is <strong class="font-normal text-white">Dopetrope</strong> a free, fully responsive HTML5 site template by
+					<a href="http://twitter.com/ajlkn" class="text-dope-footer-link underline hover:no-underline">AJ</a> for <a href="http://html5up.net/" class="text-dope-footer-link underline hover:no-underline">HTML5 UP</a> It's released for free under
+					the <a href="http://html5up.net/license/" class="text-dope-footer-link underline hover:no-underline">Creative Commons Attribution</a> license so feel free to use it for any personal or commercial project &ndash; just don't forget to credit us!
+				</p>
+				<footer class="mt-9">
+					<a href="#" class="inline-block rounded-[5px] bg-dope-red px-6 py-2.5 font-bold text-white transition-colors hover:bg-dope-red-hover">Find out more</a>
+				</footer>
+			</section>
+
+			<section>
+				<header class="mb-12">
+					<h2 class="text-[1.75em] text-white">Tempus consequat</h2>
+				</header>
+				<ul>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Lorem ipsum dolor sit amet sit veroeros</a></li>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Sed et blandit consequat sed tlorem blandit</a></li>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Adipiscing feugiat phasellus sed tempus</a></li>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Hendrerit tortor vitae mattis tempor sapien</a></li>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Sem feugiat sapien id suscipit magna felis nec</a></li>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Elit class aptent taciti sociosqu ad litora</a></li>
+				</ul>
+			</section>
+
+			<section>
+				<header class="mb-12">
+					<h2 class="text-[1.75em] text-white">Ipsum et phasellus</h2>
+				</header>
+				<ul>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Lorem ipsum dolor sit amet sit veroeros</a></li>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Sed et blandit consequat sed tlorem blandit</a></li>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Adipiscing feugiat phasellus sed tempus</a></li>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Hendrerit tortor vitae mattis tempor sapien</a></li>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Sem feugiat sapien id suscipit magna felis nec</a></li>
+					<li class="border-t border-white/5 py-4 first:border-t-0 first:pt-0"><a href="#" class="text-dope-footer-link hover:text-white">Elit class aptent taciti sociosqu ad litora</a></li>
+				</ul>
+			</section>
+
+			<section>
+				<header class="mb-12">
+					<h2 class="text-[1.75em] text-white">Vitae tempor lorem</h2>
+				</header>
+				<ul class="mb-12 flex flex-wrap gap-3">
+					<li><a href="#" class="flex size-12 items-center justify-center rounded-[5px] bg-[#3c5a98] text-white transition-colors hover:bg-[#4c6aa8]"><svg viewBox="0 0 320 512" class="size-6" fill="currentColor" aria-hidden="true"><path d="M80 299.3l0 212.7 116 0 0-212.7 86.5 0 18-97.8-104.5 0 0-34.6c0-51.7 20.3-71.5 72.7-71.5 16.3 0 29.4 .4 37 1.2l0-88.7C291.4 4 256.4 0 236.2 0 129.3 0 80 50.5 80 159.4l0 42.1-66 0 0 97.8 66 0z"/></svg><span class="sr-only">Facebook</span></a></li>
+					<li><a href="#" class="flex size-12 items-center justify-center rounded-[5px] bg-[#2daae4] text-white transition-colors hover:bg-[#3dbaf4]"><svg viewBox="0 0 448 512" class="size-6" fill="currentColor" aria-hidden="true"><path d="M357.2 48L427.8 48 273.6 224.2 455 464 313 464 201.7 318.6 74.5 464 3.8 464 168.7 275.5-5.2 48 140.4 48 240.9 180.9 357.2 48zM332.4 421.8l39.1 0-252.4-333.8-42 0 255.3 333.8z"/></svg><span class="sr-only">Twitter</span></a></li>
+					<li><a href="#" class="flex size-12 items-center justify-center rounded-[5px] bg-[#c4376b] text-white transition-colors hover:bg-[#d4477b]"><svg viewBox="0 0 512 512" class="size-6" fill="currentColor" aria-hidden="true"><path d="M256 8a248 248 0 1 0 0 496 248 248 0 1 0 0-496zM420 122.4c29.5 36 47.4 82 47.8 132-7-1.5-77-15.7-147.5-6.8-5.8-14-11.2-26.4-18.6-41.6 78.3-32 113.8-77.5 118.3-83.5zM396.4 97.9c-3.8 5.4-35.7 48.3-111 76.5-34.7-63.8-73.2-116.2-79-124 67.2-16.2 138 1.3 190.1 47.5zM165.9 64.6c5.6 7.7 43.4 60.1 78.5 122.5-99.1 26.3-186.4 25.9-195.8 25.8 13.7-65.7 58-120.4 117.3-148.3zM44.2 256.3c0-2.2 0-4.3 .1-6.5 9.3 .2 111.9 1.5 217.7-30.1 6.1 11.9 11.9 23.9 17.2 35.9-76.6 21.6-146.2 83.5-180.5 142.3-33.8-37.6-54.5-87.2-54.5-141.6zM126 423.4c22.1-45.2 82.2-103.6 167.6-132.8 29.7 77.3 42 142.1 45.2 160.6-68.1 29-150 21.1-212.8-27.9zm248.4 8.5c-2.2-12.9-13.4-74.9-41.2-151 66.4-10.6 124.7 6.8 131.9 9.1-9.4 58.9-43.3 109.8-90.8 142z"/></svg><span class="sr-only">Dribbble</span></a></li>
+					<li><a href="#" class="flex size-12 items-center justify-center rounded-[5px] bg-[#2b4661] text-white transition-colors hover:bg-[#3b5671]"><svg viewBox="0 0 320 512" class="size-6" fill="currentColor" aria-hidden="true"><path d="M309.9 480.3c-13.6 14.5-50 31.7-97.4 31.7-120.8 0-147-88.8-147-140.6l0-144-47.5 0c-5.5 0-10-4.5-10-10l0-68c0-7.2 4.5-13.6 11.3-16 62-21.8 81.5-76 84.3-117.1 .8-11 6.5-16.3 16.1-16.3l70.9 0c5.5 0 10 4.5 10 10l0 115.2 83 0c5.5 0 10 4.4 10 9.9l0 81.7c0 5.5-4.5 10-10 10l-83.4 0 0 133.2c0 34.2 23.7 53.6 68 35.8 4.8-1.9 9-3.2 12.7-2.2 3.5 .9 5.8 3.4 7.4 7.9l22 64.3c1.8 5 3.3 10.6-.4 14.5z"/></svg><span class="sr-only">Tumblr</span></a></li>
+					<li><a href="#" class="flex size-12 items-center justify-center rounded-[5px] bg-[#006599] text-white transition-colors hover:bg-[#1075a9]"><svg viewBox="0 0 448 512" class="size-6" fill="currentColor" aria-hidden="true"><path d="M100.3 448l-92.9 0 0-299.1 92.9 0 0 299.1zM53.8 108.1C24.1 108.1 0 83.5 0 53.8 0 39.5 5.7 25.9 15.8 15.8s23.8-15.8 38-15.8 27.9 5.7 38 15.8 15.8 23.8 15.8 38c0 29.7-24.1 54.3-53.8 54.3zM447.9 448l-92.7 0 0-145.6c0-34.7-.7-79.2-48.3-79.2-48.3 0-55.7 37.7-55.7 76.7l0 148.1-92.8 0 0-299.1 89.1 0 0 40.8 1.3 0c12.4-23.5 42.7-48.3 87.9-48.3 94 0 111.3 61.9 111.3 142.3l0 164.3-.1 0z"/></svg><span class="sr-only">LinkedIn</span></a></li>
+				</ul>
+				<ul>
+					<li class="group relative border-t border-white/5 py-5 pl-28 first:border-t-0 first:pt-0">
+						<h3 class="absolute top-5 left-0 text-xl text-white group-first:top-0">Address</h3>
+						<p>
+							Untitled Incorporated<br>
+							1234 Somewhere Road Suite<br>
+							Nashville, TN 00000-0000
+						</p>
+					</li>
+					<li class="group relative border-t border-white/5 py-5 pl-28 first:border-t-0 first:pt-0">
+						<h3 class="absolute top-5 left-0 text-xl text-white group-first:top-0">Mail</h3>
+						<p><a href="#" class="text-dope-footer-link hover:text-white">someone@untitled.tld</a></p>
+					</li>
+					<li class="group relative border-t border-white/5 py-5 pl-28 first:border-t-0 first:pt-0">
+						<h3 class="absolute top-5 left-0 text-xl text-white group-first:top-0">Phone</h3>
+						<p>(800) 000-0000</p>
+					</li>
+				</ul>
+			</section>
+
+			<!-- Copyright -->
+			<div id="copyright" class="text-center lg:col-span-3">
+				<ul class="inline-flex flex-wrap justify-center divide-x divide-white/5 rounded-[5px] bg-white/5 px-9 py-3.5">
+					<li class="px-4">&copy; Untitled. All rights reserved.</li>
+					<li class="px-4">Design: <a href="http://html5up.net" class="text-dope-footer-link hover:text-white">HTML5 UP</a></li>
+				</ul>
+			</div>
+
+		</div>
+	</section>
+
+</body>
+</html>
