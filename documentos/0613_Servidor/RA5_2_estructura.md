@@ -295,7 +295,7 @@ git switch -c RA5_2
 
 6. **Investiga.** Responde en tu _pull request_:
     - Abre `vendor/composer/autoload_psr4.php`. ¿Qué línea corresponde al espacio de nombres `App\`? ¿Quién ha generado ese fichero?
-    - Provoca un error: cambia temporalmente en el `routes/web.php` `return view('welcome');` por `return view('welcom');` y pide `http://marcapersonalfp.test`. Después cambia `APP_DEBUG` a `false` y vuelve a pedirla. ¿Qué muestra el navegador en cada caso? ¿Dónde queda el detalle del error en el segundo? ¿Por qué una página de error detallada sería peligrosa en producción? Al terminar, `return view('welcome');` en `routes/web.php` y `APP_DEBUG` a `true`.
+    - Provoca un error: en `routes/web.php`, cambia temporalmente `view('welcome')` por `view('welcom')`, una vista que no existe, y pide `http://marcapersonalfp.test`. Después cambia en el `.env` `APP_DEBUG` a `false` y vuelve a pedirla. ¿Qué muestra el navegador en cada caso? ¿Dónde queda el detalle del error en el segundo? ¿Por qué una página de error detallada sería peligrosa en producción? Al terminar, vuelve a poner `view('welcome')` y `APP_DEBUG=true`.
 
 > **Puente.** En _v0_, `NOMBRE_CENTRO` era una constante escrita en cada página que la necesitaba, y las opciones de la sesión se repetían hasta que las llevamos a `iniciarSesion()`. En _Laravel_, la configuración vive fuera del código: en el `.env` lo que cambia de una instalación a otra, y en `config/` el resto, con un valor por defecto. Esto que hicimos a mano, el framework lo automatiza así.
 

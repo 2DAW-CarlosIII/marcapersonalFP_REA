@@ -724,7 +724,7 @@ git switch -c RA5_2
         <ol class="pasos compacta" start="4">
           <li><strong>Un fichero de configuración propio.</strong> <code>config/marcapersonalfp.php</code> y <code>NOMBRE_CENTRO</code> en <code>.env</code> y <code>.env.example</code>.</li>
           <li><strong>Un comando propio.</strong> <code>marcapersonalfp:centro</code>, en verde y con descripción.</li>
-          <li><strong>Investiga.</strong> <code>vendor/composer/autoload_psr4.php</code>. Y un error a propósito (<code>SESSION_DRIVER=inexistente</code>) con <code>APP_DEBUG</code> a <code>true</code> y a <code>false</code>.</li>
+          <li><strong>Investiga.</strong> <code>vendor/composer/autoload_psr4.php</code>. Y un error a propósito (<code>view('welcom')</code>, una vista que no existe) con <code>APP_DEBUG</code> a <code>true</code> y a <code>false</code>.</li>
         </ol>
       </section>
 
