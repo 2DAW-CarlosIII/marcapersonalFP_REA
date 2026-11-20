@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class RA5_6_FormulariosTest extends TestCase
 {
-    private const CONTROLADOR = 'App\\Http\\Controllers\\ProyectosController';
+    private const CONTROLADOR = 'App\\Http\\Controllers\\ProyectoController';
 
     // Un proyecto válido. Durante los tests, Laravel no exige el token CSRF.
     private const VALIDO = [

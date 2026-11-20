@@ -96,11 +96,11 @@ Con unas pocas clases es manejable. Con cientos, como en _Laravel_, sería impos
 ```php
 <?php
 
-namespace App\Http\Controllers;     // esta clase es App\Http\Controllers\ProyectosController
+namespace App\Http\Controllers;     // esta clase es App\Http\Controllers\ProyectoController
 
 use App\Models\User;                // a partir de aquí, "User" significa App\Models\User
 
-class ProyectosController extends Controller
+class ProyectoController extends Controller
 {
     // ...
 }

@@ -19,7 +19,7 @@ En 5.2 presentamos el patrón **Modelo-Vista-Controlador**, y desde entonces hem
 
 | Pieza | Responsabilidad | En _marcapersonalFP_ |
 |---|---|---|
-| **Modelo** | Los datos y sus reglas | Hasta ahora, un array dentro de `ProyectosController` (5.5) |
+| **Modelo** | Los datos y sus reglas | Hasta ahora, un array dentro de `ProyectoController` (5.5) |
 | **Vista** | La presentación | `resources/views/`, con _Blade_ (5.4) |
 | **Controlador** | Coordinar: recibir la petición, pedir los datos, elegir la vista | `app/Http/Controllers/` (5.5) |
 

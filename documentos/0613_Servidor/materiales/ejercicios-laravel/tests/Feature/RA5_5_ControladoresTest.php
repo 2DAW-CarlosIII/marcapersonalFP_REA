@@ -28,7 +28,7 @@ class RA5_5_ControladoresTest extends TestCase
     public function test_las_rutas_de_proyectos_usan_su_controlador(): void
     {
         foreach (['index', 'show', 'create', 'edit'] as $metodo) {
-            $this->assertSame(self::CONTROLADORES . "ProyectosController@$metodo", $this->accion("proyectos.$metodo"));
+            $this->assertSame(self::CONTROLADORES . "ProyectoController@$metodo", $this->accion("proyectos.$metodo"));
         }
     }
 

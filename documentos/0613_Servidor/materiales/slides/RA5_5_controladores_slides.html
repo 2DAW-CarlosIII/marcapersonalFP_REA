@@ -304,7 +304,7 @@
           }
         </style>
         <h2>De la ruta al controlador</h2>
-        <svg class="anim" viewBox="0 0 960 410" style="max-height:410px" role="img" aria-label="Antes, la función de la ruta tenía los datos y elegía la vista. Los datos pasan a una propiedad de ProyectosController y la vista a su acción show. La ruta solo apunta al controlador. Después, GET /proyectos/show/7 llega a la ruta, la ruta llama a show con el 7, show toma el proyecto de $arrayProyectos y devuelve la vista proyectos.show">
+        <svg class="anim" viewBox="0 0 960 410" style="max-height:410px" role="img" aria-label="Antes, la función de la ruta tenía los datos y elegía la vista. Los datos pasan a una propiedad de ProyectoController y la vista a su acción show. La ruta solo apunta al controlador. Después, GET /proyectos/show/7 llega a la ruta, la ruta llama a show con el 7, show toma el proyecto de $arrayProyectos y devuelve la vista proyectos.show">
           <defs>
             <marker id="k-fl-gris" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#4B5563"/></marker>
             <marker id="k-fl-violeta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9 z" fill="#7C3AED"/></marker>
@@ -334,7 +334,7 @@
           <!-- 2 · los datos y la vista, al controlador -->
           <g class="fragment" data-fragment-index="2">
             <rect x="520" y="100" width="420" height="200" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
-            <text x="535" y="124" font-size="13" font-weight="700" class="mono" fill="#5B21B6">ProyectosController.php</text>
+            <text x="535" y="124" font-size="13" font-weight="700" class="mono" fill="#5B21B6">ProyectoController.php</text>
             <circle cx="915" cy="120" r="13" fill="#7C3AED"/><text x="915" y="125" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">2</text>
             <text x="535" y="152" font-size="13" class="mono" fill="#4C1D95">private array $arrayProyectos =</text>
             <text x="535" y="222" font-size="13" class="mono" fill="#4C1D95">public function show(int $id): View {</text>
@@ -344,7 +344,7 @@
           <g class="fragment" data-fragment-index="3">
             <rect x="23" y="134" width="434" height="163" fill="#EFF6FF"/>
             <text x="35" y="160" font-size="13" class="mono" fill="#1E3A8A">Route::get('proyectos/show/{id}',</text>
-            <text x="66" y="185" font-size="13" class="mono" font-weight="700" fill="#5B21B6">[ProyectosController::class, 'show']</text>
+            <text x="66" y="185" font-size="13" class="mono" font-weight="700" fill="#5B21B6">[ProyectoController::class, 'show']</text>
             <text x="35" y="210" font-size="13" class="mono" fill="#1E3A8A">)-&gt;whereNumber('id')-&gt;name('proyectos.show');</text>
             <text x="35" y="262" font-size="14" fill="#1E40AF">Un índice: dirección → acción</text>
             <rect x="225" y="301" width="30" height="28" fill="#F8FAFC"/>
@@ -376,8 +376,8 @@
         </svg>
         <ol class="leyenda">
           <li class="fragment" data-fragment-index="1">Antes: la función de la ruta lo hace <strong>todo</strong>: tiene los datos y elige la vista</li>
-          <li class="fragment" data-fragment-index="2">Se mudan a <code>ProyectosController</code>: los datos, a una propiedad; la vista, a <code>show()</code></li>
-          <li class="fragment" data-fragment-index="3">La ruta solo <strong>apunta</strong>: <code>[ProyectosController::class, 'show']</code></li>
+          <li class="fragment" data-fragment-index="2">Se mudan a <code>ProyectoController</code>: los datos, a una propiedad; la vista, a <code>show()</code></li>
+          <li class="fragment" data-fragment-index="3">La ruta solo <strong>apunta</strong>: <code>[ProyectoController::class, 'show']</code></li>
           <li class="fragment" data-fragment-index="4">Después: ruta → <code>show(7)</code> → <code>$arrayProyectos[7]</code> → <code>view('proyectos.show')</code></li>
         </ol>
         <aside class="notes">
@@ -390,7 +390,7 @@
       <section>
         <h2>Un controlador básico</h2>
         <pre class="compacto"><code class="language-bash" data-trim>
-php artisan make:controller ProyectosController
+php artisan make:controller ProyectoController
         </code></pre>
         <p class="small-text">En <code>app/Http/Controllers/</code>, espacio de nombres <code>App\Http\Controllers</code> (5.2):</p>
         <pre class="compacto"><code class="language-php" data-trim>
@@ -400,7 +400,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class ProyectosController extends Controller
+class ProyectoController extends Controller
 {
     //
 }
@@ -414,7 +414,7 @@ class ProyectosController extends Controller
         <pre class="compacto"><code class="language-php" data-trim data-line-numbers="5|7">
 use Illuminate\View\View;
 
-class ProyectosController extends Controller
+class ProyectoController extends Controller
 {
     public function index(): View
     {
@@ -433,11 +433,11 @@ class ProyectosController extends Controller
         <h2>Rutas que apuntan a controladores</h2>
         <p class="small-text">En lugar de una función, la <strong>clase</strong> y el <strong>método</strong>:</p>
         <pre class="ancho"><code class="language-php" data-trim>
-use App\Http\Controllers\ProyectosController;
+use App\Http\Controllers\ProyectoController;
 
-Route::get('proyectos', [ProyectosController::class, 'index'])-&gt;name('proyectos.index');
+Route::get('proyectos', [ProyectoController::class, 'index'])-&gt;name('proyectos.index');
         </code></pre>
-        <p class="small-text fragment"><code>ProyectosController::class</code> → <code>'App\Http\Controllers\ProyectosController'</code></p>
+        <p class="small-text fragment"><code>ProyectoController::class</code> → <code>'App\Http\Controllers\ProyectoController'</code></p>
         <p class="small-text muted fragment">El <code>use</code> permite escribirlo abreviado.</p>
       </section>
 
@@ -445,7 +445,7 @@ Route::get('proyectos', [ProyectosController::class, 'index'])-&gt;name('proyect
       <section>
         <h2>Un grupo, un controlador</h2>
         <pre class="ancho"><code class="language-php" data-trim data-line-numbers="1|2-5">
-Route::controller(ProyectosController::class)-&gt;prefix('proyectos')-&gt;name('proyectos.')
+Route::controller(ProyectoController::class)-&gt;prefix('proyectos')-&gt;name('proyectos.')
     -&gt;group(function () {
         Route::get('/', 'index')-&gt;name('index');
         Route::get('show/{id}', 'show')-&gt;whereNumber('id')-&gt;name('show');
@@ -509,7 +509,7 @@ public function show(int $id): View
       <section>
         <h2>Los datos, de momento</h2>
         <pre class="compacto"><code class="language-php" data-trim>
-class ProyectosController extends Controller
+class ProyectoController extends Controller
 {
     private array $arrayProyectos = [
         [
@@ -556,7 +556,7 @@ require __DIR__ . '/proyectos.php';
         <ul class="small-text">
           <li class="fragment"><code>routes/proyectos.php</code>: <code>&lt;?php</code>, sus <code>use</code> y solo el grupo de proyectos.</li>
           <li class="fragment">Otro recurso, otro fichero, y una línea más en <code>web.php</code>.</li>
-          <li class="fragment"><code>route:list</code> muestra ahora <code>ProyectosController@index</code>…</li>
+          <li class="fragment"><code>route:list</code> muestra ahora <code>ProyectoController@index</code>…</li>
         </ul>
       </section>
 

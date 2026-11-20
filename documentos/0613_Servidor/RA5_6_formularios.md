@@ -291,7 +291,7 @@ git switch -c RA5_6
 
 ## Ejercicios
 
-1. **Las rutas.** Añade a `routes/proyectos.php` las rutas `proyectos.store` (`POST /proyectos`) y `proyectos.update` (`PUT /proyectos/edit/{id}`), con sus acciones `store` y `update` en `ProyectosController`.
+1. **Las rutas.** Añade a `routes/proyectos.php` las rutas `proyectos.store` (`POST /proyectos`) y `proyectos.update` (`PUT /proyectos/edit/{id}`), con sus acciones `store` y `update` en `ProyectoController`.
 
 2. **El mensaje _flash_.** Añade al _layout_ (`components/layout.blade.php`) el bloque `@session('mensaje')` de este apartado.
 

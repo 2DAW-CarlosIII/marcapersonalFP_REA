@@ -355,7 +355,7 @@ public function handle(Request $request, Closure $next): Response
 
           <!-- Controlador -->
           <rect x="630" y="110" width="310" height="105" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
-          <text x="785" y="150" text-anchor="middle" font-size="17" font-weight="700" fill="#5B21B6">ProyectosController</text>
+          <text x="785" y="150" text-anchor="middle" font-size="17" font-weight="700" fill="#5B21B6">ProyectoController</text>
           <text x="785" y="178" text-anchor="middle" font-size="13" class="mono" fill="#4C1D95">edit(3) → vista de edición</text>
 
           <!-- 1 · con sesión: la petición atraviesa las capas -->
@@ -640,7 +640,7 @@ require __DIR__ . '/auth.php';      // login, registro, logout…
       <section>
         <h2>Proteger rutas con <code>auth</code></h2>
         <pre class="ancho"><code class="language-php" data-trim data-line-numbers="3-5|7-13">
-Route::controller(ProyectosController::class)-&gt;prefix('proyectos')-&gt;name('proyectos.')
+Route::controller(ProyectoController::class)-&gt;prefix('proyectos')-&gt;name('proyectos.')
 -&gt;group(function () {
     // Públicas
     Route::get('/', 'index')-&gt;name('index');

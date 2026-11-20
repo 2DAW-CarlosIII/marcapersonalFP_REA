@@ -15,19 +15,19 @@ La solución es la **C** de MVC: el **controlador**. Un controlador es una clase
 
 El fichero de rutas queda como lo que debe ser: un índice de direcciones, en el que cada una apunta a un método de un controlador.
 
-![Antes, la función de la ruta tenía los datos y elegía la vista. Los datos pasan a una propiedad de ProyectosController y la vista a su acción show. La ruta solo apunta al controlador. Después, GET /proyectos/show/7 llega a la ruta, la ruta llama a show con el 7, show toma el proyecto de $arrayProyectos y devuelve la vista proyectos.show](./images/RA5_5_rutaControlador.svg)
+![Antes, la función de la ruta tenía los datos y elegía la vista. Los datos pasan a una propiedad de ProyectoController y la vista a su acción show. La ruta solo apunta al controlador. Después, GET /proyectos/show/7 llega a la ruta, la ruta llama a show con el 7, show toma el proyecto de $arrayProyectos y devuelve la vista proyectos.show](./images/RA5_5_rutaControlador.svg)
 
 El diagrama muestra el mismo flujo antes y después: los datos y la elección de la vista salen de la función de la ruta y pasan al controlador, y la ruta se queda en una sola línea que apunta a su acción.
 
 ## Un controlador básico
 
-Los controladores son clases de la carpeta `app/Http/Controllers/`, con el espacio de nombres `App\Http\Controllers` (5.2) y el sufijo `Controller` en el nombre. Se crean con _Artisan_:
+Los controladores son clases de la carpeta `app/Http/Controllers/`, con el espacio de nombres `App\Http\Controllers` (5.2) y el sufijo `Controller` en el nombre. Por convenio, el nombre del recurso va en **singular**: `ProyectoController`, aunque gestione todos los proyectos. Se crean con _Artisan_:
 
 ```bash
-php artisan make:controller ProyectosController
+php artisan make:controller ProyectoController
 ```
 
-Que genera esta clase vacía, en `app/Http/Controllers/ProyectosController.php`:
+Que genera esta clase vacía, en `app/Http/Controllers/ProyectoController.php`:
 
 ```php
 <?php
@@ -36,7 +36,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class ProyectosController extends Controller
+class ProyectoController extends Controller
 {
     //
 }
@@ -47,7 +47,7 @@ Todos heredan de `Controller`, la clase base que trae el proyecto. Cada **métod
 ```php
 use Illuminate\View\View;
 
-class ProyectosController extends Controller
+class ProyectoController extends Controller
 {
     public function index(): View
     {
@@ -63,17 +63,17 @@ class ProyectosController extends Controller
 En la ruta, en lugar de una función, se escribe un array con la **clase** del controlador y el **nombre del método**:
 
 ```php
-use App\Http\Controllers\ProyectosController;
+use App\Http\Controllers\ProyectoController;
 
-Route::get('proyectos', [ProyectosController::class, 'index'])->name('proyectos.index');
+Route::get('proyectos', [ProyectoController::class, 'index'])->name('proyectos.index');
 ```
 
-`ProyectosController::class` es el nombre completo de la clase, `App\Http\Controllers\ProyectosController`, y el `use` del principio permite escribirlo abreviado.
+`ProyectoController::class` es el nombre completo de la clase, `App\Http\Controllers\ProyectoController`, y el `use` del principio permite escribirlo abreviado.
 
 Cuando todas las rutas de un grupo van al mismo controlador, `Route::controller()` evita repetirlo. Se combina con el prefijo y el nombre de 5.3:
 
 ```php
-Route::controller(ProyectosController::class)->prefix('proyectos')->name('proyectos.')->group(function () {
+Route::controller(ProyectoController::class)->prefix('proyectos')->name('proyectos.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('show/{id}', 'show')->whereNumber('id')->name('show');
     Route::get('create', 'create')->name('create');
@@ -123,7 +123,7 @@ Para cortar sin condición, `abort(404)`; para el caso contrario, `abort_if(cond
 Hasta el Bloque 6 no hay base de datos, así que los proyectos viven en una **propiedad** del controlador, como en las clases de 3.5:
 
 ```php
-class ProyectosController extends Controller
+class ProyectoController extends Controller
 {
     private array $arrayProyectos = [
         [
@@ -171,7 +171,7 @@ require __DIR__ . '/proyectos.php';
 
 `routes/proyectos.php` empieza como `routes/web.php`, con `<?php` y los `use` que necesite, y contiene solo el grupo de proyectos. Así, quien trabaje en otro recurso, como los reconocimientos de los ejercicios opcionales, crea su propio fichero y solo añade una línea a `routes/web.php`.
 
-En `php artisan route:list`, la columna de la acción muestra ahora `ProyectosController@index`, `ProyectosController@show`…
+En `php artisan route:list`, la columna de la acción muestra ahora `ProyectoController@index`, `ProyectoController@show`…
 
 ## Preparación del entorno de trabajo
 
@@ -187,7 +187,7 @@ git switch -c RA5_5
 
 1. **La página principal.** Crea el controlador invocable `HomeController` de este apartado y haz que la ruta `/` lo use.
 
-2. **El controlador de proyectos.** Crea `ProyectosController` con las acciones `index`, `show`, `create` y `edit`:
+2. **El controlador de proyectos.** Crea `ProyectoController` con las acciones `index`, `show`, `create` y `edit`:
     - Copia como propiedad de la clase el array de [`array_proyectos.php`](./materiales/ejercicios-laravel/array_proyectos.php), con sus diez proyectos. Ya no hace falta el array de tres proyectos de la ruta de 5.4.
     - `index` pasa a la vista todos los proyectos; `show` y `edit`, el proyecto y su `id`; `create`, nada.
     - `show` y `edit` responden 404 si el `id` no existe en el array.
@@ -239,7 +239,7 @@ git switch -c RA5_5
 6. **Investiga.** Responde en tu _pull request_:
     - Ejecuta `php artisan route:list`. ¿Qué muestra ahora la columna de la acción? ¿Cómo aparece la ruta de `HomeController`?
     - Quita temporalmente el `abort_unless()` de `show` y pide `/proyectos/show/99`. ¿Qué ves con `APP_DEBUG=true`? ¿Qué vería un usuario en producción? Vuelve a ponerlo.
-    - En 3.4 vimos `declare(strict_types=1)`. Si lo añades al principio de `ProyectosController.php`, ¿siguen funcionando `show(int $id)` y `/proyectos/show/7`? Busca en la documentación de PHP a qué llamadas afecta `strict_types`: ¿a las que se hacen **desde** el fichero que lo declara, o a las que se hacen **hacia** sus funciones?
+    - En 3.4 vimos `declare(strict_types=1)`. Si lo añades al principio de `ProyectoController.php`, ¿siguen funcionando `show(int $id)` y `/proyectos/show/7`? Busca en la documentación de PHP a qué llamadas afecta `strict_types`: ¿a las que se hacen **desde** el fichero que lo declara, o a las que se hacen **hacia** sus funciones?
 
 ### Ejercicios colaborativos opcionales
 

@@ -293,13 +293,13 @@ Los roles (alumno o docente) y la propiedad de los datos (que cada alumno solo e
 El _middleware_ `auth` se aplica como cualquier otro. Sobre una ruta:
 
 ```php
-Route::get('proyectos/create', [ProyectosController::class, 'create'])->middleware('auth');
+Route::get('proyectos/create', [ProyectoController::class, 'create'])->middleware('auth');
 ```
 
 O, mejor, sobre un grupo, para no olvidar ninguna ruta. En `routes/proyectos.php`, las rutas de consulta pueden seguir siendo públicas, y las que crean o modifican quedan protegidas:
 
 ```php
-Route::controller(ProyectosController::class)->prefix('proyectos')->name('proyectos.')->group(function () {
+Route::controller(ProyectoController::class)->prefix('proyectos')->name('proyectos.')->group(function () {
     // Públicas
     Route::get('/', 'index')->name('index');
     Route::get('show/{id}', 'show')->whereNumber('id')->name('show');

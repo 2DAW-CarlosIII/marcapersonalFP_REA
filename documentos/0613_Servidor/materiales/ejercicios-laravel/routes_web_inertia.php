@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ProyectosController;
+use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\ActividadController;
 use App\Http\Controllers\ReconocimientoController;
 use App\Http\Controllers\CurriculoController;
@@ -42,23 +42,23 @@ Route::get('/', function () {
 */
 
 Route::prefix('proyectos')->group(function () {
-    Route::get('/', [ProyectosController::class, 'getIndex'])->name('proyectos');
+    Route::get('/', [ProyectoController::class, 'getIndex'])->name('proyectos');
 
-    Route::get('/show/{id}', [ProyectosController::class, 'getShow'])->where('id', '[0-9]+');
+    Route::get('/show/{id}', [ProyectoController::class, 'getShow'])->where('id', '[0-9]+');
 
-    Route::put('/editcalificacion/{id}', [ProyectosController::class, 'editCalificacion'])->where('id', '[0-9]+')
+    Route::put('/editcalificacion/{id}', [ProyectoController::class, 'editCalificacion'])->where('id', '[0-9]+')
     ->middleware('auth');
 
-    Route::get('/create', [ProyectosController::class, 'getCreate'])
+    Route::get('/create', [ProyectoController::class, 'getCreate'])
     ->middleware('auth');
 
-    Route::get('/edit/{id}', [ProyectosController::class, 'getEdit'])->where('id', '[0-9]+')
+    Route::get('/edit/{id}', [ProyectoController::class, 'getEdit'])->where('id', '[0-9]+')
     ->middleware('auth');
 
-    Route::put('/edit/{id}', [ProyectosController::class, 'putEdit'])->where('id', '[0-9]+')
+    Route::put('/edit/{id}', [ProyectoController::class, 'putEdit'])->where('id', '[0-9]+')
     ->middleware('auth');
 
-    Route::post('/', [ProyectosController::class, 'store']);
+    Route::post('/', [ProyectoController::class, 'store']);
 });
 
 Route::prefix('reconocimientos')->group(function () {
