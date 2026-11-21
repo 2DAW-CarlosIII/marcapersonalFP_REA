@@ -14,8 +14,8 @@ Los contenidos que se presentan a continuación constituyen un desarrollo que, i
 | 2 | Inserción de código en páginas web (RA2) | 8 |
 | 3 | Programación con código embebido (RA3) | 24 |
 | 4 | Aplicaciones web con código embebido: estado y autenticación (RA4) | 10 |
-| 5 | Generación dinámica de páginas web: introducción a Laravel (RA5) | 26 |
-| 6 | Acceso a almacenes de datos (RA6) | 32 |
+| 5 | Generación dinámica de páginas web: introducción a Laravel (RA5) | 34 |
+| 6 | Acceso a almacenes de datos (RA6) | 24 |
 | 7 | Servicios web reutilizables (RA7) | 28 |
 | 8 | Aplicaciones web dinámicas (RA8) | 6 |
 | 9 | Aplicaciones web híbridas (RA9) | 6 |

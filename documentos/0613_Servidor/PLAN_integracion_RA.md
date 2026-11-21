@@ -2,7 +2,7 @@
 
 **Objetivo:** alinear los Resultados de Aprendizaje (RA) y criterios de evaluación (CE) del módulo *Desarrollo web en entorno servidor* con la práctica guiada del REA *marcapersonalFP*, reflejando la secuencia lógica de los RA e integrando los fundamentos de PHP (RA2–RA4) dentro de la propia práctica.
 
-> **Cambios respecto a la v2:** el antiguo Bloque 4 (RA4 + RA5, 36 h) se divide en dos bloques, uno por RA, de modo que el **Bloque _n_ corresponde siempre al RA _n_** (9 bloques, con el Bloque 1 fuera del REA); se reajustan las horas (Bloque 2: 12 → 8 h; Acceso a datos: 28 → 32 h); se pasa a **Laravel 13**; y se actualiza el flujo de contribución (§6).
+> **Cambios respecto a la v2:** el antiguo Bloque 4 (RA4 + RA5, 36 h) se divide en dos bloques, uno por RA, de modo que el **Bloque _n_ corresponde siempre al RA _n_** (9 bloques, con el Bloque 1 fuera del REA); se reajustan las horas (Bloque 2: 12 → 8 h; Bloque 5: 26 → 34 h; Acceso a datos: 28 → 24 h); se pasa a **Laravel 13**; y se actualiza el flujo de contribución (§6).
 
 ## Datos confirmados
 
@@ -26,14 +26,14 @@ La distribución oficial de Murcia tiene 8 bloques y agrupa RA4 y RA5 en su bloq
 | 2 | Inserción de código en páginas web | RA2 | 8 | 2 (12) |
 | 3 | Programación basada en lenguajes de marcas con código embebido | RA3 | 24 | 3 (24) |
 | 4 | Desarrollo de aplicaciones web utilizando código embebido | RA4 | 10 | 4 (36), junto con RA5 |
-| 5 | Generación dinámica de páginas web: introducción a Laravel | RA5 | 26 | 4 (36), junto con RA4 |
-| 6 | Acceso a almacenes de datos | RA6 | 32 | 5 (28) |
+| 5 | Generación dinámica de páginas web: introducción a Laravel | RA5 | 34 | 4 (36), junto con RA4 |
+| 6 | Acceso a almacenes de datos | RA6 | 24 | 5 (28) |
 | 7 | Servicios web reutilizables | RA7 | 28 | 6 (28) |
 | 8 | Aplicaciones web dinámicas | RA8 | 6 | 7 (6) |
 | 9 | Aplicaciones web híbridas | RA9 | 6 | 8 (6) |
 | | **Total** | | **148** | **148** |
 
-**Reajuste de horas:** el alumnado llega con conocimientos previos de programación, así que el Bloque 2 baja de 12 a 8 h; esas 4 h pasan al de acceso a datos, que asume los modelos _Eloquent_ (ver §2).
+**Reajuste de horas:** el alumnado llega con conocimientos previos de programación, así que el Bloque 2 baja de 12 a 8 h; esas 4 h pasaron al de acceso a datos, que asume los modelos _Eloquent_ (ver §2), y lo dejaron en 32 h. Ya durante la impartición del Bloque 5, este sube de 26 a 34 h, y el de acceso a datos baja otras 8 h, a 24. El Bloque 6 se reestructura para planificarse sobre **20 h**, con menos ejercicios, y deja 4 h de margen.
 
 **Lectura clave:** los bloques 2, 3 y 4 (≈ **42 h**, casi un tercio del módulo) son **programación embebida / PHP plano**. El REA original apenas los cubría: ahí está el grueso del trabajo nuevo.
 
@@ -65,8 +65,8 @@ Motivos: la evaluación en FP es por RA (cada bloque tiene su cierre y sus instr
 | **2 · RA2 · 8h** | PHP embebido en HTML; etiquetas `<?php ?>`; tipos y conversiones; variables/constantes; operadores; ámbitos | **Nuevo** |
 | **3 · RA3 · 24h** | Decisión, bucles, arrays/tipos compuestos, funciones; **POO en PHP**; formularios y procesamiento (`$_GET`/`$_POST`), validación; comentarios | **Nuevo** |
 | **4 · RA4 · 10h** | Mantenimiento del estado (*cookies*, sesiones), autenticación nativa (*login*/*logout*, `password_hash`), depuración con Xdebug; proyecto: área privada de _v0_ | **Nuevo** |
-| **5 · RA5 · 26h** | *Laravel:* instalación, rutas, Artisan, vistas/Blade/layout, controladores, middleware, redirecciones, formularios/datos de entrada/validación, **Breeze** (control de usuarios); separación lógica/presentación (MVC), **POO y patrones** (Singleton, repositorio, DAO) | Actuales cap. 2, 3 y 5 + patrones **nuevo** |
-| **6 · RA6 · 32h** | Configuración BD (MariaDB), migraciones, Schema Builder, **Eloquent/ORM**, seeding, Query Builder, relaciones (1:1, 1:N, N:M), transacciones y **bloqueos** | Actuales cap. 4 y 8 (+ bloqueos) |
+| **5 · RA5 · 34h** | *Laravel:* instalación, rutas, Artisan, vistas/Blade/layout, controladores, middleware, redirecciones, formularios/datos de entrada/validación, **Breeze** (control de usuarios); separación lógica/presentación (MVC), **POO y patrones** (Singleton, repositorio, DAO) | Actuales cap. 2, 3 y 5 + patrones **nuevo** |
+| **6 · RA6 · 24h** | Configuración BD (MariaDB), migraciones, Schema Builder, **Eloquent/ORM**, seeding, Query Builder, relaciones (1:1, 1:N, N:M), transacciones y **bloqueos** | Actuales cap. 4 y 8 (+ bloqueos) |
 | **7 · RA7 · 28h** | API y REST, esqueleto de la API, controladores de recursos, autenticación de API (tokens/sesiones), autorización (gates/policies/roles), manejo de ficheros en la API, **documentación OpenAPI/Swagger** | Actuales cap. 6 (REST), 7, 9, 10, 11 |
 | **8 · RA8 · 6h** | React-Admin / Inertia, validación de formularios, **internacionalización (i18n)**, **TDD** | React-Admin del actual cap. 6 (+ i18n, TDD) |
 | **9 · RA9 · 6h** | Consumo de APIs externas, reutilización, repositorios a medida, correo, **introducción a Big Data / inteligencia de negocios** | Actuales cap. 12 y 13 (+ Big Data/BI) |
