@@ -24,7 +24,7 @@ Necesita GitHub CLI (gh) identificado con una cuenta con acceso a los repositori
 (00_instalacionEntorno.md, §12). Uso:
 
     python3 recoger_notas.py [--alumnos alumnos.csv] REPOSITORIO [REPOSITORIO ...]
-    python3 recoger_notas.py --alumnos alumnos.csv 2DAW-CarlosIII/26_27_Grupo-{1..5}
+    python3 recoger_notas.py --alumnos alumnos.csv 2DAW-CarlosIII/eportfolio_g{1..5}
 
 alumnos.csv (opcional) relaciona cada usuario de GitHub con el nombre del alumno:
 
@@ -117,7 +117,7 @@ def main() -> None:
         sys.exit(__doc__)
     analizador = argparse.ArgumentParser(description='Reúne en CSV los resultados de la corrección automática.')
     analizador.add_argument('repositorios', nargs='+', metavar='REPOSITORIO',
-                            help='organización/repositorio, por ejemplo 2DAW-CarlosIII/26_27_Grupo-1')
+                            help='organización/repositorio, por ejemplo 2DAW-CarlosIII/eportfolio_g1')
     analizador.add_argument('--alumnos', metavar='CSV', help='relación entre usuarios de GitHub y alumnos')
     opciones = analizador.parse_args()
 

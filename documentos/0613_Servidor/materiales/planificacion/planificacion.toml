@@ -67,8 +67,8 @@ bloque = "Bloque"
 # repositorio de marcapersonalfp, sobre el que el profesorado explica: todo se genera primero en
 # él. Los proyectos de los grupos que aún no existen se crean copiando el suyo, con sus vistas.
 #
-# "repo" es el nombre del repositorio en GitHub. GitHub cambia los espacios por guiones:
-# compruébalo antes de la primera ejecución real.
+# "nombre" es el del grupo, y aparece en el título de su proyecto; "repo", el nombre de su
+# repositorio en la organización.
 [[destinos]]
 nombre = "marcapersonalfp2627"
 repo = "marcapersonalfp2627"
@@ -76,23 +76,23 @@ referencia = true
 
 [[destinos]]
 nombre = "26_27_Grupo 1"
-repo = "26_27_Grupo-1"
+repo = "eportfolio_g1"
 
 [[destinos]]
 nombre = "26_27_Grupo 2"
-repo = "26_27_Grupo-2"
+repo = "eportfolio_g2"
 
 [[destinos]]
 nombre = "26_27_Grupo 3"
-repo = "26_27_Grupo-3"
+repo = "eportfolio_g3"
 
 [[destinos]]
 nombre = "26_27_Grupo 4"
-repo = "26_27_Grupo-4"
+repo = "eportfolio_g4"
 
 [[destinos]]
 nombre = "26_27_Grupo 5"
-repo = "26_27_Grupo-5"
+repo = "eportfolio_g5"
 
 # ---------------------------------------------------------------------------------------------
 # Los bloques y sus apartados, en el orden en que se imparten

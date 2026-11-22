@@ -2,7 +2,7 @@
 
 Herramientas para corregir automáticamente los _pull requests_ del alumnado y reunir sus resultados en una hoja de calificaciones.
 
-**Desde 5.5, se corrigen los ejercicios del _ePortfolio_**: los _pull requests_ que cada alumno abre en el repositorio de _ePortfolio_ de su grupo (por ejemplo, `2DAW-CarlosIII/26_27_Grupo-1`) para resolver los _issues_ de [`ejercicios-laravel/issues/`](../ejercicios-laravel/issues/). El docente va generando las soluciones de los ejercicios del REA en _marcapersonalfp_ (`marcapersonalfp2627`), donde el alumnado ya no abre _pull requests_. Hasta 5.4, el flujo se aplicó a ese repositorio, y `recoger_notas.py` sigue leyendo sus resultados (ver "Los resultados de _marcapersonalfp_").
+**Desde 5.5, se corrigen los ejercicios del _ePortfolio_**: los _pull requests_ que cada alumno abre en el repositorio de _ePortfolio_ de su grupo (por ejemplo, `2DAW-CarlosIII/eportfolio_g1`) para resolver los _issues_ de [`ejercicios-laravel/issues/`](../ejercicios-laravel/issues/). El docente va generando las soluciones de los ejercicios del REA en _marcapersonalfp_ (`marcapersonalfp2627`), donde el alumnado ya no abre _pull requests_. Hasta 5.4, el flujo se aplicó a ese repositorio, y `recoger_notas.py` sigue leyendo sus resultados (ver "Los resultados de _marcapersonalfp_").
 
 | Fichero | Qué es |
 |---|---|
@@ -59,12 +59,12 @@ En el _ePortfolio_ hay un riesgo más: el alumnado **fusiona** los _pull request
     ```bash
     gh auth refresh -s workflow
     for n in 1 2 3 4 5; do
-      gh api -X PUT "repos/2DAW-CarlosIII/26_27_Grupo-$n/contents/.github/workflows/correccion.yml" \
+      gh api -X PUT "repos/2DAW-CarlosIII/eportfolio_g$n/contents/.github/workflows/correccion.yml" \
         -f message="Añade la corrección automática" -f content="$(base64 -w0 correccion.yml)"
     done
     ```
 
-    El permiso `workflow` hace falta para crear o cambiar flujos de _GitHub Actions_. Para **actualizar** el fichero cuando ya existe, la API pide además su _hash_ actual: añade `-f sha="$(gh api repos/2DAW-CarlosIII/26_27_Grupo-$n/contents/.github/workflows/correccion.yml --jq .sha)"`. Cada integrante recibe el flujo en su _fork_ la próxima vez que actualice su `main` (`git pull upstream main`).
+    El permiso `workflow` hace falta para crear o cambiar flujos de _GitHub Actions_. Para **actualizar** el fichero cuando ya existe, la API pide además su _hash_ actual: añade `-f sha="$(gh api repos/2DAW-CarlosIII/eportfolio_g$n/contents/.github/workflows/correccion.yml --jq .sha)"`. Cada integrante recibe el flujo en su _fork_ la próxima vez que actualice su `main` (`git pull upstream main`).
 
 2. En **Settings → Actions → General** de cada repositorio:
     - comprueba que _Actions_ está activado y que se permiten las acciones que usa: `actions/checkout`, `actions/setup-node`, `actions/upload-artifact` y `shivammathur/setup-php`;
@@ -79,7 +79,7 @@ En el _ePortfolio_ hay un riesgo más: el alumnado **fusiona** los _pull request
 Necesitas _GitHub CLI_ (`gh`) en la máquina virtual, identificado con tu cuenta ([§12 de la preparación del entorno](../../00_instalacionEntorno.md#12-github-cli-gh)). Copia `alumnos.example.csv` como `alumnos.csv` y complétalo con el usuario de _GitHub_ y el nombre de cada alumno. Después, con los cinco repositorios a la vez:
 
 ```bash
-python3 recoger_notas.py --alumnos alumnos.csv 2DAW-CarlosIII/26_27_Grupo-{1..5}
+python3 recoger_notas.py --alumnos alumnos.csv 2DAW-CarlosIII/eportfolio_g{1..5}
 ```
 
 (`{1..5}` lo expande _bash_ en los cinco nombres.) El script avisa de los repositorios cuyo `correccion.yml` de `main` no coincide con el de esta carpeta, y genera, en la carpeta desde la que lo ejecutas:
@@ -100,7 +100,7 @@ Los artefactos caducan a los 90 días. Ejecuta el script al terminar cada aparta
 Los artefactos del flujo anterior (5.1 a 5.4, en `marcapersonalfp2627`) se leen igual: su ejercicio es el apartado de la rama (`RA5_2`, `RA5_3`…), y en el detalle los tests de los apartados anteriores salen como `anterior`. Recógelos **antes de que caduquen**, por ejemplo junto con los de los grupos:
 
 ```bash
-python3 recoger_notas.py --alumnos alumnos.csv 2DAW-CarlosIII/marcapersonalfp2627 2DAW-CarlosIII/26_27_Grupo-{1..5}
+python3 recoger_notas.py --alumnos alumnos.csv 2DAW-CarlosIII/marcapersonalfp2627 2DAW-CarlosIII/eportfolio_g{1..5}
 ```
 
 El aviso de que su `correccion.yml` no coincide con el de esta carpeta es normal: es la versión anterior del flujo. Como el alumnado ya no abre _pull requests_ en ese repositorio, puedes dejarlo o borrarlo: borrarlo no elimina los artefactos que ya existen.
