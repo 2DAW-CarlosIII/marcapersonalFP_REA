@@ -85,6 +85,8 @@ El test comprueba que la portada y el perfil responden, y que sus rutas apuntan 
 
 Si todo está bien: `Tests: 2 passed`.
 
+Al abrir tu _pull request_, el repositorio del grupo ejecuta en _GitHub_ estos mismos tests, y los de los _issues_ anteriores, que deben seguir pasando. El resultado aparece en la pestaña **Checks**, y es el que cuenta para la nota. Para eso, la rama debe llamarse exactamente como se indica arriba.
+
 ### Revisión por un compañero
 
 1. Descarga la rama del _pull request_ (5.1, "Probar un _pull request_ localmente") y ejecuta el test.
@@ -168,6 +170,8 @@ php artisan test --filter=RA5_5_RecursosTest --group=evidencias
 
 Si todo está bien: `Tests: 6 passed`. El test del _issue_ de 5.3 (`--filter=RA5_3_DireccionesTest`) también debe seguir pasando.
 
+Al abrir tu _pull request_, el repositorio del grupo ejecuta en _GitHub_ estos mismos tests, y los de los _issues_ anteriores, que deben seguir pasando. El resultado aparece en la pestaña **Checks**, y es el que cuenta para la nota. Para eso, la rama debe llamarse exactamente como se indica arriba.
+
 ### Revisión por un compañero
 
 1. Descarga la rama del _pull request_ y ejecuta los tests de este _issue_ y el test del _issue_ de 5.3.
@@ -240,6 +244,8 @@ php artisan test --filter=RA5_5_RecursosTest --group=familias-profesionales
 ```
 
 Si todo está bien: `Tests: 6 passed`.
+
+Al abrir tu _pull request_, el repositorio del grupo ejecuta en _GitHub_ estos mismos tests, y los de los _issues_ anteriores, que deben seguir pasando. El resultado aparece en la pestaña **Checks**, y es el que cuenta para la nota. Para eso, la rama debe llamarse exactamente como se indica arriba.
 
 ### Revisión por un compañero
 
@@ -321,6 +327,8 @@ php artisan test --filter=RA5_5_RecursosTest --group=ciclos-formativos
 ```
 
 Si todo está bien: `Tests: 6 passed`.
+
+Al abrir tu _pull request_, el repositorio del grupo ejecuta en _GitHub_ estos mismos tests, y los de los _issues_ anteriores, que deben seguir pasando. El resultado aparece en la pestaña **Checks**, y es el que cuenta para la nota. Para eso, la rama debe llamarse exactamente como se indica arriba.
 
 ### Revisión por un compañero
 
@@ -404,6 +412,8 @@ php artisan test --filter=RA5_5_RecursosTest --group=modulos-formativos
 ```
 
 Si todo está bien: `Tests: 6 passed`.
+
+Al abrir tu _pull request_, el repositorio del grupo ejecuta en _GitHub_ estos mismos tests, y los de los _issues_ anteriores, que deben seguir pasando. El resultado aparece en la pestaña **Checks**, y es el que cuenta para la nota. Para eso, la rama debe llamarse exactamente como se indica arriba.
 
 ### Revisión por un compañero
 

@@ -343,6 +343,11 @@ El _logout_ sigue siendo un formulario `POST` con `@csrf`, como en 4.2: un enlac
 
 ## Preparación del entorno de trabajo
 
+> **Curso 2026/27: los ejercicios, en el _ePortfolio_.** Este curso, los ejercicios de este apartado los resuelve el docente en _marcapersonalfp_, y tú aplicas lo aprendido en el _ePortfolio_ de tu grupo, con el _issue_ de 5.7 de su repositorio. Por eso:
+>
+> - **En _marcapersonalfp_**, no crees la rama `RA5_7`: cuando el docente publique su solución, actualiza `main` (`git switch main` y `git pull upstream main`) y úsala para seguir el apartado y probar lo que explica. El test de "Comprueba tu solución" también sirve para ella.
+> - **En el _ePortfolio_**, resuelve el _issue_ en su rama (`RA5_7`, o la que indique el _issue_) y abre tu _pull request_ hacia el repositorio del grupo. Ese es el que se corrige: el resultado de sus tests aparece en la pestaña **Checks**. Las preguntas de **Investiga** de este apartado, respóndelas en la descripción de ese _pull request_.
+
 Seguimos en el proyecto `marcapersonalfp`, con los formularios de [5.6](./RA5_6_formularios.md). Crea la rama del apartado en el terminal de la máquina virtual:
 
 ```bash

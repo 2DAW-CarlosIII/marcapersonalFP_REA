@@ -1,9 +1,14 @@
-# Corrección automática de los pull requests del alumnado.
+# Corrección automática de los pull requests del ePortfolio.
 #
-# Se copia al repositorio base del curso como .github/workflows/correccion.yml.
-# Ejecuta los tests OFICIALES del REA (no las copias del alumno) sobre el código de cada
-# pull request y guarda el resultado (JUnit XML + metadatos) como artefacto. El script
+# Se copia al repositorio de ePortfolio de cada grupo como .github/workflows/correccion.yml.
+# Ejecuta los tests OFICIALES de los issues del REA (no las copias del alumno) sobre el código
+# de cada pull request y guarda el resultado (JUnit XML + metadatos) como artefacto. El script
 # recoger_notas.py reúne esos artefactos en un CSV de calificaciones.
+#
+# El nombre de la rama dice qué se corrige: RA5_x es el issue del apartado x, y RA5_x_recurso,
+# su sub-issue "recurso" (el #[Group] del mismo nombre en el test). Si el test tiene grupos y la
+# rama no lleva sufijo, se corrige el grupo principal. Ese test es el que cuenta para la nota;
+# los de los issues anteriores se ejecutan también, para comprobar que nada se ha roto.
 #
 # Seguridad: el evento pull_request ejecuta el código del alumno con un token de solo
 # lectura y sin acceso a los secretos del repositorio, que es lo que GitHub recomienda para
@@ -27,11 +32,12 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Versión del REA de la que se toman los tests oficiales. Para fijar una concreta, crea en
-  # el repositorio la variable REA_REF (Settings → Secrets and variables → Actions → Variables)
-  # con el hash de un commit; si no existe, se usa master.
-  REA_TESTS: https://raw.githubusercontent.com/2DAW-CarlosIII/marcapersonalFP_REA/${{ vars.REA_REF || 'master' }}/documentos/0613_Servidor/materiales/ejercicios-laravel/tests/Feature
-  TESTS_RA5: RA5_1_InstalacionTest RA5_2_EstructuraTest RA5_3_RutasTest RA5_4_VistasTest RA5_5_ControladoresTest RA5_6_FormulariosTest RA5_7_BreezeTest RA5_8_ProyectoTest
+  # Versión del REA de la que se toman los tests oficiales. Para fijar una concreta, crea la
+  # variable REA_REF (en la organización o en el repositorio: Settings → Secrets and variables →
+  # Actions → Variables) con el hash de un commit; si no existe, se usa master.
+  REA_TESTS: https://raw.githubusercontent.com/2DAW-CarlosIII/marcapersonalFP_REA/${{ vars.REA_REF || 'master' }}/documentos/0613_Servidor/materiales/ejercicios-laravel/issues
+  # Los tests de los issues, en orden. Cada test nuevo de un issue se añade aquí.
+  TESTS_EPORTFOLIO: RA5_2_ConfiguracionTest RA5_3_DireccionesTest RA5_4_PlantillaTest RA5_5_RecursosTest
 
 jobs:
   tests:
@@ -86,46 +92,92 @@ jobs:
           touch database/database.sqlite
           php artisan migrate --force
 
-      - name: Apartado del pull request
-        id: apartado
+      - name: Tests oficiales del REA y ejercicio del pull request
+        id: ejercicio
+        working-directory: app
         env:
           RAMA: ${{ github.event.pull_request.head.ref }}
         run: |
-          # La rama de cada apartado se llama RA5_x (5.1, paso 6). Si no lo sigue, se corrigen todos.
-          if [[ "$RAMA" =~ ^RA5_([1-8]) ]]; then n="${BASH_REMATCH[1]}"; else n=8; fi
-          echo "n=$n" >> "$GITHUB_OUTPUT"
+          # RA5_x, RA5_x_recurso, RA5_x-arreglo… Si la rama no sigue el nombre, no hay ejercicio
+          # que puntuar, y se ejecutan todos los tests como comprobación.
+          if [[ "$RAMA" =~ ^RA5_([1-9])(.*)$ ]]; then
+            n="${BASH_REMATCH[1]}"; sufijo="${BASH_REMATCH[2]#[_-]}"
+          else
+            n=99; sufijo=""
+            echo "::warning::La rama no se llama RA5_x: se ejecutan todos los tests, pero no cuentan para la nota."
+          fi
 
-      - name: Tests oficiales del REA (hasta el apartado del pull request)
-        working-directory: app
-        env:
-          N: ${{ steps.apartado.outputs.n }}
-        run: |
           rm -f tests/Feature/RA5_*Test.php
-          i=0
-          for test in $TESTS_RA5; do
-            i=$((i + 1))
-            if [ "$i" -le "$N" ]; then
-              curl -fsSL "$REA_TESTS/$test.php" -o "tests/Feature/$test.php"
+          actual=""; anteriores=""
+          for test in $TESTS_EPORTFOLIO; do
+            [[ "$test" =~ ^RA5_([0-9]+)_ ]] || continue
+            m="${BASH_REMATCH[1]}"
+            if [ "$m" -lt "$n" ]; then anteriores="$anteriores $test"
+            elif [ "$m" -eq "$n" ]; then actual="$test"
+            else continue
             fi
+            curl -fsSL "$REA_TESTS/$test.php" -o "tests/Feature/$test.php"
           done
           ls tests/Feature
 
+          # El grupo: el sufijo de la rama, si es un #[Group] del test; si no lleva sufijo, principal.
+          grupo=""
+          if [ -n "$actual" ]; then
+            grupos=$(grep -oP "#\[Group\('\K[^']+" "tests/Feature/$actual.php" | grep -vx entorno | sort -u || true)
+            for g in $grupos; do
+              if [ "$sufijo" = "$g" ] || [[ "$sufijo" == "$g"-* ]]; then grupo="$g"; fi
+            done
+            if [ -z "$grupo" ] && [ -z "$sufijo" ] && grep -qx principal <<< "$grupos"; then grupo=principal; fi
+            if [ -n "$grupos" ] && [ -z "$grupo" ]; then
+              echo "::warning::La rama no indica ninguno de los issues del test ($(echo $grupos)): se corrige el test completo."
+            fi
+          elif [ "$n" != 99 ]; then
+            echo "::notice::El apartado 5.$n no tiene test automático en el ePortfolio."
+          fi
+
+          ejercicio=""; apartado=""
+          if [ "$n" != 99 ]; then apartado="RA5_$n"; fi
+          if [ -n "$actual" ]; then ejercicio="RA5_$n${grupo:+_$grupo}"; fi
+          {
+            echo "apartado=$apartado"
+            echo "actual=$actual"
+            echo "grupo=$grupo"
+            echo "ejercicio=$ejercicio"
+            echo "anteriores=$(echo $anteriores | tr ' ' '|')"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Ejecutar los tests
         working-directory: app
+        env:
+          ACTUAL: ${{ steps.ejercicio.outputs.actual }}
+          GRUPO: ${{ steps.ejercicio.outputs.grupo }}
+          ANTERIORES: ${{ steps.ejercicio.outputs.anteriores }}
         run: |
           mkdir -p ../resultados
+          casos() { python3 -c "import sys, xml.etree.ElementTree as E; print(sum(1 for _ in E.parse(sys.argv[1]).iter('testcase')))" "$1" 2>/dev/null || echo 0; }
+          codigo=0
           set +e
-          php artisan test --filter=RA5_ --exclude-group=entorno --log-junit ../resultados/resultados.xml 2>&1 | tee ../salida_tests.txt
-          codigo=${PIPESTATUS[0]}
-          set -e
-          # En 5.1 todo el test es del grupo entorno: no hay nada que ejecutar, y no es un fallo.
-          # Solo cuenta como tal si PHPUnit dice "No tests found"; un error fatal sigue siendo un fallo.
-          casos=$(python3 -c "import sys, xml.etree.ElementTree as E; print(sum(1 for _ in E.parse(sys.argv[1]).iter('testcase')))" ../resultados/resultados.xml 2>/dev/null || echo 0)
-          if [ "$casos" = "0" ] && grep -q "No tests found" ../salida_tests.txt; then
-            touch ../resultados/sin_tests
-            echo "::notice::Este apartado no tiene tests automáticos: sus comprobaciones (grupo entorno) se hacen en la máquina de cada alumno."
-            exit 0
+          # El test del ejercicio, el que cuenta para la nota: resultados.xml.
+          if [ -n "$ACTUAL" ]; then
+            php artisan test --filter="$ACTUAL" ${GRUPO:+--group="$GRUPO"} --exclude-group=entorno \
+              --log-junit ../resultados/resultados.xml 2>&1 | tee ../salida_tests.txt
+            c=${PIPESTATUS[0]}
+            # Si todo el test es del grupo entorno, no hay nada que ejecutar, y no es un fallo.
+            # Solo cuenta como tal si PHPUnit dice "No tests found"; un error fatal sigue siendo un fallo.
+            if [ "$(casos ../resultados/resultados.xml)" = "0" ] && grep -q "No tests found" ../salida_tests.txt; then
+              touch ../resultados/sin_tests
+              rm -f ../resultados/resultados.xml
+              echo "::notice::Este ejercicio no tiene tests automáticos: sus comprobaciones (grupo entorno) se hacen en la máquina de cada alumno."
+            elif [ "$c" -ne 0 ]; then codigo=$c; fi
           fi
+          # Los de los issues anteriores, que deben seguir pasando: anteriores.xml.
+          if [ -n "$ANTERIORES" ]; then
+            php artisan test --filter="$ANTERIORES" --exclude-group=entorno \
+              --log-junit ../resultados/anteriores.xml 2>&1 | tee ../salida_anteriores.txt
+            c=${PIPESTATUS[0]}
+            if [ "$c" -ne 0 ] && ! grep -q "No tests found" ../salida_anteriores.txt; then codigo=$c; fi
+          fi
+          set -e
           exit $codigo
 
       - name: Metadatos
@@ -135,34 +187,52 @@ jobs:
           AUTOR: ${{ github.event.pull_request.user.login }}
           RAMA: ${{ github.event.pull_request.head.ref }}
           SHA: ${{ github.event.pull_request.head.sha }}
-          N: ${{ steps.apartado.outputs.n }}
+          REPOSITORIO: ${{ github.repository }}
+          APARTADO: ${{ steps.ejercicio.outputs.apartado }}
+          ACTUAL: ${{ steps.ejercicio.outputs.actual }}
+          GRUPO: ${{ steps.ejercicio.outputs.grupo }}
+          EJERCICIO: ${{ steps.ejercicio.outputs.ejercicio }}
         run: |
           mkdir -p resultados
-          jq -n --arg pr "$PR" --arg autor "$AUTOR" --arg rama "$RAMA" --arg sha "$SHA" --arg apartado "RA5_$N" \
-            '{pr: ($pr | tonumber), autor: $autor, rama: $rama, sha: $sha, apartado: $apartado}' > resultados/meta.json
+          jq -n --arg pr "$PR" --arg autor "$AUTOR" --arg rama "$RAMA" --arg sha "$SHA" \
+                --arg repositorio "$REPOSITORIO" --arg apartado "$APARTADO" --arg test "$ACTUAL" \
+                --arg grupo "$GRUPO" --arg ejercicio "$EJERCICIO" \
+            '{pr: ($pr | tonumber), autor: $autor, rama: $rama, sha: $sha, repositorio: $repositorio,
+              apartado: $apartado, test: $test, grupo: $grupo, ejercicio: $ejercicio}' > resultados/meta.json
 
       - name: Resumen para el alumno
         if: always()
+        env:
+          EJERCICIO: ${{ steps.ejercicio.outputs.ejercicio }}
         run: |
           python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import os, xml.etree.ElementTree as ET
-          ruta = 'resultados/resultados.xml'
+
+          def clases(ruta):
+              resultado = {}
+              for caso in ET.parse(ruta).iter('testcase'):
+                  clase = (caso.get('class') or caso.get('classname') or '').replace('.', '\\').split('\\')[-1]
+                  fallo = caso.find('failure') is not None or caso.find('error') is not None
+                  ok, total, fallos = resultado.get(clase, (0, 0, []))
+                  resultado[clase] = (ok + (not fallo), total + 1, fallos + ([caso.get('name')] if fallo else []))
+              return resultado
+
+          ejercicio = os.environ.get('EJERCICIO') or 'ninguno'
+          print(f'**Ejercicio corregido:** {ejercicio}\n')
           if os.path.exists('resultados/sin_tests'):
-              print('Este apartado no tiene tests automáticos: sus comprobaciones (grupo entorno) se hacen en la máquina de cada alumno.')
+              print('Este ejercicio no tiene tests automáticos: sus comprobaciones (grupo entorno) se hacen en la máquina de cada alumno.\n')
+          filas = []
+          for fichero, tipo in (('resultados.xml', 'el ejercicio (cuenta para la nota)'), ('anteriores.xml', 'issue anterior (debe seguir pasando)')):
+              ruta = f'resultados/{fichero}'
+              if os.path.exists(ruta):
+                  filas += [(clase, tipo, *datos) for clase, datos in sorted(clases(ruta).items())]
+          if not filas:
+              print('No se ha ejecutado ningún test: revisa los pasos anteriores.')
               raise SystemExit
-          if not os.path.exists(ruta):
-              print('No se han podido ejecutar los tests: revisa los pasos anteriores.')
-              raise SystemExit
-          clases = {}
-          for caso in ET.parse(ruta).iter('testcase'):
-              clase = (caso.get('class') or caso.get('classname') or '').replace('.', '\\').split('\\')[-1]
-              fallo = caso.find('failure') is not None or caso.find('error') is not None
-              ok, total, fallos = clases.get(clase, (0, 0, []))
-              clases[clase] = (ok + (not fallo), total + 1, fallos + ([caso.get('name')] if fallo else []))
-          print('| Test | Aprobados | Fallidos |')
-          print('|---|---|---|')
-          for clase, (ok, total, fallos) in sorted(clases.items()):
-              print(f'| {clase} | {ok} / {total} | {", ".join(fallos) or "—"} |')
+          print('| Test | Tipo | Aprobados | Fallidos |')
+          print('|---|---|---|---|')
+          for clase, tipo, ok, total, fallos in filas:
+              print(f'| {clase} | {tipo} | {ok} / {total} | {", ".join(fallos) or "—"} |')
           PY
 
       - name: Guardar el resultado
