@@ -1,0 +1,198 @@
+# Planificación de los ejercicios del ePortfolio, desde el Bloque 5 hasta el final del curso.
+#
+# La lee planificar_eportfolio.py (ver README.md). Si cambia algo (un festivo, las horas de un
+# apartado, la fecha real en que se planteó un ejercicio), se corrige aquí y se vuelve a ejecutar
+# el script: actualiza las fechas sin duplicar nada.
+#
+# Las fechas se escriben AAAA-MM-DD, sin comillas.
+
+# ---------------------------------------------------------------------------------------------
+# El calendario: de horas a fechas
+# ---------------------------------------------------------------------------------------------
+[calendario]
+# Primer día de clase del Bloque 5. Las horas se cuentan desde aquí.
+inicio = 2026-11-02
+# Último día lectivo del curso. Lo que se planifique después aparece con un aviso.
+fin_curso = 2027-02-12
+
+# Horas de clase de cada día de la semana (lunes, martes, miercoles, jueves, viernes, sabado,
+# domingo). Los días que no aparecen no tienen clase.
+[calendario.horas_por_dia]
+lunes = 2
+martes = 2
+jueves = 2
+viernes = 2
+
+# Días sin clase: un día suelto (solo "desde") o un intervalo, ambos incluidos.
+[[calendario.no_lectivos]]
+desde = 2026-10-12
+motivo = "Fiesta Nacional de España"
+
+[[calendario.no_lectivos]]
+desde = 2026-12-06
+hasta = 2026-12-08
+motivo = "Puente de la Inmaculada"
+
+[[calendario.no_lectivos]]
+desde = 2026-12-21
+hasta = 2027-01-10
+motivo = "Navidad"
+
+[[calendario.no_lectivos]]
+desde = 2027-02-01
+motivo = "San Juan Bosco, patrón de la FP"
+
+[[calendario.no_lectivos]]
+desde = 2027-02-08
+motivo = "Carnavales de Cartagena"
+
+# ---------------------------------------------------------------------------------------------
+# GitHub
+# ---------------------------------------------------------------------------------------------
+[github]
+organizacion = "2DAW-CarlosIII"
+# {nombre} se sustituye por el nombre de cada destino.
+titulo_proyecto = "Planificación del ePortfolio · {nombre}"
+descripcion = "Cuándo se plantea y cuándo termina cada ejercicio del ePortfolio"
+publico = true
+# Carpeta de los issues, relativa a este fichero.
+carpeta_issues = "../ejercicios-laravel/issues"
+
+[github.campos]
+planteamiento = "Planteamiento"
+limite = "Fecha límite"
+bloque = "Bloque"
+
+# Los destinos, en el orden en que se procesan. El primero, marcado como referencia, es el
+# repositorio de marcapersonalfp, sobre el que el profesorado explica: todo se genera primero en
+# él. Los proyectos de los grupos que aún no existen se crean copiando el suyo, con sus vistas.
+#
+# "repo" es el nombre del repositorio en GitHub. GitHub cambia los espacios por guiones:
+# compruébalo antes de la primera ejecución real.
+[[destinos]]
+nombre = "marcapersonalfp2627"
+repo = "marcapersonalfp2627"
+referencia = true
+
+[[destinos]]
+nombre = "26_27_Grupo 1"
+repo = "26_27_Grupo-1"
+
+[[destinos]]
+nombre = "26_27_Grupo 2"
+repo = "26_27_Grupo-2"
+
+[[destinos]]
+nombre = "26_27_Grupo 3"
+repo = "26_27_Grupo-3"
+
+[[destinos]]
+nombre = "26_27_Grupo 4"
+repo = "26_27_Grupo-4"
+
+[[destinos]]
+nombre = "26_27_Grupo 5"
+repo = "26_27_Grupo-5"
+
+# ---------------------------------------------------------------------------------------------
+# Los bloques y sus apartados, en el orden en que se imparten
+# ---------------------------------------------------------------------------------------------
+# Cada apartado ocupa sus "horas" en el calendario. Su ejercicio del ePortfolio puede ser:
+#   issue = "RA5_x_tema.md"   el fichero de la carpeta de issues; si no existe aún, va como borrador.
+#   borrador = true           un borrador en el proyecto, hasta que exista su issue.
+#   (nada)                    el apartado no tiene ejercicio, pero sus horas cuentan igual.
+#
+# planteamiento = AAAA-MM-DD fija la fecha real en que se planteó el apartado; los siguientes se
+# calculan desde ahí. La "Fecha límite" de cada ejercicio es el día en que empieza el apartado
+# siguiente; fecha_limite = AAAA-MM-DD la fija a mano.
+#
+# Un bloque sin apartados lleva un único borrador, y admite también planteamiento y fecha_limite.
+# "horas" es lo que ocupa en el calendario, y "horas_planificadas" (opcional), lo que ocupan sus
+# ejercicios (el resto es margen).
+
+[[bloques]]
+numero = 5
+titulo = "Generación dinámica de páginas web: introducción a Laravel"
+# 34 h en el PLAN; las 4 de 5.8 no se imparten.
+horas = 30
+
+  [[bloques.apartados]]
+  numero = "5.1"
+  titulo = "Instalación de Laravel y desarrollo colaborativo"
+  horas = 4
+  planteamiento = 2026-11-02   # fecha real
+
+  [[bloques.apartados]]
+  numero = "5.2"
+  titulo = "Estructura de un proyecto, configuración y Artisan"
+  horas = 4
+  issue = "RA5_2_configuracion.md"
+  planteamiento = 2026-11-05   # fecha real
+
+  [[bloques.apartados]]
+  numero = "5.3"
+  titulo = "Rutas"
+  horas = 4
+  issue = "RA5_3_direcciones.md"
+  planteamiento = 2026-11-09   # fecha real
+
+  [[bloques.apartados]]
+  numero = "5.4"
+  titulo = "Vistas, Blade y layouts"
+  horas = 4
+  planteamiento = 2026-11-12   # fecha real
+
+  # 5.4.1 son las 2 últimas de las 6 horas de 5.4; su issue es el del ePortfolio de 5.4.
+  [[bloques.apartados]]
+  numero = "5.4.1"
+  titulo = "El layout con una plantilla"
+  horas = 2
+  issue = "RA5_4_plantilla.md"
+  planteamiento = 2026-11-16   # fecha real
+
+  [[bloques.apartados]]
+  numero = "5.5"
+  titulo = "Controladores"
+  horas = 4
+  issue = "RA5_5_recursos.md"
+  planteamiento = 2026-11-23   # fecha real
+
+  [[bloques.apartados]]
+  numero = "5.6"
+  titulo = "Formularios, datos de entrada, validación y redirecciones"
+  horas = 4
+  borrador = true
+  # issue = "RA5_6_….md"   # cuando esté redactado
+
+  [[bloques.apartados]]
+  numero = "5.7"
+  titulo = "Middleware y control de usuarios con Breeze"
+  horas = 4
+  borrador = true
+  # issue = "RA5_7_….md"   # cuando esté redactado
+
+  # 5.8 (Proyecto: marcapersonalFP en Laravel. POO y patrones de diseño) no se imparte, por
+  # falta de tiempo: el docente facilita su commit. Sin horas ni ejercicio.
+
+# Las horas de los bloques 6 a 9 son las que caben en el curso, no las del PLAN (24, 28, 6 y 6).
+[[bloques]]
+numero = 6
+titulo = "Acceso a almacenes de datos"
+horas = 16
+
+[[bloques]]
+numero = 7
+titulo = "Servicios web reutilizables"
+horas = 24
+
+[[bloques]]
+numero = 8
+titulo = "Aplicaciones web dinámicas"
+horas = 6
+
+[[bloques]]
+numero = 9
+titulo = "Aplicaciones web híbridas"
+horas = 6
+# El último día de clase es el 12/02, pero el plazo termina el lunes siguiente.
+fecha_limite = 2027-02-15
