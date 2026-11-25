@@ -161,8 +161,7 @@ horas = 30
   numero = "5.6"
   titulo = "Formularios, datos de entrada, validación y redirecciones"
   horas = 4
-  borrador = true
-  # issue = "RA5_6_….md"   # cuando esté redactado
+  issue = "RA5_6_validacion.md"
 
   [[bloques.apartados]]
   numero = "5.7"

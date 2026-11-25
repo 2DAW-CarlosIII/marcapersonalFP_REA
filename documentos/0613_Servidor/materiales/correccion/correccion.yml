@@ -37,7 +37,7 @@ env:
   # Actions → Variables) con el hash de un commit; si no existe, se usa master.
   REA_TESTS: https://raw.githubusercontent.com/2DAW-CarlosIII/marcapersonalFP_REA/${{ vars.REA_REF || 'master' }}/documentos/0613_Servidor/materiales/ejercicios-laravel/issues
   # Los tests de los issues, en orden. Cada test nuevo de un issue se añade aquí.
-  TESTS_EPORTFOLIO: RA5_2_ConfiguracionTest RA5_3_DireccionesTest RA5_4_PlantillaTest RA5_5_RecursosTest
+  TESTS_EPORTFOLIO: RA5_2_ConfiguracionTest RA5_3_DireccionesTest RA5_4_PlantillaTest RA5_5_RecursosTest RA5_6_ValidacionTest
 
 jobs:
   tests:
