@@ -167,8 +167,7 @@ horas = 30
   numero = "5.7"
   titulo = "Middleware y control de usuarios con Breeze"
   horas = 4
-  borrador = true
-  # issue = "RA5_7_….md"   # cuando esté redactado
+  issue = "RA5_7_usuarios.md"
 
   # 5.8 (Proyecto: marcapersonalFP en Laravel. POO y patrones de diseño) no se imparte, por
   # falta de tiempo: el docente facilita su commit. Sin horas ni ejercicio.

@@ -27,9 +27,9 @@ En cada _pull request_ que se abre, se reabre o recibe nuevos _commits_:
 | Rama | Ejercicio | Qué se ejecuta para la nota |
 |---|---|---|
 | `RA5_2`, `RA5_3`, `RA5_4` | `RA5_2`, `RA5_3`, `RA5_4` | El test del _issue_ completo (`RA5_2_ConfiguracionTest`…) |
-| `RA5_5` | `RA5_5_principal` | `RA5_5_RecursosTest --group=principal` |
-| `RA5_5_evidencias` | `RA5_5_evidencias` | `RA5_5_RecursosTest --group=evidencias` (igual con los otros tres recursos) |
-| `RA5_6`… sin test todavía | ninguno | Solo los tests de los _issues_ anteriores, con un aviso |
+| `RA5_5` | `RA5_5_principal` | `RA5_5_RecursosTest --group=principal` (igual en `RA5_6` y `RA5_7`, con `RA5_6_ValidacionTest` y `RA5_7_UsuariosTest`) |
+| `RA5_5_evidencias` | `RA5_5_evidencias` | `RA5_5_RecursosTest --group=evidencias` (igual con los otros tres recursos, y en `RA5_6_…` y `RA5_7_…`) |
+| `RA5_8`, sin _issue_ | ninguno | Solo los tests de los _issues_ anteriores, con un aviso |
 | Cualquier otra | ninguno | Todos los tests, con un aviso: no cuentan para la nota |
 
 Detrás del nombre se admite un sufijo con guion (`RA5_3-arreglo`, `RA5_5_evidencias-v2`). El _issue_ del 5.4 es el de 5.4.1 (la plantilla), en la rama `RA5_4`.

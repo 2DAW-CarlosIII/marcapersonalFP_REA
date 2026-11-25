@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Group;
@@ -26,6 +27,8 @@ class RA5_5_RecursosTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Desde 5.7, el alta y la edición exigen sesión: los tests entran como un usuario identificado.
+        $this->actingAs(new User(['name' => 'Ana López', 'email' => 'ana.lopez@eportfolio.test']));
         // Las vistas usan @vite: el test no necesita los estilos compilados.
         $this->withoutVite();
     }

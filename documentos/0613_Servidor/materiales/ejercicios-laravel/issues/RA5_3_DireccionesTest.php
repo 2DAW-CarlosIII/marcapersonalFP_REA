@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
@@ -19,6 +20,8 @@ class RA5_3_DireccionesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Desde 5.7, el alta y la edición exigen sesión: los tests entran como un usuario identificado.
+        $this->actingAs(new User(['name' => 'Ana López', 'email' => 'ana.lopez@eportfolio.test']));
         // Si la portada ya devuelve una vista con @vite (5.4), el test no necesita los estilos compilados.
         $this->withoutVite();
     }
