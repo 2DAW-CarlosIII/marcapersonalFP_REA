@@ -85,7 +85,7 @@ Procesa todos los destinos: el de referencia (que ya está al día) y los cinco 
 python3 planificar_eportfolio.py --destino "26_27_Grupo 1" --destino "26_27_Grupo 2"
 ```
 
-Si el _script_ se detiene por un error, corrige la causa y vuelve a ejecutarlo: continúa donde lo dejó.
+Si el _script_ se detiene por un error, corrige la causa y vuelve a ejecutarlo: continúa donde lo dejó. Si avisa de que no encuentra en el proyecto un elemento o de que no puede enlazar un _sub-issue_, es que _GitHub_ aún no muestra lo que se acaba de crear: vuelve a ejecutarlo al cabo de un rato, y completará lo que faltaba.
 
 ## Las vistas, a mano
 

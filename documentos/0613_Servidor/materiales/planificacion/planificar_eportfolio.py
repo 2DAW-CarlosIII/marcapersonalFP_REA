@@ -66,7 +66,7 @@ query($org: String!, $numero: Int!, $despues: String) {
           id type
           content {
             ... on DraftIssue { id title body }
-            ... on Issue { id number url title }
+            ... on Issue { id number url title body }
             ... on PullRequest { id number url title } }
           fieldValues(first: 30) { nodes {
             ... on ProjectV2ItemFieldDateValue { date field { ... on ProjectV2FieldCommon { id } } }
@@ -471,6 +471,8 @@ class Destino:
         self.bloques = [f"Bloque {b['numero']}" for b in datos['bloques']]
         self.gh, self.tramos, self.elementos = gh, tramos, elementos
         self.estado = Estado()
+        self.urls: dict[str, str] = {}        # clave del issue → su URL en el repositorio
+        self.ids_nuevos: dict[str, str] = {}  # clave → id del elemento recién añadido al proyecto
 
     # -- utilidades ----------------------------------------------------------------------------
 
@@ -606,16 +608,19 @@ class Destino:
                     numeros[el.clave] = int(url.rstrip('/').split('/')[-1]) if url else None
                     if url:
                         existentes.append({'number': numeros[el.clave], 'title': el.titulo, 'url': url, 'body': el.cuerpo})
+                if url:
+                    self.urls[el.clave] = url
                 if url not in en_proyecto_url:
-                    self.gh.cambiar('project', 'item-add', self.numero, '--owner', self.org,
-                                    '--url', url or f'<url de "{el.titulo}">', '--format', 'json')
+                    self.anadir_issue(el, url)
                     cambios = True
             else:
                 existente = borradores.get(el.clave)
                 if existente is None:
                     print(f'    Borrador "{el.titulo}": se crea')
-                    self.gh.cambiar('project', 'item-create', self.numero, '--owner', self.org,
-                                    '--title', el.titulo, '--body', el.cuerpo, '--format', 'json')
+                    creado = json_o_nada(self.gh.cambiar('project', 'item-create', self.numero, '--owner', self.org,
+                                                         '--title', el.titulo, '--body', el.cuerpo, '--format', 'json'))
+                    if creado and creado.get('id'):
+                        self.ids_nuevos[el.clave] = creado['id']
                     cambios = True
                 elif existente['titulo'] != el.titulo or existente['cuerpo'].strip() != el.cuerpo.strip():
                     print(f'    Borrador "{el.titulo}": se actualiza su texto')
@@ -635,6 +640,14 @@ class Destino:
         if cambios:
             self.releer()
         return numeros
+
+    def anadir_issue(self, el: Elemento, url: str | None) -> str | None:
+        """Añade el issue al proyecto y devuelve el id de su elemento. Si ya estaba, gh devuelve el que tenía."""
+        anadido = json_o_nada(self.gh.cambiar('project', 'item-add', self.numero, '--owner', self.org,
+                                              '--url', url or f'<url de "{el.titulo}">', '--format', 'json'))
+        if anadido and anadido.get('id'):
+            self.ids_nuevos[el.clave] = anadido['id']
+        return self.ids_nuevos.get(el.clave)
 
     def crear_issue(self, el: Elemento) -> str | None:
         if self.gh.prueba:
@@ -670,17 +683,31 @@ class Destino:
             id_hijo = None
             if hijo is not None:
                 id_hijo = (self.gh.leer('api', f'repos/{self.repo}/issues/{hijo}', '--jq', '.id') or '').strip()
+            if not self.gh.prueba and (padre is None or not id_hijo):
+                print('    Aviso: falta el número del principal o el id del sub-issue; no se enlaza. '
+                      'Vuelve a ejecutar el script.')
+                continue
             self.gh.cambiar('api', '-X', 'POST', f'repos/{self.repo}/issues/{padre or "<N>"}/sub_issues',
                             '-F', f'sub_issue_id={id_hijo or "<id del issue>"}')
 
     def item_de(self, el: Elemento) -> dict | None:
         if el.tipo == 'borrador':
-            return next((i for i in self.estado.elementos
+            item = next((i for i in self.estado.elementos
                          if i['tipo'] == 'DRAFT_ISSUE' and marca_de(i['cuerpo']) == el.clave), None)
-        return next((i for i in self.estado.elementos if i['tipo'] == 'ISSUE'
-                     and (marca_de(i['cuerpo']) == el.clave
-                          or normalizar_titulo(i['titulo']) == normalizar_titulo(el.titulo))
-                     and (i['url'] or '').lower().startswith(f'https://github.com/{self.repo.lower()}/')), None)
+        else:
+            # Por la URL del issue, que es segura; si no se conoce, por su marca o su título.
+            url = self.urls.get(el.clave, '').lower()
+            item = next((i for i in self.estado.elementos
+                         if i['tipo'] == 'ISSUE' and url and (i['url'] or '').lower() == url), None)
+            if item is None:
+                item = next((i for i in self.estado.elementos if i['tipo'] == 'ISSUE'
+                             and (marca_de(i['cuerpo']) == el.clave
+                                  or normalizar_titulo(i['titulo']) == normalizar_titulo(el.titulo))
+                             and (i['url'] or '').lower().startswith(f'https://github.com/{self.repo.lower()}/')), None)
+        if item is None and el.clave in self.ids_nuevos:
+            # Recién añadido: GitHub puede tardar unos segundos en mostrarlo en el proyecto.
+            item = {'id': self.ids_nuevos[el.clave], 'valores': {}}
+        return item
 
     def poner_valores(self) -> None:
         print('  Fechas y bloque')
@@ -690,6 +717,13 @@ class Destino:
             if el.tipo == 'issue' and not self.crear_issues:
                 continue
             item = self.item_de(el)
+            if item is None and not self.gh.prueba and el.tipo == 'issue' and el.clave in self.urls:
+                id_nuevo = self.anadir_issue(el, self.urls[el.clave])
+                item = {'id': id_nuevo, 'valores': {}} if id_nuevo else None
+            if item is None and not self.gh.prueba:
+                print(f'    Aviso: no se encuentra en el proyecto "{el.titulo}"; no se le ponen fechas. '
+                      'Vuelve a ejecutar el script dentro de un rato.')
+                continue
             id_item = item['id'] if item else f'<elemento "{abreviar(el.titulo)}">'
             valores = item['valores'] if item else {}
             objetivos = [('planteamiento', el.tramo.planteamiento.isoformat()),
