@@ -90,8 +90,10 @@ class RA5_6_FormulariosTest extends TestCase
     {
         $this->assertTrue(class_exists('App\\Http\\Requests\\ProyectoRequest'), 'Falta el Form Request ProyectoRequest.');
 
-        $this->from('/proyectos/create')->post('/proyectos', []);
-        $this->assertSame('El nombre del proyecto es obligatorio.', session('errors')?->first('nombre'));
+        $this->from('/proyectos/create')->post('/proyectos', [])
+        ->assertSessionHasErrors([
+            'nombre' => 'El nombre del proyecto es obligatorio.',
+        ]);
     }
 
     public function test_edicion_valida_redirige_al_detalle(): void
