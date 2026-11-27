@@ -76,7 +76,7 @@ class RA5_5_ControladoresTest extends TestCase
             ->assertOk()
             ->assertViewIs('proyectos.edit')
             ->assertViewHas('proyecto', fn ($proyecto) => $proyecto['nombre'] === 'Ingeniería Civil')
-            ->assertSeeText('Ingeniería Civil');
+            ->assertSee('Ingeniería Civil');
     }
 
     public function test_un_proyecto_inexistente_da_404(): void
