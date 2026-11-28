@@ -160,18 +160,23 @@ class RA5_6_ValidacionTest extends TestCase
             ->assertSessionHasInput($conservado, $datos[$conservado]);
     }
 
-    /** Los campos obligatorios tienen su mensaje en español, y uno de ellos es exactamente el pedido. */
-    private function comprobarMensajes(string $recurso, array $obligatorios, array $datos, string $campo, string $mensaje): void
+    /** Uno de los mensajes es exactamente el pedido, y los campos obligatorios tienen su mensaje propio en messages(). */
+    private function comprobarMensajes(string $recurso, string $request, array $obligatorios, array $datos, string $campo, string $mensaje): void
     {
-        $this->from("/{$recurso}/create")->post("/{$recurso}", $datos);
-        $this->assertSame($mensaje, session('errors')?->first($campo), "El mensaje de error de {$campo} debe ser exactamente «{$mensaje}».");
+        // Los errores se leen con las aserciones de la respuesta, no con session('errors').
+        $this->from("/{$recurso}/create")
+            ->post("/{$recurso}", $datos)
+            ->assertSessionHasErrors([$campo => $mensaje]);
 
-        $this->from("/{$recurso}/create")->post("/{$recurso}", []);
+        $this->from("/{$recurso}/create")
+            ->post("/{$recurso}", [])
+            ->assertSessionHasErrors($obligatorios);
+
+        $clase = self::REQUESTS . $request;
+        $this->assertTrue(class_exists($clase), "Falta el Form Request {$request}: php artisan make:request {$request}.");
+        $mensajes = (new $clase())->messages();
         foreach ($obligatorios as $obligatorio) {
-            $texto = (string) session('errors')?->first($obligatorio);
-
-            $this->assertNotSame('', $texto, "El campo {$obligatorio} debe ser obligatorio (required).");
-            $this->assertStringNotContainsString('field is required', $texto, "Escribe en messages() el mensaje de {$obligatorio}.required en español, no «{$texto}».");
+            $this->assertArrayHasKey("{$obligatorio}.required", $mensajes, "Escribe en messages() de {$request} el mensaje de {$obligatorio}.required, en español.");
         }
     }
 
@@ -258,6 +263,7 @@ class RA5_6_ValidacionTest extends TestCase
     {
         $this->comprobarMensajes(
             'evidencias',
+            'EvidenciaRequest',
             array_keys(self::EVIDENCIA),
             ['url' => 'no es una url'] + self::EVIDENCIA,
             'url',
@@ -319,6 +325,7 @@ class RA5_6_ValidacionTest extends TestCase
     {
         $this->comprobarMensajes(
             'familias-profesionales',
+            'FamiliaProfesionalRequest',
             ['codigo', 'nombre'],
             ['codigo' => ''] + self::FAMILIA,
             'codigo',
@@ -387,6 +394,7 @@ class RA5_6_ValidacionTest extends TestCase
     {
         $this->comprobarMensajes(
             'ciclos-formativos',
+            'CicloFormativoRequest',
             ['codigo_familia', 'grado', 'codigo', 'nombre'],
             ['grado' => 'master'] + self::CICLO,
             'grado',
@@ -468,6 +476,7 @@ class RA5_6_ValidacionTest extends TestCase
     {
         $this->comprobarMensajes(
             'modulos-formativos',
+            'ModuloFormativoRequest',
             ['codigo_ciclo', 'nombre', 'codigo', 'horas_totales'],
             ['horas_totales' => 'muchas'] + self::MODULO,
             'horas_totales',
