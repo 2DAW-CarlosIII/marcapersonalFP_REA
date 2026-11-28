@@ -8,7 +8,8 @@ Herramientas para corregir automáticamente los _pull requests_ del alumnado y r
 |---|---|
 | [`correccion.yml`](./correccion.yml) | Flujo de _GitHub Actions_ que ejecuta los tests de cada _pull request_ |
 | [`recoger_notas.py`](./recoger_notas.py) | Script que reúne los resultados de uno o varios repositorios en dos CSV |
-| [`alumnos.example.csv`](./alumnos.example.csv) | Ejemplo de la relación entre usuarios de _GitHub_ y alumnos |
+| [`desempeno_github.py`](./desempeno_github.py) | Script que mide la aportación de cada alumno al repositorio de su grupo, a partir del registro de auditoría de la organización |
+| [`alumnos.example.csv`](./alumnos.example.csv) | Ejemplo de la relación entre usuarios de _GitHub_, alumnos y grupos, que usan los dos _scripts_ |
 
 ## Qué hace el flujo
 
@@ -76,7 +77,7 @@ En el _ePortfolio_ hay un riesgo más: el alumnado **fusiona** los _pull request
 
 ## Recoger las notas
 
-Necesitas _GitHub CLI_ (`gh`) en la máquina virtual, identificado con tu cuenta ([§12 de la preparación del entorno](../../00_instalacionEntorno.md#12-github-cli-gh)). Copia `alumnos.example.csv` como `alumnos.csv` y complétalo con el usuario de _GitHub_ y el nombre de cada alumno. Después, con los cinco repositorios a la vez:
+Necesitas _GitHub CLI_ (`gh`) en la máquina virtual, identificado con tu cuenta ([§12 de la preparación del entorno](../../00_instalacionEntorno.md#12-github-cli-gh)). Copia `alumnos.example.csv` como `alumnos.csv` y complétalo con el usuario de _GitHub_, el nombre y el grupo de cada alumno. `recoger_notas.py` no usa el grupo, pero `desempeno_github.py` sí. Después, con los cinco repositorios a la vez:
 
 ```bash
 python3 recoger_notas.py --alumnos alumnos.csv 2DAW-CarlosIII/eportfolio_g{1..5}
@@ -108,3 +109,58 @@ El aviso de que su `correccion.yml` no coincide con el de esta carpeta es normal
 ### Los _pull requests_, después de corregirlos
 
 En el _ePortfolio_, **el grupo decide qué se fusiona**: de cada _issue_ fusiona un _pull request_ y cierra los demás (en los _sub-issues_, se fusionan todos). Ni fusionar ni cerrar un _pull request_ borra su artefacto, así que el script lo sigue encontrando. Antes de recoger las notas, comprueba que la ejecución del último _commit_ de cada _pull request_ ha terminado (una marca verde o roja junto a él).
+
+## Medir el desempeño de cada alumno
+
+Los tests dicen si el código de un _pull request_ cumple el _issue_. No dicen quién ha trabajado en el grupo. [`desempeno_github.py`](./desempeno_github.py) lo estima a partir del **registro de auditoría** de la organización: los _pull requests_ que cada alumno crea, revisa e integra, sus comentarios de revisión y sus _pushes_.
+
+### Ejecutarlo
+
+1. Exporta el registro, en formato JSON, desde `https://github.com/organizations/2DAW-CarlosIII/settings/audit-log`. Hace falta ser propietario de la organización.
+2. Usa el mismo `alumnos.csv` que con `recoger_notas.py`, con la columna `grupo` rellena, y el `notas_detalle.csv` que genera ese _script_. Sin él, la nota es solo de actividad.
+3. Ejecuta el _script_ desde esta carpeta:
+
+    ```bash
+    python3 desempeno_github.py export-audit-log.json \
+        --estudiantes alumnos.csv \
+        --planificacion ../planificacion/planificacion.toml \
+        --tests notas_detalle.csv \
+        --exclude tu-usuario-de-github
+    ```
+
+Necesita Python 3.11 o posterior y `matplotlib` (`pip install matplotlib`). Toma las tareas y sus fechas de `planificacion.toml`, con las funciones de `planificar_eportfolio.py`, así que coinciden con las de los proyectos de _GitHub_.
+
+### Cómo puntúa
+
+1. **Puntos.** Cada evento suma puntos a quien lo hace: crear un _pull request_ (3), que se integre uno suyo (3), una revisión (2), un comentario de revisión (1), un _merge_ (1), un _push_ (0,5)… Los puntos se cambian con `--pesos-eventos`.
+2. **La tarea.** Cada _pull request_ se asigna a una tarea por el código `RA5_x` de su título y, si no lo tiene, por su fecha de creación.
+3. **La nota de actividad** de una tarea es la parte de los puntos del grupo que ha hecho el alumno, multiplicada por el número de miembros: quien aporta su parte proporcional, o más, saca un 10.
+4. **Las notas de los tests.** Con `--tests`, la nota de cada tarea combina las dos: `--peso-tests` (0,6 por defecto) para los tests y el resto para la actividad.
+5. **La nota final** es la media de las tareas, ponderada por sus horas.
+
+Es una estimación, no una calificación automática: revisa `eventos_atribuidos.csv` antes de usarla.
+
+### Opciones
+
+| Opción | Para qué |
+|---|---|
+| `--tests notas_detalle.csv` | Las notas de los tests de cada _pull request_: el `notas_detalle.csv` de `recoger_notas.py`, tal cual. De cada _pull request_ cuenta su propio test (`tipo` igual a `ejercicio`) y, si se corrigió varias veces, la corrección más reciente. También admite un CSV propio con las columnas `pull_request_url` (o `repo` y `numero`) y `nota` |
+| `--peso-tests 0.6` | El peso de los tests en la nota de cada tarea, entre 0 y 1 |
+| `--from` y `--to` | El periodo, en formato `AAAA-MM-DD`, por ejemplo una evaluación |
+| `--exclude` | Las cuentas que no se cuentan, como la del profesorado (separadas por comas o repitiendo la opción) |
+| `--commits` | Cuenta también los _commits_ de cada _pull request_, consultando la API de _GitHub_ con el _token_ de `gh auth token` o de `--token` |
+| `--pesos-eventos pesos.toml` | Otros puntos por tipo de evento (por ejemplo, `revision = 3`) |
+| `--repos` | La expresión regular de los repositorios de grupo. Si cambian sus nombres, se cambia aquí |
+| `--salida carpeta` | Dónde se guardan los resultados (por defecto, `informe_desempeno/`) |
+| `--csv-sep` | `;` con coma decimal, para _Excel_ en español (por defecto), o `,` |
+
+### Resultados
+
+| Fichero | Contenido |
+|---|---|
+| `desempeno_estudiantes.csv` | Una fila por alumno: cuántos eventos de cada tipo, su parte del grupo, la nota de cada tarea y la final |
+| `desempeno_por_tarea.csv` | Una fila por alumno y tarea, con sus puntos, los del grupo y sus notas |
+| `eventos_atribuidos.csv` | Cada evento contado: a quién, qué tarea y cuántos puntos. Sirve para revisar la nota |
+| `informe.html` | El informe, en un único fichero: notas, aportaciones por tipo, notas por tarea y actividad diaria de cada grupo |
+
+El registro exportado y los resultados contienen datos personales: guárdalos fuera del repositorio.

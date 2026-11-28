@@ -1,0 +1,7 @@
+# Datos del alumnado y resultados de los scripts: se guardan fuera del repositorio.
+alumnos.csv
+notas_detalle.csv
+notas_resumen.csv
+informe_desempeno/
+export-*.json
+export-*.json.gz

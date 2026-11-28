@@ -150,7 +150,44 @@ Cada PR es revisable y reversible por separado. Los alumnos usan la rama estable
 
 ---
 
-## 7. Mejoras futuras
+## 7. Evaluación
+
+Desde el curso 2026/27, la evaluación de los ejercicios del _ePortfolio_ se apoya en cuatro herramientas. Están en `materiales/` para reutilizarlas y mejorarlas en cursos posteriores:
+
+| Herramienta | Qué hace | Lee | Genera |
+|---|---|---|---|
+| [`planificacion/planificar_eportfolio.py`](./materiales/planificacion/README.md) | Crea en cada repositorio de grupo los _issues_ y un proyecto de _GitHub_ con la fecha de planteamiento y la fecha límite de cada ejercicio | [`planificacion.toml`](./materiales/planificacion/planificacion.toml) (calendario, horas y _issues_) y los `.md` de [`ejercicios-laravel/issues/`](./materiales/ejercicios-laravel/issues/) | Los _issues_, sus _sub-issues_ y los proyectos |
+| [`correccion/correccion.yml`](./materiales/correccion/README.md) | Flujo de _GitHub Actions_ que ejecuta los tests oficiales del REA en cada _pull request_, según el nombre de su rama | Los tests de `TESTS_EPORTFOLIO` | Un artefacto por ejecución, con los resultados en JUnit, durante 90 días |
+| [`correccion/recoger_notas.py`](./materiales/correccion/README.md#recoger-las-notas) | Reúne los artefactos de los repositorios de los grupos | La relación de alumnos y los artefactos | `notas_detalle.csv` y `notas_resumen.csv`: la nota de los tests de cada ejercicio |
+| [`correccion/desempeno_github.py`](./materiales/correccion/README.md#medir-el-desempeño-de-cada-alumno) | Mide la aportación de cada alumno al repositorio de su grupo: _pull requests_, revisiones, _merges_… y, con las notas de los tests, calcula una nota por tarea | La exportación del registro de auditoría de la organización, la relación de alumnos con su grupo, `planificacion.toml` y, opcionalmente, el `notas_detalle.csv` de `recoger_notas.py` | Tres CSV y un informe HTML con gráficos |
+
+**A lo largo del curso:**
+
+1. **Antes de plantear un apartado**, se redacta su _issue_, se anota en `planificacion.toml` y se ejecuta `planificar_eportfolio.py`.
+2. **Mientras se resuelve**, el flujo corrige cada _pull request_, y el alumnado ve el resultado en la pestaña **Checks**.
+3. **Al terminar cada apartado**, y siempre antes de que caduquen los artefactos, se ejecuta `recoger_notas.py`.
+4. **Al cerrar un bloque o una evaluación**, se exporta el registro de auditoría y se ejecuta `desempeno_github.py`. Calcula la nota de cada tarea a partir de dos notas:
+    - la de **actividad**: la parte del trabajo del grupo que ha hecho cada alumno;
+    - la de **tests**: la media de sus _pull requests_.
+
+    Su nota final es la media de las tareas, ponderada por sus horas. Antes de usarla, se revisa `eventos_atribuidos.csv`: es una estimación a partir de la actividad, no una calificación automática.
+
+**Al empezar un curso nuevo:**
+
+- En `planificacion.toml`:
+    - el calendario (`inicio`, `fin_curso`, `horas_por_dia` y `no_lectivos`);
+    - los destinos: el repositorio de referencia y los de los grupos;
+    - las fechas reales de planteamiento, a medida que se imparte.
+- **Los repositorios de los grupos:**
+    - se copia `correccion.yml` a `.github/workflows/` de cada uno;
+    - si sus nombres cambian, se actualiza el patrón `--repos` de `desempeno_github.py`.
+- **La relación de alumnos.** Es un CSV con el usuario de _GitHub_, el nombre y el grupo de cada alumno. La relación, las exportaciones del registro de auditoría y los CSV y el informe que generan los _scripts_ contienen datos personales: se guardan fuera del repositorio.
+
+Las ideas para mejorar estas herramientas se anotan en §8.
+
+---
+
+## 8. Mejoras futuras
 
 Ideas detectadas durante el desarrollo que no se abordan ahora. Al resolver una, se borra de la lista y se indica en el mensaje del commit.
 
